@@ -1,0 +1,3029 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>გარდაბნის მობილური აკადემია</title>
+  
+  <!-- Immediate Theme Initializer to prevent white flash -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
+  <!-- Leaflet CSS with CDN and fallback -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM: PURE BLACK NIGHT MODE & CLEAN DAY MODE
+       ========================================================================== */
+    :root {
+      --primary-hub: #dc2626;         /* Hub Red / Crimson */
+      --primary-hub-glow: rgba(220, 38, 38, 0.35);
+      --primary-village: #2563eb;     /* Village Royal Blue */
+      --primary-village-glow: rgba(37, 99, 235, 0.25);
+      --accent-gardabani: #4f46e5;    /* Gardabani Boundary Indigo */
+      --accent-cyan: #0284c7;
+      
+      /* Light Mode (default) */
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f8fafc;
+      --bg-hover: #f1f5f9;
+      --bg-input: #f8fafc;
+      --bg-nav: #f1f5f9;
+      
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      
+      --border-light: #e2e8f0;
+      --border-focus: #94a3b8;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+      --shadow-popup: 0 20px 25px -5px rgba(0, 0, 0, 0.22), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+      
+      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    }
+
+    /* Night Mode Theme Variables (TRUE PURE BLACK - NO BLUE TINT) */
+    [data-theme="dark"] {
+      --bg-page: #000000;         /* True Pure Black */
+      --bg-card: #0a0a0a;         /* Deep neutral black card */
+      --bg-card-subtle: #141414;  /* Slightly lighter card element */
+      --bg-hover: #1c1c1c;        /* Neutral dark hover */
+      --bg-input: #121212;        /* Dark input field */
+      --bg-nav: #0e0e0e;          /* Navigation pill background */
+      
+      --text-main: #f5f5f5;       /* Crisp clean white text */
+      --text-muted: #a3a3a3;      /* Clean neutral gray text */
+      --text-subtle: #737373;     /* Muted neutral gray */
+      
+      --border-light: #262626;    /* Dark neutral border, no blue tint */
+      --border-focus: #3b82f6;    /* Focus outline */
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.8);
+      --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.9);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
+      --shadow-popup: 0 20px 30px rgba(0, 0, 0, 0.95);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    /* Compact Container */
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 10px 18px 16px;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Fullscreen Mode */
+    body.fullscreen-mode {
+      overflow: hidden;
+    }
+    body.fullscreen-mode .app-container {
+      max-width: 100%;
+      height: 100vh;
+      padding: 0;
+      gap: 0;
+    }
+    body.fullscreen-mode header.header,
+    body.fullscreen-mode .controls-stats-bar {
+      display: none;
+    }
+    body.fullscreen-mode .map-panel {
+      border-radius: 0;
+      border: none;
+      height: 100vh;
+      max-height: 100vh;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header.header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 10px 18px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: inline-flex;
+      background: var(--bg-nav);
+      padding: 3px;
+      border-radius: var(--radius-full);
+      gap: 3px;
+      border: 1px solid var(--border-light);
+      transition: background-color 0.25s ease;
+    }
+
+    .nav-tab {
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.80rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
+    }
+
+    .nav-tab.active {
+      background: var(--bg-card);
+      color: #2563eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] .nav-tab.active {
+      color: #60a5fa;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Standard Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.80rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      background: var(--bg-card);
+      border-color: var(--border-light);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-focus);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-gardabani {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1e40af;
+    }
+
+    .btn-gardabani:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+
+    [data-theme="dark"] .btn-gardabani {
+      background: #172554;
+      border-color: #1e40af;
+      color: #93c5fd;
+    }
+
+    [data-theme="dark"] .btn-gardabani:hover {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      background: var(--bg-nav);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.80rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-focus);
+    }
+
+    /* Admin Badge & Controls (Hidden for regular users) */
+    .admin-indicator {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .admin-indicator:hover {
+      background: #d1fae5;
+    }
+
+    [data-theme="dark"] .admin-indicator {
+      background: #064e3b;
+      color: #a7f3d0;
+      border-color: #047857;
+    }
+
+    .admin-controls-group {
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* TOP BAR: CLEAN MAP TYPE & ACTIONS BAR */
+    .controls-stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .map-type-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .options-group-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .layer-pills {
+      display: inline-flex;
+      background: var(--bg-nav);
+      padding: 2px;
+      border-radius: var(--radius-full);
+      gap: 2px;
+      border: 1px solid var(--border-light);
+    }
+
+    .layer-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .layer-btn:hover {
+      color: var(--text-main);
+    }
+
+    .layer-btn.active {
+      background: var(--bg-card);
+      color: #2563eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] .layer-btn.active {
+      color: #60a5fa;
+    }
+
+    /* MAP CONTAINER (Strictly bounded viewport height) */
+    .map-panel {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 130px);
+      min-height: 530px;
+      max-height: 840px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      background: var(--bg-page);
+      z-index: 1;
+    }
+
+    /* Night mode map styling for Google tiles */
+    [data-theme="dark"] #map {
+      background: #000000 !important;
+    }
+    
+    [data-theme="dark"] #map.dark-tiles .leaflet-tile-pane {
+      filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(95%);
+    }
+
+    [data-theme="dark"] #map.dark-tiles .leaflet-tile-container {
+      background: #000000 !important;
+    }
+
+    /* ==========================================================================
+       PROMINENT FLOATING DRAWER TRIGGER BUTTON (TOP-LEFT OF MAP)
+       ========================================================================== */
+    .map-floating-left {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 1020;
+      pointer-events: auto;
+    }
+
+    .drawer-trigger-btn {
+      background: var(--bg-card);
+      border: 2px solid #2563eb;
+      color: var(--text-main);
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .drawer-trigger-btn:hover {
+      background: #2563eb;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .drawer-trigger-btn:hover .trigger-badge {
+      background: #ffffff;
+      color: #2563eb;
+      border-color: #ffffff;
+    }
+
+    [data-theme="dark"] .drawer-trigger-btn {
+      background: #0a0a0a;
+      border-color: #3b82f6;
+      color: #f5f5f5;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85);
+    }
+
+    [data-theme="dark"] .drawer-trigger-btn:hover {
+      background: #3b82f6;
+      color: #000000;
+      box-shadow: 0 6px 22px rgba(59, 130, 246, 0.5);
+    }
+
+    .trigger-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+      color: #2563eb;
+      transition: color 0.15s ease;
+    }
+
+    .drawer-trigger-btn:hover .trigger-icon {
+      color: inherit;
+    }
+
+    [data-theme="dark"] .trigger-icon {
+      color: #60a5fa;
+    }
+
+    .trigger-badge {
+      background: #eff6ff;
+      color: #1e40af;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 800;
+      border: 1px solid #bfdbfe;
+      transition: all 0.15s ease;
+    }
+
+    [data-theme="dark"] .trigger-badge {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    /* Floating quick controls right */
+    .map-floating-right {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: auto;
+    }
+
+    .map-ctrl-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 6px 11px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .map-ctrl-btn:hover {
+      background: var(--bg-hover);
+      color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .map-ctrl-btn {
+      background: rgba(10, 10, 10, 0.92);
+      border-color: #262626;
+      color: #ffffff;
+    }
+
+    [data-theme="dark"] .map-ctrl-btn:hover {
+      background: #1f1f1f;
+      color: #60a5fa;
+    }
+
+    /* ==========================================================================
+       OFF-CANVAS SLIDE-OUT DRAWER (ZERO SCROLL OVERFLOW, MAP HEIGHT BOUNDED)
+       ========================================================================== */
+    .drawer-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 1040;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar-drawer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 380px;
+      max-width: 90%;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border-light);
+      box-shadow: 10px 0 35px rgba(0, 0, 0, 0.3);
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-height: 100%;
+      transform: translateX(-100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .sidebar-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+
+    .drawer-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .drawer-close-btn {
+      background: var(--bg-nav);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.90rem;
+      font-weight: 800;
+      transition: all 0.15s ease;
+    }
+
+    .drawer-close-btn:hover {
+      background: #fee2e2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    [data-theme="dark"] .drawer-close-btn:hover {
+      background: #350808;
+      border-color: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .drawer-search-wrap {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-card-subtle);
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.80rem;
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 7px 10px 7px 28px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      font-family: inherit;
+      font-size: 0.78rem;
+      color: var(--text-main);
+      background: var(--bg-input);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      background: var(--bg-card);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    /* INTERNAL SCROLL ONLY - STRICTLY PREVENTS PAGE SCROLLING */
+    .locations-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      flex: 1;
+      padding: 12px 14px;
+      margin: 0;
+    }
+
+    .locations-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .locations-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    [data-theme="dark"] .locations-list::-webkit-scrollbar-thumb {
+      background: #262626;
+    }
+
+    .loc-card-item {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 9px 11px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .loc-card-item:hover {
+      border-color: #93c5fd;
+      background: var(--bg-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .loc-card-item.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    [data-theme="dark"] .loc-card-item.active {
+      border-color: #3b82f6;
+      background: #171717;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    .loc-card-item.hub-item {
+      border-left: 3.5px solid var(--primary-hub);
+    }
+
+    .loc-card-item.village-item {
+      border-left: 3.5px solid var(--primary-village);
+    }
+
+    .loc-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .loc-item-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .type-badge {
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .type-badge.hub {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    [data-theme="dark"] .type-badge.hub {
+      background: #350808;
+      color: #fca5a5;
+      border-color: #7f1d1d;
+    }
+
+    .type-badge.village {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    [data-theme="dark"] .type-badge.village {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    .loc-item-act {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Date badge in list */
+    .loc-item-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.70rem;
+      color: #2563eb;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    [data-theme="dark"] .loc-item-date {
+      color: #60a5fa;
+    }
+
+    .loc-item-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 3px;
+      font-size: 0.68rem;
+      color: var(--text-subtle);
+    }
+
+    .loc-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .loc-action-btn {
+      background: transparent;
+      border: 1px solid var(--border-light);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .loc-action-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    /* LEAFLET CUSTOM MARKER STYLES */
+    .custom-marker-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      border: 2px solid #ffffff;
+      transition: all 0.2s ease;
+    }
+
+    .custom-marker-pin.hub {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .custom-marker-pin.village {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .custom-marker-pin span {
+      transform: rotate(45deg);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.75rem;
+    }
+
+    .custom-marker-pin:hover {
+      transform: rotate(-45deg) scale(1.15);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+    }
+
+    /* POPUP STYLES */
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--radius-lg);
+      padding: 0;
+      box-shadow: var(--shadow-popup);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+      width: 310px !important;
+      line-height: 1.4;
+    }
+
+    .popup-card {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg-card);
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 6px;
+    }
+
+    .popup-title {
+      font-size: 0.90rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .popup-distance {
+      font-size: 0.70rem;
+      color: #2563eb;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    [data-theme="dark"] .popup-distance {
+      color: #60a5fa;
+    }
+
+    .popup-date-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 800;
+      width: fit-content;
+      border: 1px solid #bfdbfe;
+    }
+
+    [data-theme="dark"] .popup-date-row {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    .popup-act-title {
+      font-size: 0.80rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .popup-act-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .popup-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      border-top: 1px dashed var(--border-light);
+      padding-top: 6px;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-window {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-popup);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .form-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-textarea {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 6px 9px;
+      font-family: inherit;
+      font-size: 0.80rem;
+      background: var(--bg-input);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-card-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* TOAST */
+    .toast-msg {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.80rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 3000;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .toast-msg {
+      background: #141414;
+      color: #ffffff;
+      border: 1px solid #262626;
+    }
+
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Stealth Admin Modal */
+    .stealth-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: stealthFadeIn 0.2s ease-out;
+    }
+    @keyframes stealthFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .stealth-modal-window {
+      background: var(--bg-card);
+      border: 1px solid #2563eb;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(37, 99, 235, 0.3);
+      overflow: hidden;
+      animation: stealthSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] .stealth-modal-window {
+      background: #0a0a0a;
+      border-color: #3b82f6;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 25px rgba(59, 130, 246, 0.25);
+    }
+    @keyframes stealthSlideUp {
+      from { transform: translateY(20px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .stealth-modal-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stealth-header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stealth-shield-icon {
+      font-size: 1.5rem;
+    }
+    .stealth-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+    .stealth-badge {
+      display: block;
+      font-size: 0.70rem;
+      color: #3b82f6;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .stealth-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-subtle);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .stealth-close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+    .stealth-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .stealth-desc {
+      font-size: 0.82rem;
+      color: var(--text-subtle);
+      line-height: 1.45;
+      margin: 0;
+    }
+    .stealth-lockout-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ef4444;
+    }
+    .lockout-icon {
+      font-size: 1.6rem;
+    }
+    .lockout-heading {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #f87171;
+    }
+    .lockout-sub {
+      font-size: 0.80rem;
+      font-family: monospace;
+      font-weight: 700;
+      margin-top: 2px;
+      color: #ef4444;
+    }
+    .stealth-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .stealth-input-wrapper .form-input {
+      width: 100%;
+      padding-right: 40px;
+      box-sizing: border-box;
+    }
+    .stealth-toggle-pw {
+      position: absolute;
+      right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 1rem;
+      opacity: 0.7;
+      color: var(--text-main);
+    }
+    .stealth-toggle-pw:hover {
+      opacity: 1;
+    }
+    .stealth-attempts-info {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .stealth-error-alert {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.80rem;
+      margin-top: 6px;
+      font-weight: 600;
+      animation: shake 0.35s ease;
+    }
+    .stealth-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .btn-indicator-logout {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #ef4444;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      cursor: pointer;
+      margin-left: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-indicator-logout:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="header-title" id="header-brand-title" style="cursor:pointer;" title="გარდაბნის მობილური აკადემია">
+          <span class="header-logo" id="header-logo">🚐</span>
+          <span>გარდაბნის მობილური აკადემია</span>
+        </h1>
+        <nav class="nav-tabs">
+          <a href="index.html" class="nav-tab active">მთავარი გვერდი</a>
+          <a href="calendar.html" class="nav-tab">კალენდარი</a>
+          <a href="mentors.html" class="nav-tab">მენტორები</a>
+          <a href="settings.html" class="nav-tab">პარამეტრები</a>
+        </nav>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Admin Indicator (shown when admin mode is on) -->
+        <div class="admin-indicator" id="admin-indicator" style="display:none;" title="ადმინისტრატორის სესია აქტიურია">
+          <span>🛡️ ადმინი</span>
+          <button type="button" class="btn-indicator-logout" id="btn-header-logout" title="სესიის დასრულება">✕ გამოსვლა</button>
+        </div>
+
+        <!-- Admin Only Buttons (hidden for normal users) -->
+        <div class="admin-controls-group" id="admin-controls">
+          <button class="btn btn-primary" id="btn-add-location">
+            <span>➕</span> ახალი ლოკაცია
+          </button>
+          <button class="btn btn-outline" id="btn-open-editor">
+            <span>✏️</span> რედაქტორი
+          </button>
+        </div>
+
+        <!-- Day / Night Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
+          <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- TOP BAR: MAP TYPE SELECTOR & QUICK ACTIONS -->
+    <section class="controls-stats-bar">
+      <!-- Map Type Selector (relocated to where layers were) -->
+      <div class="map-type-bar">
+        <span class="options-group-title">🗺️ რუკის ტიპი:</span>
+        <div class="layer-pills" id="layer-selector">
+          <button class="layer-btn active" data-layer="roadmap">
+            <span>🗺️</span> საგზაო
+          </button>
+          <button class="layer-btn" data-layer="satellite">
+            <span>🛰️</span> სატელიტი
+          </button>
+          <button class="layer-btn" data-layer="terrain">
+            <span>🏔️</span> რელიეფი
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-gardabani" id="btn-fit-boundary" title="გარდაბნის საზღვარზე ფოკუსი">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+        გარდაბანზე ფოკუსი
+      </button>
+    </section>
+
+    <!-- MAP PANEL (Holds Leaflet Map, Floating Drawer Trigger & Off-Canvas Drawer) -->
+    <main class="map-panel">
+
+      <!-- PROMINENT FLOATING DRAWER TRIGGER BUTTON (TOP-LEFT OF MAP) -->
+      <div class="map-floating-left">
+        <button class="drawer-trigger-btn" id="drawer-trigger-btn" title="აქტივობების სიის გამოწევა">
+          <span class="trigger-icon">☰</span>
+          <span>აქტივობები</span>
+          <span class="trigger-badge" id="drawer-badge">7 აქტივობა</span>
+        </button>
+      </div>
+
+      <!-- Drawer Backdrop -->
+      <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+      <!-- Off-Canvas Slide-Out Locations Drawer -->
+      <aside class="sidebar-drawer" id="sidebar-drawer">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+          <div class="drawer-title-group">
+            <h2 class="drawer-title">🎯 აქტივობები</h2>
+            <span class="type-badge village" id="list-count-badge">7 აქტივობა</span>
+          </div>
+          <button class="drawer-close-btn" id="drawer-close-btn" title="დახურვა">✕</button>
+        </div>
+
+        <!-- Search box inside drawer -->
+        <div class="drawer-search-wrap">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search-input" placeholder="მოძებნეთ სოფელი ან აქტივობა...">
+          </div>
+        </div>
+
+        <!-- Scrollable Locations List (Strictly internal scroll) -->
+        <ul class="locations-list" id="locations-list">
+          <!-- Dynamically populated -->
+        </ul>
+      </aside>
+
+      <!-- Floating quick controls right -->
+      <div class="map-floating-right">
+        <button class="map-ctrl-btn" id="btn-recenter" title="გარდაბანზე დაბრუნება">
+          <span>🎯</span> ცენტრირება
+        </button>
+        <button class="map-ctrl-btn" id="btn-fullscreen" title="მთელ ეკრანზე გაშლა">
+          <span id="fs-icon">⛶</span> ეკრანი
+        </button>
+      </div>
+
+      <!-- The Leaflet map element (Default open view) -->
+      <div id="map"></div>
+
+    </main>
+
+  </div>
+
+  <!-- IN-BROWSER LIVE EDIT / ADD MODAL (ADMIN ONLY) -->
+  <div class="modal-backdrop" id="edit-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>✏️</span> ლოკაციების მართვა და რედაქტორი</h3>
+        <button class="btn btn-outline" id="modal-close" style="padding:3px 7px;">✕</button>
+      </div>
+      <div class="modal-body" id="modal-form-container">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btn-copy-config">📋 JSON კოდის კოპირება</button>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-outline" id="btn-reset-config">საწყისზე დაბრუნება</button>
+          <button class="btn btn-primary" id="btn-save-config">შენახვა და განახლება</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- STEALTH ADMIN ACCESS MODAL (TRIGGERED ONLY BY CTRL+SHIFT+A+L OR 5 CLICKS ON LOGO) -->
+  <div class="stealth-modal-backdrop" id="stealth-admin-modal" style="display:none;">
+    <div class="stealth-modal-window">
+      <div class="stealth-modal-header">
+        <div class="stealth-header-title">
+          <span class="stealth-shield-icon">🛡️</span>
+          <div>
+            <h3 class="stealth-title">ადმინისტრატორის დაცული წვდომა</h3>
+            <span class="stealth-badge" id="stealth-security-badge">SHA-256 დაცული • Rate-Limited</span>
+          </div>
+        </div>
+        <button class="stealth-close-btn" id="stealth-close-btn" title="დახურვა">✕</button>
+      </div>
+
+      <div class="stealth-modal-body">
+        <p class="stealth-desc" id="stealth-desc-text">
+          შეიყვანეთ ადმინისტრატორის საიდუმლო კოდი. კოდი მოწმდება კლიენტის კრიპტოგრაფიული ჰეშით. 3 არასწორი მცდელობის შემდეგ სისტემა დროებით დაიბლოკება.
+        </p>
+
+        <!-- Lockout Banner (shown during lockout) -->
+        <div class="stealth-lockout-box" id="stealth-lockout-box" style="display:none;">
+          <div class="lockout-icon">🔒</div>
+          <div class="lockout-info">
+            <div class="lockout-heading">სისტემა დროებით დაბლოკილია!</div>
+            <div class="lockout-sub" id="stealth-lockout-timer">დარჩენილი დრო: 05:00</div>
+          </div>
+        </div>
+
+        <!-- Optional Email Input (visible in Supabase mode) -->
+        <div class="stealth-input-group" id="stealth-email-group" style="display:none; margin-bottom:12px;">
+          <label class="form-label" for="stealth-email-input">ადმინისტრატორის ელ-ფოსტა</label>
+          <div class="stealth-input-wrapper">
+            <input type="email" class="form-input" id="stealth-email-input" placeholder="admin@gardabani.ge" autocomplete="username">
+          </div>
+        </div>
+
+        <!-- Input Row -->
+        <div class="stealth-input-group" id="stealth-input-group">
+          <label class="form-label" for="stealth-pass-input" id="stealth-pass-label">ადმინისტრატორის კოდი</label>
+          <div class="stealth-input-wrapper">
+            <input type="password" class="form-input" id="stealth-pass-input" placeholder="შეიყვანეთ კოდი..." autocomplete="current-password">
+            <button class="stealth-toggle-pw" id="stealth-toggle-pw" type="button" title="პაროლის ჩვენება/დამალვა">👁️</button>
+          </div>
+          <div class="stealth-attempts-info" id="stealth-attempts-info">
+            დარჩენილია 3 მცდელობა
+          </div>
+          <div class="stealth-error-alert" id="stealth-error-alert" style="display:none;"></div>
+        </div>
+
+        <div class="stealth-modal-footer">
+          <button class="btn btn-outline" id="stealth-cancel-btn">გაუქმება</button>
+          <button class="btn btn-primary" id="stealth-submit-btn">
+            <span>🔑</span> შესვლა
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast notification -->
+  <div class="toast-msg" id="toast">შეტყობინება</div>
+
+  <!-- Supabase JS Client & Project Configuration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase_config.js"></script>
+
+  <!-- Leaflet JS with unpkg primary and cdnjs fallback -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';"></script>
+
+  <script>
+    // ==========================================================================
+    // GARDABANI MUNICIPALITY OFFICIAL BOUNDARY (GeoJSON)
+    // ==========================================================================
+    const GARDABANI_BOUNDARY = {"type":"Polygon","coordinates":[[[44.73034,41.6383],[44.74124,41.63146],[44.75433,41.62173],[44.76342,41.60815],[44.77454,41.6028],[44.77865,41.59687],[44.78242,41.59356],[44.79358,41.58497],[44.79858,41.58062],[44.80834,41.5706],[44.83102,41.55556],[44.82523,41.538],[44.85802,41.54855],[44.88629,41.55577],[44.89127,41.55628],[44.89294,41.55642],[44.89576,41.55667],[44.89512,41.5646],[44.89392,41.57698],[44.8909,41.58458],[44.90035,41.58684],[44.90555,41.58495],[44.90716,41.58555],[44.91144,41.58471],[44.91343,41.58397],[44.91659,41.58441],[44.91913,41.58542],[44.9213,41.58538],[44.92271,41.58474],[44.92367,41.58204],[44.92409,41.57974],[44.92526,41.57689],[44.92736,41.57471],[44.93233,41.57607],[44.93271,41.57729],[44.9319,41.58042],[44.9298,41.58272],[44.93035,41.58779],[44.93368,41.5893],[44.94371,41.59406],[44.94067,41.6003],[44.94197,41.60066],[44.94417,41.60047],[44.94613,41.6],[44.94878,41.60117],[44.95064,41.60022],[44.95578,41.5961],[44.96205,41.59424],[44.97044,41.59133],[44.97193,41.58747],[44.97911,41.58432],[44.98724,41.58366],[44.99524,41.58079],[45.00136,41.58143],[45.00518,41.57991],[45.00626,41.57736],[45.01085,41.57674],[45.01102,41.57756],[45.01485,41.57957],[45.01718,41.57998],[45.01911,41.57648],[45.01627,41.57554],[45.0163,41.57485],[45.01828,41.57449],[45.0196,41.57352],[45.0192,41.56911],[45.02811,41.57023],[45.03299,41.57046],[45.03401,41.57054],[45.03645,41.57012],[45.03808,41.5688],[45.03915,41.56792],[45.04106,41.56661],[45.04528,41.56191],[45.04551,41.55516],[45.05714,41.54259],[45.07245,41.53631],[45.07924,41.52076],[45.08183,41.51919],[45.0788,41.51016],[45.07097,41.51494],[45.06618,41.51618],[45.06255,41.51658],[45.05924,41.51653],[45.05749,41.5154],[45.05585,41.51202],[45.05587,41.51154],[45.05481,41.5115],[45.04993,41.50944],[45.04563,41.50931],[45.04165,41.51047],[45.04273,41.50708],[45.03533,41.49605],[45.03546,41.4931],[45.03229,41.49243],[45.03081,41.49165],[45.02786,41.49225],[45.02764,41.49497],[45.02561,41.49679],[45.0248,41.49692],[45.02273,41.49558],[45.02332,41.48194],[45.01372,41.47311],[45.01051,41.45385],[45.02011,41.44341],[45.03557,41.43498],[45.04382,41.41451],[45.04221,41.39646],[45.05719,41.37431],[45.07399,41.36528],[45.08298,41.36192],[45.07915,41.35809],[45.08498,41.35084],[45.09697,41.34368],[45.10653,41.3521],[45.11319,41.3578],[45.12311,41.3677],[45.13557,41.37881],[45.1726,41.41266],[45.17308,41.41647],[45.17223,41.41743],[45.17203,41.41832],[45.1719,41.4194],[45.17254,41.42012],[45.17345,41.42049],[45.17371,41.42145],[45.17405,41.42223],[45.17463,41.42267],[45.17801,41.4238],[45.18022,41.42264],[45.18098,41.42225],[45.18159,41.42188],[45.18419,41.42127],[45.18746,41.4197],[45.19011,41.41845],[45.19385,41.41723],[45.19638,41.41676],[45.23283,41.43577],[45.24907,41.44632],[45.25199,41.45191],[45.25735,41.4612],[45.27892,41.46413],[45.29523,41.46614],[45.30784,41.47408],[45.3038,41.48329],[45.29049,41.48823],[45.28539,41.49251],[45.28317,41.49378],[45.28132,41.49482],[45.28063,41.4956],[45.27798,41.49672],[45.27436,41.49697],[45.27398,41.49794],[45.27082,41.49744],[45.26888,41.49833],[45.26801,41.49883],[45.26807,41.49824],[45.26556,41.49885],[45.25502,41.50461],[45.24678,41.50763],[45.24185,41.50938],[45.23625,41.51314],[45.22606,41.51422],[45.21971,41.51558],[45.21768,41.51508],[45.21662,41.517],[45.21444,41.51703],[45.20993,41.51662],[45.21305,41.51985],[45.2179,41.52395],[45.15135,41.54823],[45.12935,41.55455],[45.15231,41.58232],[45.15956,41.59567],[45.15513,41.59633],[45.15265,41.60347],[45.15917,41.61503],[45.19006,41.62001],[45.20885,41.6363],[45.2121,41.65548],[45.18942,41.69451],[45.19571,41.7016],[45.20555,41.69711],[45.20484,41.70487],[45.20483,41.71007],[45.19582,41.71172],[45.18912,41.723],[45.19241,41.72833],[45.17976,41.73551],[45.16711,41.74722],[45.17028,41.75836],[45.16376,41.76375],[45.15603,41.75589],[45.14304,41.75136],[45.11717,41.75895],[45.10368,41.78026],[45.09735,41.78967],[45.09513,41.79734],[45.08608,41.82366],[45.07718,41.84202],[45.06092,41.84656],[45.04221,41.8479],[45.00572,41.85264],[44.96362,41.85959],[44.9558,41.85904],[44.94388,41.85291],[44.91597,41.83646],[44.90629,41.83366],[44.88506,41.84005],[44.87837,41.83253],[44.89067,41.82585],[44.9052,41.81696],[44.89478,41.80353],[44.89339,41.80233],[44.89196,41.80154],[44.89314,41.80135],[44.89493,41.80121],[44.89463,41.80087],[44.8939,41.80069],[44.89334,41.80051],[44.89262,41.80023],[44.89163,41.79987],[44.89112,41.79982],[44.89072,41.79961],[44.89042,41.79954],[44.89024,41.79938],[44.88935,41.79922],[44.88892,41.79885],[44.88683,41.799],[44.88526,41.79869],[44.88367,41.79885],[44.88238,41.79839],[44.88105,41.79813],[44.88059,41.7972],[44.88212,41.7965],[44.88359,41.79551],[44.88375,41.79469],[44.88222,41.79516],[44.88215,41.79472],[44.88164,41.79441],[44.88086,41.79427],[44.8818,41.7919],[44.88005,41.7822],[44.88266,41.77723],[44.8845,41.77544],[44.88503,41.77355],[44.88594,41.77262],[44.88595,41.77204],[44.88539,41.77164],[44.88508,41.77128],[44.88472,41.77126],[44.88442,41.77091],[44.88337,41.77056],[44.88236,41.76982],[44.88235,41.76877],[44.88112,41.7681],[44.88066,41.76686],[44.88027,41.76584],[44.87788,41.76463],[44.87768,41.76369],[44.88176,41.76124],[44.88729,41.75957],[44.89298,41.75792],[44.89369,41.75816],[44.89612,41.75849],[44.89972,41.7587],[44.90187,41.75998],[44.90366,41.75953],[44.90621,41.75912],[44.90843,41.75779],[44.91142,41.7576],[44.91211,41.75798],[44.91497,41.76002],[44.91601,41.76184],[44.91746,41.76528],[44.91807,41.76585],[44.92103,41.76472],[44.92371,41.7636],[44.92466,41.76378],[44.9249,41.76423],[44.92547,41.76482],[44.92764,41.76592],[44.92901,41.76651],[44.92991,41.76675],[44.93103,41.76647],[44.933,41.76549],[44.93557,41.76506],[44.93634,41.76538],[44.93739,41.76589],[44.93732,41.76639],[44.93819,41.76636],[44.93833,41.76473],[44.94007,41.76316],[44.94292,41.76105],[44.94717,41.76062],[44.94891,41.76111],[44.94923,41.76028],[44.94874,41.75992],[44.9499,41.7598],[44.95047,41.76],[44.95132,41.75979],[44.95257,41.75996],[44.95588,41.75982],[44.95628,41.75948],[44.95704,41.75814],[44.9605,41.75776],[44.96202,41.75776],[44.96229,41.7567],[44.96368,41.75604],[44.96673,41.7561],[44.96857,41.75638],[44.96957,41.75569],[44.97208,41.7539],[44.97584,41.75387],[44.99409,41.74545],[44.99383,41.74467],[44.99421,41.74366],[44.99283,41.74354],[44.99285,41.74264],[44.99268,41.74117],[44.99131,41.74102],[44.98984,41.74103],[44.98772,41.74011],[44.9869,41.74002],[44.98672,41.7392],[44.98578,41.73657],[44.99585,41.72941],[44.99704,41.73089],[45.00265,41.73511],[45.00618,41.73754],[45.00726,41.73404],[45.00879,41.73237],[45.00977,41.73135],[45.01287,41.72759],[45.0133,41.72605],[45.01571,41.72461],[45.01609,41.7239],[45.01594,41.72332],[45.01574,41.7216],[45.01538,41.72085],[45.01554,41.72034],[45.01489,41.7197],[45.01281,41.71876],[45.01262,41.71835],[45.01247,41.71804],[45.01224,41.71773],[45.01218,41.71611],[45.01246,41.71445],[45.01254,41.7134],[45.01236,41.71289],[45.01247,41.71205],[45.01345,41.71099],[45.01461,41.71019],[45.01565,41.70949],[45.01558,41.70871],[45.01515,41.70783],[45.01472,41.7073],[45.01443,41.70648],[45.01396,41.70555],[45.01426,41.70445],[45.01538,41.70449],[45.01619,41.70399],[45.01717,41.7032],[45.01729,41.70285],[45.01702,41.70201],[45.01685,41.7009],[45.01652,41.69978],[45.01603,41.69936],[45.01689,41.69768],[45.01691,41.69689],[45.01636,41.69495],[45.01599,41.69432],[45.01628,41.69356],[45.01543,41.69279],[45.01437,41.69187],[45.01408,41.69087],[45.01408,41.69041],[45.01351,41.6898],[45.01254,41.68952],[45.01213,41.68904],[45.0118,41.68855],[45.01149,41.68789],[45.01156,41.68721],[45.01116,41.68688],[45.0106,41.68652],[45.00941,41.68594],[45.00891,41.68572],[45.0084,41.68566],[45.00759,41.68545],[45.00713,41.68527],[45.00654,41.68515],[45.00567,41.68499],[45.00474,41.68473],[45.00382,41.68453],[45.00247,41.68406],[45.00157,41.68351],[45.00055,41.68217],[45.00018,41.68113],[44.99996,41.67985],[45.00012,41.6781],[45.00061,41.67719],[45.00051,41.67642],[45.00031,41.67564],[44.99991,41.67475],[44.99962,41.67475],[44.99863,41.67401],[44.9977,41.67325],[44.99702,41.67315],[44.99692,41.67296],[44.99582,41.67229],[44.99505,41.67145],[44.99511,41.67044],[44.99473,41.66903],[44.99531,41.66741],[44.99543,41.66679],[44.99605,41.66615],[44.99661,41.66516],[44.99624,41.66478],[44.9955,41.66396],[44.99474,41.66349],[44.99342,41.66277],[44.99192,41.66137],[44.99116,41.6607],[44.99046,41.66081],[44.98812,41.65919],[44.98723,41.65896],[44.98609,41.65888],[44.98485,41.65868],[44.98416,41.65911],[44.9836,41.65905],[44.98274,41.65952],[44.98209,41.65968],[44.9813,41.66001],[44.97995,41.66035],[44.9786,41.66008],[44.97751,41.65786],[44.97666,41.65692],[44.97628,41.656],[44.97579,41.65543],[44.97484,41.65498],[44.97348,41.65453],[44.97118,41.65457],[44.96905,41.65373],[44.96852,41.65349],[44.96835,41.65279],[44.96816,41.6521],[44.96764,41.65198],[44.96707,41.65203],[44.96675,41.65177],[44.96625,41.65151],[44.96526,41.6507],[44.96473,41.65071],[44.96417,41.6506],[44.96397,41.65025],[44.9636,41.65019],[44.96316,41.65019],[44.96264,41.6503],[44.96191,41.65022],[44.96137,41.65007],[44.96083,41.65029],[44.9603,41.65049],[44.95872,41.64942],[44.958,41.64855],[44.9588,41.64814],[44.95914,41.64782],[44.96002,41.64706],[44.96103,41.64643],[44.96143,41.64561],[44.9614,41.64473],[44.96156,41.64375],[44.9615,41.64328],[44.96147,41.64254],[44.96163,41.64157],[44.96083,41.64101],[44.96042,41.64033],[44.95955,41.63972],[44.95848,41.63918],[44.95792,41.63899],[44.95691,41.63881],[44.95612,41.6388],[44.95479,41.6391],[44.95364,41.63958],[44.95203,41.63949],[44.95079,41.63923],[44.95066,41.63851],[44.94947,41.63771],[44.94852,41.63712],[44.94774,41.63664],[44.94733,41.63601],[44.94571,41.63585],[44.94356,41.63506],[44.94261,41.63517],[44.94234,41.63568],[44.94134,41.63692],[44.94084,41.63753],[44.93988,41.63928],[44.93485,41.63879],[44.93186,41.63779],[44.93109,41.63759],[44.92924,41.63778],[44.92851,41.63788],[44.92789,41.63673],[44.92567,41.63513],[44.92334,41.6336],[44.92216,41.63159],[44.92132,41.63009],[44.92837,41.61884],[44.92387,41.61779],[44.92304,41.61995],[44.91678,41.6214],[44.91343,41.62218],[44.90713,41.62329],[44.90637,41.62304],[44.90563,41.62146],[44.90149,41.62418],[44.90291,41.62945],[44.90367,41.6308],[44.90571,41.63621],[44.90231,41.63977],[44.88657,41.63917],[44.88665,41.63977],[44.88577,41.64186],[44.89017,41.64311],[44.88832,41.64414],[44.88585,41.64522],[44.88381,41.64564],[44.88061,41.64647],[44.8762,41.64769],[44.86931,41.64821],[44.86874,41.6502],[44.86691,41.6508],[44.86584,41.65155],[44.86418,41.65374],[44.85438,41.65564],[44.85217,41.65523],[44.85134,41.65501],[44.84593,41.65669],[44.84197,41.65746],[44.83983,41.65761],[44.83773,41.65723],[44.83671,41.65627],[44.83606,41.65601],[44.83385,41.6564],[44.82908,41.65635],[44.82501,41.65625],[44.82364,41.65622],[44.82092,41.65649],[44.81618,41.65693],[44.81469,41.65692],[44.81288,41.65606],[44.8109,41.6551],[44.8067,41.65375],[44.80195,41.65142],[44.80154,41.65106],[44.80049,41.65035],[44.79902,41.65025],[44.79515,41.64984],[44.79446,41.64964],[44.79562,41.64903],[44.79672,41.64818],[44.79743,41.64757],[44.79832,41.64641],[44.79871,41.6457],[44.7991,41.6454],[44.79944,41.64464],[44.79973,41.6436],[44.79974,41.64321],[44.80049,41.64259],[44.80081,41.64196],[44.80127,41.6416],[44.80155,41.64135],[44.80173,41.64092],[44.80234,41.6405],[44.80212,41.63967],[44.80229,41.63916],[44.80358,41.63827],[44.80414,41.63796],[44.80546,41.63706],[44.80623,41.63655],[44.80698,41.636],[44.8082,41.63555],[44.80898,41.63463],[44.80659,41.63305],[44.80425,41.63164],[44.80365,41.63206],[44.80195,41.63131],[44.80256,41.63057],[44.80112,41.62952],[44.80053,41.62919],[44.80003,41.62708],[44.79982,41.62604],[44.79918,41.62559],[44.79908,41.62554],[44.79873,41.62547],[44.79718,41.62531],[44.79713,41.62497],[44.79668,41.62491],[44.79616,41.62537],[44.79647,41.62595],[44.79617,41.62634],[44.79564,41.6268],[44.79516,41.62723],[44.79429,41.62746],[44.79374,41.6279],[44.7934,41.628],[44.79308,41.62825],[44.79291,41.62877],[44.79264,41.62911],[44.79268,41.62965],[44.79238,41.6299],[44.79205,41.63039],[44.79155,41.63059],[44.79163,41.63075],[44.79141,41.63098],[44.79111,41.63116],[44.7905,41.63161],[44.79043,41.63183],[44.79015,41.63238],[44.79016,41.63291],[44.79022,41.63355],[44.78997,41.63446],[44.78933,41.63475],[44.78732,41.63388],[44.78776,41.63271],[44.7868,41.63192],[44.78545,41.63158],[44.78524,41.63186],[44.78505,41.63234],[44.78439,41.63261],[44.78407,41.63299],[44.78362,41.6332],[44.78333,41.63342],[44.78282,41.63349],[44.78275,41.63391],[44.78197,41.63418],[44.77915,41.63426],[44.78029,41.63262],[44.78006,41.63193],[44.77913,41.63143],[44.77716,41.63113],[44.77481,41.63148],[44.77381,41.63154],[44.77198,41.63139],[44.77063,41.63153],[44.7682,41.63184],[44.76607,41.6326],[44.76509,41.63255],[44.7626,41.63246],[44.76162,41.63271],[44.7603,41.63319],[44.75735,41.63495],[44.75692,41.62868],[44.75625,41.62907],[44.75545,41.629],[44.75555,41.62932],[44.75519,41.62963],[44.75419,41.63004],[44.75397,41.6304],[44.75417,41.63067],[44.75378,41.63092],[44.75162,41.63138],[44.75179,41.63212],[44.75139,41.63223],[44.75068,41.63243],[44.75031,41.63264],[44.75002,41.63299],[44.74967,41.63334],[44.74947,41.63327],[44.74888,41.63372],[44.74853,41.63401],[44.74823,41.63389],[44.7481,41.63398],[44.74797,41.63406],[44.74762,41.63416],[44.74697,41.6343],[44.74624,41.63442],[44.74588,41.63483],[44.7456,41.63522],[44.74515,41.63527],[44.74527,41.63559],[44.74535,41.636],[44.74466,41.63614],[44.7434,41.63676],[44.74355,41.63716],[44.74285,41.6374],[44.74196,41.63756],[44.7415,41.63796],[44.74096,41.63823],[44.74039,41.63833],[44.74023,41.63828],[44.73971,41.63822],[44.73928,41.63873],[44.73885,41.63894],[44.73867,41.63998],[44.73568,41.63888],[44.73034,41.6383]]]};
+
+    // ==========================================================================
+    // GEORGIAN DATE FORMATTER
+    // ==========================================================================
+    const GEORGIAN_MONTHS = [
+      'იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი',
+      'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'
+    ];
+
+    function formatGeorgianDate(dateStr) {
+      if (!dateStr) return 'თარიღი უცნობია';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const day = parseInt(parts[2], 10);
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const year = parts[0];
+      return day + ' ' + (GEORGIAN_MONTHS[monthIdx] || '') + ', ' + year;
+    }
+
+    // ==========================================================================
+    // PROJECT DATA: CONFIRMED LOCATIONS & ACTIVITIES (OCTOBER 2026 TEST DATES)
+    // ==========================================================================
+    const INITIAL_LOCATIONS = [
+      {
+        id: 1,
+        name: "მთავარი ჰაბი — ქ. გარდაბანი",
+        shortName: "ქ. გარდაბანი",
+        type: "hub",
+        date: "2026-10-03",
+        latitude: 41.4589,
+        longitude: 45.0928,
+        activityTitle: "ცენტრალური საგანმანათლებლო პროგრამა და კოორდინაცია",
+        activityDescription: "პროგრამის ძირითადი შტაბი და ცენტრალური შეხვედრების სივრცე. ქართველ და აზერბაიჯანელ ახალგაზრდებს შორის კულტურული დიალოგი, ენობრივი გაცვლა და ტექნოლოგიური ვორქშოფები."
+      },
+      {
+        id: 2,
+        name: "ლოკაცია 1: სოფ. კესალო",
+        shortName: "კესალო",
+        type: "village",
+        date: "2026-10-07",
+        latitude: 41.4360,
+        longitude: 45.0315,
+        activityTitle: "მობილური ვორქშოფი: შემოქმედებითი უნარები და გუნდურობა",
+        activityDescription: "ახალგაზრდული გუნდური პროექტები, ხელოვნების თერაპია, დებატები და ერთობლივი ინიციატივების დაგეგმვა ადგილობრივი თემის მონაწილეობით."
+      },
+      {
+        id: 3,
+        name: "ლოკაცია 2: სოფ. ნაზარლო",
+        shortName: "ნაზარლო",
+        type: "village",
+        date: "2026-10-12",
+        latitude: 41.4085,
+        longitude: 45.0740,
+        activityTitle: "მობილური ვორქშოფი: სამოქალაქო ჩართულობა და მედიაწიგნიერება",
+        activityDescription: "ტრენინგები კრიტიკულ აზროვნებაში, ციფრული უსაფრთხოება, ადგილობრივი საჭიროებების ადვოკატირება და სამოქალაქო აქტივიზმი."
+      },
+      {
+        id: 4,
+        name: "ლოკაცია 3: სოფ. სართიჭალა",
+        shortName: "სართიჭალა",
+        type: "village",
+        date: "2026-10-16",
+        latitude: 41.7145,
+        longitude: 45.1820,
+        activityTitle: "მობილური ვორქშოფი: ტექნოლოგიები და კარიერული ორიენტაცია",
+        activityDescription: "ციფრული უნარების განვითარება, თანამედროვე პროფესიების გაცნობა, CV-ის შედგენა და პროფესიული განათლების შესაძლებლობები."
+      },
+      {
+        id: 5,
+        name: "ლოკაცია 4: სოფ. კუმისი",
+        shortName: "კუმისი",
+        type: "village",
+        date: "2026-10-21",
+        latitude: 41.5860,
+        longitude: 44.8380,
+        activityTitle: "მობილური ვორქშოფი: ეკოლოგია და გარემოსდაცვითი ინიციატივები",
+        activityDescription: "ერთობლივი ეკო-აქტივობები, კუმისის ტბის მიმდებარე ტერიტორიის დასუფთავების აქცია და გარემოსდაცვითი ცნობიერების ამაღლება."
+      },
+      {
+        id: 6,
+        name: "ლოკაცია 5: სოფ. ყარაჯალარი",
+        shortName: "ყარაჯალარი",
+        type: "village",
+        date: "2026-10-25",
+        latitude: 41.5650,
+        longitude: 45.0220,
+        activityTitle: "მობილური ვორქშოფი: ქართულ-აზერბაიჯანული ენობრივი კლუბი",
+        activityDescription: "ინტერაქტიული ენობრივი თამაშები, ორმხრივი ენის პრაქტიკა, კულტურათაშორისი დიალოგი და ახალგაზრდების დამეგობრების კლუბი."
+      },
+      {
+        id: 7,
+        name: "ლოკაცია 6: სოფ. ვახტანგისი",
+        shortName: "ვახტანგისი",
+        type: "village",
+        date: "2026-10-29",
+        latitude: 41.3480,
+        longitude: 45.1050,
+        activityTitle: "მობილური ვორქშოფი: სოციალური მეწარმეობა და იდეების ბანკი",
+        activityDescription: "სასაზღვრო რეგიონის ახალგაზრდებისთვის მცირე სოციალური ბიზნეს-იდეების გენერირება და სათემო პროექტების დაფინანსების შესაძლებლობები."
+      }
+    ];
+
+    // Load from localStorage if present
+    function loadSavedLocations() {
+      try {
+        const saved = localStorage.getItem('gardabani_locations');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(INITIAL_LOCATIONS));
+    }
+
+    function saveLocationsToStorage() {
+      try {
+        localStorage.setItem('gardabani_locations', JSON.stringify(locations));
+      } catch (e) {}
+    }
+
+    // Asynchronous Cloud Sync with Supabase (Public Read / RLS Protected)
+    async function syncLocationsFromSupabase() {
+      const client = initSupabase();
+      if (!client) return;
+      try {
+        const { data, error } = await client
+          .from('locations')
+          .select('*')
+          .order('id', { ascending: true });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          locations = data.map(r => ({
+            id: Number(r.id),
+            name: r.name,
+            shortName: r.short_name,
+            type: r.type,
+            date: r.date,
+            latitude: Number(r.latitude),
+            longitude: Number(r.longitude),
+            activityTitle: r.activity_title,
+            activityDescription: r.activity_description
+          }));
+          saveLocationsToStorage();
+          renderMapOverlays();
+          renderSidebar();
+          console.log('✅ Supabase: ' + locations.length + ' ლოკაცია ჩაიტვირთა ღრუბლიდან');
+        }
+      } catch (err) {
+        console.warn('Supabase fetch notice (using local storage):', err);
+      }
+    }
+
+    // Write location to Supabase with RLS verification
+    async function syncLocationToSupabase(locRecord) {
+      const client = initSupabase();
+      if (!client) return;
+      try {
+        const row = {
+          id: locRecord.id,
+          name: locRecord.name,
+          short_name: locRecord.shortName,
+          type: locRecord.type,
+          date: locRecord.date,
+          latitude: locRecord.latitude,
+          longitude: locRecord.longitude,
+          activity_title: locRecord.activityTitle,
+          activity_description: locRecord.activityDescription
+        };
+        const { error } = await client.from('locations').upsert(row);
+        if (error) {
+          console.warn('Supabase upsert notice:', error);
+          showToast('⚠️ ლოკალურად შეინახა, Supabase RLS შეცდომა: ' + (error.message || 'წვდომა უარყოფილია'));
+        } else {
+          showToast('☁️ მონაცემები შენახულია Supabase ღრუბლოვან ბაზაში!');
+        }
+      } catch (err) {
+        console.warn('Supabase sync error:', err);
+      }
+    }
+
+    // State
+    let locations = loadSavedLocations();
+    let activeLocationId = null;
+    let map = null;
+    let markersLayer = null;
+    let boundaryLayer = null;
+    let radiusLayer = null;
+    let baseLayers = {};
+    let currentBaseLayerName = 'roadmap';
+    let isFullscreen = false;
+    let isDrawerOpen = false;
+
+    // Strict Georgia Bounds Lock
+    const GEORGIA_BOUNDS = L.latLngBounds(
+      [41.00, 39.80],
+      [43.60, 46.85]
+    );
+
+    // Gardabani Center
+    const GARDABANI_CENTER = [41.52, 45.05];
+
+    // Haversine formula for distances in km
+    function calcDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return (R * c).toFixed(1);
+    }
+
+
+    // ==========================================================================
+    // STEALTH ADMIN ACCESS LOGIC (SHA-256, RATE LIMIT, INACTIVITY TIMEOUT & SUPABASE)
+    // ==========================================================================
+    const ADMIN_HASH = 'c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672';
+    const LOCKOUT_TIERS = [5, 10, 15]; // Minutes: 1st lockout = 5m, 2nd = 10m, 3rd+ = 15m
+    const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+    let lockoutTimerInterval = null;
+    let inactivityTimeoutId = null;
+    let supabaseClient = null;
+
+    // Cryptographic SHA-256 via Web Crypto API
+    async function computeSHA256(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuf = await crypto.subtle.digest('SHA-256', data);
+      const hashArr = Array.from(new Uint8Array(hashBuf));
+      return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function isSupabaseConfigured() {
+      return typeof SUPABASE_CONFIG !== 'undefined' &&
+             typeof SUPABASE_CONFIG.url === 'string' &&
+             SUPABASE_CONFIG.url.startsWith('https://') &&
+             !SUPABASE_CONFIG.url.includes('YOUR_SUPABASE') &&
+             typeof SUPABASE_CONFIG.anonKey === 'string' &&
+             SUPABASE_CONFIG.anonKey.length > 20 &&
+             !SUPABASE_CONFIG.anonKey.includes('YOUR_SUPABASE') &&
+             typeof supabase !== 'undefined' &&
+             typeof supabase.createClient === 'function';
+    }
+
+    function initSupabase() {
+      if (isSupabaseConfigured() && !supabaseClient) {
+        try {
+          supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        } catch (e) {
+          console.warn('Supabase init error:', e);
+          supabaseClient = null;
+        }
+      }
+      return supabaseClient;
+    }
+
+    function isAdminMode() {
+      return sessionStorage.getItem('gardabani_admin_session') === 'true';
+    }
+
+    function getLockoutUntil() {
+      const val = parseInt(localStorage.getItem('gardabani_lockout_until') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function isLockedOut() {
+      return Date.now() < getLockoutUntil();
+    }
+
+    function getFailedAttempts() {
+      const val = parseInt(localStorage.getItem('gardabani_failed_attempts') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function getLockoutLevel() {
+      const val = parseInt(localStorage.getItem('gardabani_lockout_level') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function recordFailedAttempt() {
+      const attempts = getFailedAttempts() + 1;
+      localStorage.setItem('gardabani_failed_attempts', attempts.toString());
+
+      if (attempts >= 3) {
+        const level = getLockoutLevel() + 1;
+        localStorage.setItem('gardabani_lockout_level', level.toString());
+        const minutes = LOCKOUT_TIERS[Math.min(level - 1, LOCKOUT_TIERS.length - 1)];
+        const until = Date.now() + minutes * 60 * 1000;
+        localStorage.setItem('gardabani_lockout_until', until.toString());
+        return { locked: true, minutes: minutes, remaining: 0 };
+      }
+
+      return { locked: false, remaining: 3 - attempts };
+    }
+
+    function resetAdminLockout() {
+      localStorage.removeItem('gardabani_failed_attempts');
+      localStorage.removeItem('gardabani_lockout_until');
+      localStorage.removeItem('gardabani_lockout_level');
+    }
+
+    function updateLockoutUI() {
+      const until = getLockoutUntil();
+      const now = Date.now();
+      const box = document.getElementById('stealth-lockout-box');
+      const timerEl = document.getElementById('stealth-lockout-timer');
+      const passInput = document.getElementById('stealth-pass-input');
+      const emailInput = document.getElementById('stealth-email-input');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+      const attemptsEl = document.getElementById('stealth-attempts-info');
+
+      if (now < until) {
+        const diffSec = Math.ceil((until - now) / 1000);
+        const m = Math.floor(diffSec / 60).toString().padStart(2, '0');
+        const s = (diffSec % 60).toString().padStart(2, '0');
+        if (box) box.style.display = 'flex';
+        if (timerEl) timerEl.textContent = 'დარჩენილი დრო: ' + m + ':' + s;
+        if (emailInput) emailInput.disabled = true;
+        if (passInput) passInput.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (attemptsEl) attemptsEl.style.display = 'none';
+
+        if (!lockoutTimerInterval) {
+          lockoutTimerInterval = setInterval(updateLockoutUI, 1000);
+        }
+      } else {
+        if (lockoutTimerInterval) {
+          clearInterval(lockoutTimerInterval);
+          lockoutTimerInterval = null;
+        }
+        if (until > 0) {
+          localStorage.removeItem('gardabani_lockout_until');
+          localStorage.setItem('gardabani_failed_attempts', '0');
+        }
+        if (box) box.style.display = 'none';
+        if (emailInput) emailInput.disabled = false;
+        if (passInput) passInput.disabled = false;
+        if (submitBtn) submitBtn.disabled = false;
+        if (attemptsEl) {
+          attemptsEl.style.display = 'block';
+          const rem = 3 - getFailedAttempts();
+          attemptsEl.textContent = 'დარჩენილია ' + rem + ' მცდელობა';
+        }
+      }
+    }
+
+    function openStealthAdminModal() {
+      const modal = document.getElementById('stealth-admin-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      const errorAlert = document.getElementById('stealth-error-alert');
+      if (errorAlert) errorAlert.style.display = 'none';
+      updateLockoutUI();
+
+      const emailGroup = document.getElementById('stealth-email-group');
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const passLabel = document.getElementById('stealth-pass-label');
+      const badgeEl = document.getElementById('stealth-security-badge');
+      const descEl = document.getElementById('stealth-desc-text');
+
+      if (isSupabaseConfigured()) {
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (passLabel) passLabel.textContent = 'ადმინისტრატორის პაროლი';
+        if (badgeEl) badgeEl.textContent = 'Supabase Cloud Auth • RLS დაცული';
+        if (descEl) descEl.textContent = 'შეიყვანეთ Supabase ადმინისტრატორის ელ-ფოსტა და პაროლი სრული ღრუბლოვანი წვდომისთვის.';
+        if (emailInput) {
+          const savedEmail = localStorage.getItem('gardabani_admin_saved_email') || (typeof SUPABASE_CONFIG !== 'undefined' ? SUPABASE_CONFIG.adminEmail : '') || '';
+          emailInput.value = savedEmail;
+        }
+      } else {
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (passLabel) passLabel.textContent = 'ადმინისტრატორის კოდი';
+        if (badgeEl) badgeEl.textContent = 'SHA-256 დაცული • Rate-Limited';
+        if (descEl) descEl.textContent = 'შეიყვანეთ ადმინისტრატორის საიდუმლო კოდი. კოდი მოწმდება კლიენტის კრიპტოგრაფიული ჰეშით. 3 არასწორი მცდელობის შემდეგ სისტემა დროებით დაიბლოკება.';
+      }
+
+      if (passInput && !isLockedOut()) {
+        passInput.value = '';
+        setTimeout(() => {
+          if (isSupabaseConfigured() && emailInput && !emailInput.value) {
+            emailInput.focus();
+          } else {
+            passInput.focus();
+          }
+        }, 150);
+      }
+    }
+
+    function closeStealthAdminModal() {
+      const modal = document.getElementById('stealth-admin-modal');
+      if (modal) modal.style.display = 'none';
+      if (lockoutTimerInterval) {
+        clearInterval(lockoutTimerInterval);
+        lockoutTimerInterval = null;
+      }
+    }
+
+    async function handleStealthLogin() {
+      if (isLockedOut()) return;
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const errorAlert = document.getElementById('stealth-error-alert');
+      const attemptsEl = document.getElementById('stealth-attempts-info');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+
+      const enteredEmail = (emailInput ? emailInput.value : '').trim();
+      const enteredPass = (passInput ? passInput.value : '').trim();
+
+      if (!enteredPass) {
+        if (errorAlert) {
+          errorAlert.textContent = 'გთხოვთ შეიყვანოთ კოდი / პაროლი.';
+          errorAlert.style.display = 'block';
+        }
+        return;
+      }
+
+      // 1. Supabase Cloud Authentication (if configured & email provided)
+      if (isSupabaseConfigured() && enteredEmail) {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>⏳</span> მოწმდება...';
+        }
+        try {
+          const client = initSupabase();
+          const { data, error } = await client.auth.signInWithPassword({
+            email: enteredEmail,
+            password: enteredPass
+          });
+
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🔑</span> შესვლა';
+          }
+
+          if (error) {
+            const res = recordFailedAttempt();
+            if (res.locked) {
+              updateLockoutUI();
+              showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
+            } else {
+              if (errorAlert) {
+                errorAlert.textContent = '❌ ' + (error.message === 'Invalid login credentials' ? 'არასწორი ელ-ფოსტა ან პაროლი!' : error.message) + ' (დარჩა ' + res.remaining + ')';
+                errorAlert.style.display = 'block';
+              }
+              if (attemptsEl) attemptsEl.textContent = 'დარჩენილია ' + res.remaining + ' მცდელობა';
+              if (passInput) {
+                passInput.classList.add('shake');
+                setTimeout(() => passInput.classList.remove('shake'), 400);
+                passInput.focus();
+                passInput.select();
+              }
+            }
+            return;
+          }
+
+          // Supabase Auth Success
+          resetAdminLockout();
+          localStorage.setItem('gardabani_admin_saved_email', enteredEmail);
+          sessionStorage.setItem('gardabani_admin_session', 'true');
+          sessionStorage.setItem('gardabani_admin_mode_type', 'supabase');
+          sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+          closeStealthAdminModal();
+          startInactivityWatcher();
+          if (typeof syncAdminUI === 'function') syncAdminUI();
+          if (typeof syncAdminView === 'function') syncAdminView();
+          if (typeof renderSidebar === 'function') renderSidebar();
+          if (typeof renderMarkers === 'function') renderMarkers();
+          showToast('🛡️ Supabase Cloud Admin რეჟიმი გააქტიურდა!');
+          return;
+        } catch (authErr) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🔑</span> შესვლა';
+          }
+          console.warn('Supabase Auth error, attempting local check...', authErr);
+        }
+      }
+
+      // 2. Cryptographic SHA-256 Check (Local Prototype / Fallback)
+      const hash = await computeSHA256(enteredPass);
+      if (hash === ADMIN_HASH) {
+        // Success
+        resetAdminLockout();
+        sessionStorage.setItem('gardabani_admin_session', 'true');
+        sessionStorage.setItem('gardabani_admin_mode_type', 'local');
+        sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+        closeStealthAdminModal();
+        startInactivityWatcher();
+        if (typeof syncAdminUI === 'function') syncAdminUI();
+        if (typeof syncAdminView === 'function') syncAdminView();
+        if (typeof renderSidebar === 'function') renderSidebar();
+        if (typeof renderMarkers === 'function') renderMarkers();
+        showToast('🛡️ ადმინისტრატორის სესია წარმატებით გააქტიურდა!');
+      } else {
+        // Fail
+        const res = recordFailedAttempt();
+        if (res.locked) {
+          updateLockoutUI();
+          showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
+        } else {
+          if (errorAlert) {
+            errorAlert.textContent = '❌ არასწორი კოდი! დარჩენილია ' + res.remaining + ' მცდელობა.';
+            errorAlert.style.display = 'block';
+          }
+          if (attemptsEl) {
+            attemptsEl.textContent = 'დარჩენილია ' + res.remaining + ' მცდელობა';
+          }
+          if (passInput) {
+            passInput.classList.add('shake');
+            setTimeout(() => passInput.classList.remove('shake'), 400);
+            passInput.focus();
+            passInput.select();
+          }
+        }
+      }
+    }
+
+    async function adminLogout(reason) {
+      sessionStorage.removeItem('gardabani_admin_session');
+      sessionStorage.removeItem('gardabani_admin_mode_type');
+      sessionStorage.removeItem('gardabani_last_active');
+      const client = initSupabase();
+      if (client) {
+        try {
+          await client.auth.signOut();
+        } catch (e) {}
+      }
+      clearTimeout(inactivityTimeoutId);
+      if (typeof syncAdminUI === 'function') syncAdminUI();
+      if (typeof syncAdminView === 'function') syncAdminView();
+      if (typeof renderSidebar === 'function') renderSidebar();
+      if (typeof renderMarkers === 'function') renderMarkers();
+      if (reason === 'inactivity') {
+        showToast('⚠️ უმოქმედობის გამო (15 წთ) ადმინისტრატორის სესია დასრულდა');
+      } else {
+        showToast('ადმინისტრატორის რეჟიმი გაითიშა 🔒');
+      }
+    }
+
+    function recordActivity() {
+      if (!isAdminMode()) return;
+      sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+      resetInactivityTimer();
+    }
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimeoutId);
+      if (!isAdminMode()) return;
+      inactivityTimeoutId = setTimeout(() => {
+        adminLogout('inactivity');
+      }, INACTIVITY_TIMEOUT_MS);
+    }
+
+    function startInactivityWatcher() {
+      if (isAdminMode()) {
+        const last = parseInt(sessionStorage.getItem('gardabani_last_active') || '0', 10);
+        if (last && (Date.now() - last > INACTIVITY_TIMEOUT_MS)) {
+          adminLogout('inactivity');
+          return;
+        }
+        recordActivity();
+      }
+    }
+
+    // Attach listeners
+    ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        const now = Date.now();
+        const last = parseInt(sessionStorage.getItem('gardabani_last_active') || '0', 10);
+        if (now - last > 10000) {
+          recordActivity();
+        }
+      }, { passive: true });
+    });
+
+    // 1. Secret Key Shortcut: Ctrl + Shift + A + L
+    const activeKeys = new Set();
+    let chordSeq = [];
+    let chordTimer = null;
+
+    window.addEventListener('keydown', (e) => {
+      activeKeys.add(e.key.toLowerCase());
+      activeKeys.add(e.code.toLowerCase());
+
+      const isCtrl = e.ctrlKey || activeKeys.has('control');
+      const isShift = e.shiftKey || activeKeys.has('shift');
+      const hasA = activeKeys.has('a') || activeKeys.has('keya');
+      const hasL = activeKeys.has('l') || activeKeys.has('keyl');
+
+      if (isCtrl && isShift && hasA && hasL) {
+        e.preventDefault();
+        openStealthAdminModal();
+        return;
+      }
+
+      if (isCtrl && isShift) {
+        const k = e.key.toLowerCase();
+        if (k === 'a' || k === 'l') {
+          chordSeq.push(k);
+          clearTimeout(chordTimer);
+          chordTimer = setTimeout(() => { chordSeq = []; }, 2000);
+          if (chordSeq.includes('a') && chordSeq.includes('l')) {
+            e.preventDefault();
+            chordSeq = [];
+            openStealthAdminModal();
+          }
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      activeKeys.delete(e.key.toLowerCase());
+      activeKeys.delete(e.code.toLowerCase());
+    });
+
+    // 2. Secret Door: 5 Rapid Clicks on Logo
+    let rapidLogoClicks = 0;
+    let rapidLogoTimer = null;
+
+    function setupSecretLogoDoor() {
+      const logoEl = document.getElementById('header-brand-title') || document.getElementById('header-logo') || document.querySelector('.header-title');
+      if (logoEl) {
+        logoEl.style.cursor = 'pointer';
+        logoEl.title = 'გარდაბნის მობილური აკადემია';
+        logoEl.addEventListener('click', (e) => {
+          rapidLogoClicks++;
+          clearTimeout(rapidLogoTimer);
+          rapidLogoTimer = setTimeout(() => {
+            rapidLogoClicks = 0;
+          }, 3000);
+
+          if (rapidLogoClicks >= 5) {
+            e.preventDefault();
+            e.stopPropagation();
+            rapidLogoClicks = 0;
+            openStealthAdminModal();
+          }
+        });
+      }
+    }
+
+    // Modal DOM Events
+    function setupStealthModalDOM() {
+      const closeBtn = document.getElementById('stealth-close-btn');
+      const cancelBtn = document.getElementById('stealth-cancel-btn');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+      const togglePw = document.getElementById('stealth-toggle-pw');
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const modal = document.getElementById('stealth-admin-modal');
+
+      if (closeBtn) closeBtn.onclick = closeStealthAdminModal;
+      if (cancelBtn) cancelBtn.onclick = closeStealthAdminModal;
+      if (submitBtn) submitBtn.onclick = handleStealthLogin;
+      if (togglePw && passInput) {
+        togglePw.onclick = () => {
+          const isPw = passInput.type === 'password';
+          passInput.type = isPw ? 'text' : 'password';
+          togglePw.textContent = isPw ? '🙈' : '👁️';
+        };
+      }
+      if (emailInput) {
+        emailInput.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            if (passInput) passInput.focus();
+          }
+          if (e.key === 'Escape') closeStealthAdminModal();
+        };
+      }
+      if (passInput) {
+        passInput.onkeydown = (e) => {
+          if (e.key === 'Enter') handleStealthLogin();
+          if (e.key === 'Escape') closeStealthAdminModal();
+        };
+      }
+      if (modal) {
+        modal.onclick = (e) => {
+          if (e.target === modal) closeStealthAdminModal();
+        };
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setupSecretLogoDoor();
+      setupStealthModalDOM();
+      startInactivityWatcher();
+    });
+
+
+    function syncAdminUI() {
+      const isAdmin = isAdminMode();
+      const adminIndicator = document.getElementById('admin-indicator');
+      const adminControls = document.getElementById('admin-controls');
+      if (adminIndicator) adminIndicator.style.display = isAdmin ? 'inline-flex' : 'none';
+      if (adminControls) adminControls.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
+
+    // ==========================================================================
+    // MAP INITIALIZATION (100% RELIABLE GOOGLE MAPS LAYERS)
+    // ==========================================================================
+    function initMap() {
+      map = L.map('map', {
+        center: GARDABANI_CENTER,
+        zoom: 11,
+        minZoom: 8,
+        maxZoom: 19,
+        maxBounds: GEORGIA_BOUNDS,
+        maxBoundsViscosity: 1.0,
+        zoomControl: false
+      });
+
+      // Move zoom control to bottomright so it never collides with top-left drawer trigger
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      // 1. Google Maps Roadmap Tile Layer
+      const roadmapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 19,
+        attribution: '© Google Maps'
+      });
+
+      // 2. Google Maps Hybrid Satellite
+      const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 19,
+        attribution: '© Google Maps Satellite'
+      });
+
+      // 3. Google Maps Terrain Tile Layer
+      const terrainLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 19,
+        attribution: '© Google Maps Terrain'
+      });
+
+      baseLayers = {
+        roadmap: roadmapLayer,
+        satellite: satelliteLayer,
+        terrain: terrainLayer
+      };
+
+      roadmapLayer.addTo(map);
+      currentBaseLayerName = 'roadmap';
+      updateLayerPillsUI('roadmap');
+      updateMapThemeTiles();
+
+      // Boundary overlay layer
+      boundaryLayer = L.geoJSON(GARDABANI_BOUNDARY, {
+        style: {
+          color: '#2563eb',
+          weight: 3.2,
+          opacity: 0.95,
+          fillColor: '#3b82f6',
+          fillOpacity: 0.10,
+          dashArray: '5, 5'
+        },
+        onEachFeature: function(feature, layer) {
+          layer.bindTooltip("<b>გარდაბნის მუნიციპალიტეტი</b><br>ადმინისტრაციული საზღვარი", {
+            sticky: true,
+            className: 'boundary-tooltip'
+          });
+          layer.on({
+            mouseover: function(e) {
+              const l = e.target;
+              l.setStyle({ weight: 4.2, fillOpacity: 0.20, dashArray: '' });
+            },
+            mouseout: function(e) {
+              boundaryLayer.resetStyle(e.target);
+            }
+          });
+        }
+      });
+
+      radiusLayer = L.layerGroup();
+      markersLayer = L.layerGroup().addTo(map);
+
+      // Apply settings from localStorage
+      applyLayerSettings();
+
+      // Render markers & 5km radius circles
+      renderMapOverlays();
+
+      // Fit map to Gardabani boundary on initial load
+      fitGardabaniBoundary();
+
+      // Check Deep Link from Calendar (e.g. ?loc=3)
+      checkDeepLink();
+    }
+
+    function checkDeepLink() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const locParam = urlParams.get('loc');
+        if (locParam) {
+          const locId = parseInt(locParam, 10);
+          if (!isNaN(locId)) {
+            setTimeout(() => {
+              zoomToLocation(locId);
+              showToast('გადახვედით არჩეულ ლოკაციაზე');
+            }, 500);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Dynamic layer settings synchronization
+    function applyLayerSettings() {
+      if (!map || !boundaryLayer || !radiusLayer) return;
+
+      const showBoundary = localStorage.getItem('gardabani_setting_boundary') !== 'false';
+      const showRadius = localStorage.getItem('gardabani_setting_radius') === 'true';
+
+      if (showBoundary) {
+        if (!map.hasLayer(boundaryLayer)) boundaryLayer.addTo(map);
+      } else {
+        if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
+      }
+
+      if (showRadius) {
+        if (!map.hasLayer(radiusLayer)) radiusLayer.addTo(map);
+      } else {
+        if (map.hasLayer(radiusLayer)) map.removeLayer(radiusLayer);
+      }
+    }
+
+    function updateLayerPillsUI(layerName) {
+      document.querySelectorAll('#layer-selector .layer-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-layer') === layerName);
+      });
+    }
+
+    function switchBaseLayer(layerType) {
+      if (!baseLayers[layerType] || layerType === currentBaseLayerName) return;
+      map.removeLayer(baseLayers[currentBaseLayerName]);
+      baseLayers[layerType].addTo(map);
+      currentBaseLayerName = layerType;
+      updateLayerPillsUI(layerType);
+      updateMapThemeTiles();
+    }
+
+    function updateMapThemeTiles() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const mapEl = document.getElementById('map');
+      if (!mapEl) return;
+      if (isDark && (currentBaseLayerName === 'roadmap' || currentBaseLayerName === 'terrain')) {
+        mapEl.classList.add('dark-tiles');
+      } else {
+        mapEl.classList.remove('dark-tiles');
+      }
+    }
+
+    // ==========================================================================
+    // RENDER MARKERS & OVERLAYS
+    // ==========================================================================
+    function renderMapOverlays() {
+      if (!map) return;
+
+      markersLayer.clearLayers();
+      radiusLayer.clearLayers();
+
+      const hub = locations.find(l => l.type === 'hub') || locations[0];
+
+      locations.forEach((loc, index) => {
+        const isHub = loc.type === 'hub';
+        const numLabel = isHub ? '★' : (index);
+
+        // Custom HTML Marker Icon
+        const iconHtml = `
+          <div class="custom-marker-pin ${isHub ? 'hub' : 'village'}">
+            <span>${numLabel}</span>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          className: 'custom-leaflet-marker',
+          html: iconHtml,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        const marker = L.marker([loc.latitude, loc.longitude], { icon: customIcon });
+
+        // Calculate distance from hub
+        let distanceText = '';
+        if (!isHub && hub) {
+          const dist = calcDistanceKm(hub.latitude, hub.longitude, loc.latitude, loc.longitude);
+          distanceText = `<span class="popup-distance">📏 ${dist} კმ ჰაბიდან</span>`;
+        } else if (isHub) {
+          distanceText = `<span class="popup-distance" style="color:#dc2626;">★ საკოორდინაციო ცენტრი</span>`;
+        }
+
+        // Popup Content
+        const isAdmin = isAdminMode();
+        const popupContent = `
+          <div class="popup-card">
+            <div class="popup-header">
+              <div>
+                <h3 class="popup-title">${loc.name}</h3>
+                ${distanceText}
+              </div>
+              <span class="type-badge ${isHub ? 'hub' : 'village'}">${isHub ? 'ჰაბი' : 'სოფელი'}</span>
+            </div>
+            
+            <div class="popup-date-row">
+              <span>📅</span> <span>${formatGeorgianDate(loc.date)}</span>
+            </div>
+
+            <div>
+              <div class="popup-act-title">🎯 ${loc.activityTitle}</div>
+              <div class="popup-act-desc">${loc.activityDescription}</div>
+            </div>
+            <div class="popup-footer">
+              <span style="font-size:0.70rem; color:var(--text-subtle);">📍 ${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}</span>
+              <div style="display:flex; gap:4px;">
+                <a href="calendar.html" class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;">📅 კალენდარი</a>
+                ${isAdmin ? `<button class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem;" onclick="openEditLocation(${loc.id})">✏️ რედაქტირება</button>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent, {
+          closeButton: true,
+          autoPan: true,
+          autoPanPadding: [50, 50]
+        });
+
+        marker.on('click', () => {
+          highlightLocationInList(loc.id);
+        });
+
+        markersLayer.addLayer(marker);
+
+        // 5km Service Radius Circle
+        const circle = L.circle([loc.latitude, loc.longitude], {
+          radius: 5000,
+          color: isHub ? '#ef4444' : '#3b82f6',
+          weight: 1.2,
+          opacity: 0.7,
+          fillColor: isHub ? '#ef4444' : '#3b82f6',
+          fillOpacity: 0.06,
+          dashArray: '4, 6'
+        });
+
+        circle.bindTooltip(`<b>${loc.shortName || loc.name}</b><br>5კმ მომსახურების არეალი`, {
+          sticky: true,
+          className: 'radius-tooltip'
+        });
+
+        radiusLayer.addLayer(circle);
+      });
+    }
+
+    function fitGardabaniBoundary() {
+      if (boundaryLayer && map) {
+        map.fitBounds(boundaryLayer.getBounds(), {
+          padding: [25, 25],
+          animate: true,
+          duration: 0.6
+        });
+      }
+    }
+
+    function zoomToLocation(id) {
+      const loc = locations.find(l => l.id === id);
+      if (!loc || !map) return;
+      
+      map.flyTo([loc.latitude, loc.longitude], 13.5, {
+        duration: 0.7
+      });
+
+      markersLayer.eachLayer(layer => {
+        const latlng = layer.getLatLng();
+        if (Math.abs(latlng.lat - loc.latitude) < 0.0001 && Math.abs(latlng.lng - loc.longitude) < 0.0001) {
+          layer.openPopup();
+        }
+      });
+
+      // Auto-close drawer tab when a location is clicked so the map is fully visible
+      closeDrawer();
+    }
+
+    // ==========================================================================
+    // DRAWER TOGGLE & BEHAVIOR (STRICTLY MAP-HEIGHT BOUNDED)
+    // ==========================================================================
+    function openDrawer() {
+      const drawer = document.getElementById('sidebar-drawer');
+      const backdrop = document.getElementById('drawer-backdrop');
+      if (drawer && backdrop) {
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        isDrawerOpen = true;
+      }
+    }
+
+    function closeDrawer() {
+      const drawer = document.getElementById('sidebar-drawer');
+      const backdrop = document.getElementById('drawer-backdrop');
+      if (drawer && backdrop) {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        isDrawerOpen = false;
+      }
+    }
+
+    function toggleDrawer() {
+      if (isDrawerOpen) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
+    }
+
+    // ==========================================================================
+    // SIDEBAR DRAWER LOCATIONS LIST
+    // ==========================================================================
+    function renderSidebar() {
+      const listEl = document.getElementById('locations-list');
+      const searchInput = document.getElementById('search-input');
+      const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      const isAdmin = isAdminMode();
+
+      const totalCount = locations.length;
+      
+      const badge = document.getElementById('list-count-badge');
+      if (badge) {
+        badge.textContent = totalCount + ' აქტივობა';
+      }
+
+      const drawerBadge = document.getElementById('drawer-badge');
+      if (drawerBadge) {
+        drawerBadge.textContent = totalCount + ' აქტივობა';
+      }
+
+      // Filter list
+      const filtered = locations.filter(l => {
+        if (!query) return true;
+        return l.name.toLowerCase().includes(query) ||
+               (l.date && l.date.includes(query)) ||
+               l.activityTitle.toLowerCase().includes(query) ||
+               l.activityDescription.toLowerCase().includes(query);
+      });
+
+      listEl.innerHTML = '';
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <li style="padding:16px; text-align:center; color:var(--text-subtle); font-size:0.80rem;">
+            შესატყვისი ლოკაცია ვერ მოიძებნა
+          </li>
+        `;
+        return;
+      }
+
+      filtered.forEach((loc) => {
+        const isHub = loc.type === 'hub';
+        const li = document.createElement('li');
+        li.className = `loc-card-item ${isHub ? 'hub-item' : 'village-item'} ${activeLocationId === loc.id ? 'active' : ''}`;
+        li.id = 'loc-card-' + loc.id;
+
+        li.innerHTML = `
+          <div class="loc-item-top">
+            <span class="loc-item-name">
+              <span>${isHub ? '★' : '📍'}</span>
+              <span>${loc.name}</span>
+            </span>
+            <span class="type-badge ${isHub ? 'hub' : 'village'}">${isHub ? 'ჰაბი' : 'სოფელი'}</span>
+          </div>
+          <div class="loc-item-act">${loc.activityTitle}</div>
+          <div class="loc-item-date">
+            <span>📅</span> ${formatGeorgianDate(loc.date)}
+          </div>
+          <div class="loc-item-footer">
+            <span class="loc-item-coords">${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}</span>
+            <div class="loc-item-actions">
+              <button class="loc-action-btn" title="რუკაზე ჩვენება" onclick="event.stopPropagation(); zoomToLocation(${loc.id})">🔍 ჩვენება</button>
+              ${isAdmin ? `<button class="loc-action-btn" title="რედაქტირება" onclick="event.stopPropagation(); openEditLocation(${loc.id})">✏️</button>` : ''}
+            </div>
+          </div>
+        `;
+
+        li.onclick = () => zoomToLocation(loc.id);
+        listEl.appendChild(li);
+      });
+    }
+
+    function highlightLocationInList(id) {
+      activeLocationId = id;
+      document.querySelectorAll('.loc-card-item').forEach(el => el.classList.remove('active'));
+      const activeCard = document.getElementById('loc-card-' + id);
+      if (activeCard) {
+        activeCard.classList.add('active');
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // ==========================================================================
+    // DAY & NIGHT MODE CONTROLS
+    // ==========================================================================
+    function setupThemeToggle() {
+      const themeBtn = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
+
+      function syncUI(theme) {
+        if (theme === 'dark') {
+          themeIcon.textContent = '☀️';
+          themeText.textContent = 'დღე';
+          themeBtn.title = 'დღის რეჟიმზე გადართვა';
+        } else {
+          themeIcon.textContent = '🌙';
+          themeText.textContent = 'ღამე';
+          themeBtn.title = 'ღამის რეჟიმზე გადართვა';
+        }
+      }
+
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      syncUI(currentTheme);
+
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        syncUI(newTheme);
+        updateMapThemeTiles();
+
+        showToast(newTheme === 'dark' ? 'ღამის რეჟიმი გააქტიურდა 🌙' : 'დღის რეჟიმი გააქტიურდა ☀️');
+      });
+    }
+
+    // ==========================================================================
+    // CONTROLS & EVENT LISTENERS
+    // ==========================================================================
+    function setupControls() {
+      // Layer switcher buttons
+      document.querySelectorAll('#layer-selector .layer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const layerType = this.getAttribute('data-layer');
+          switchBaseLayer(layerType);
+          showToast('რუკის რეჟიმი: ' + this.textContent.trim());
+        });
+      });
+
+      // Drawer Open / Close / Backdrop
+      const drawerTrigger = document.getElementById('drawer-trigger-btn');
+      const drawerClose = document.getElementById('drawer-close-btn');
+      const drawerBackdrop = document.getElementById('drawer-backdrop');
+
+      if (drawerTrigger) drawerTrigger.addEventListener('click', toggleDrawer);
+      if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+      if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+      // Close drawer on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDrawer();
+          closeModal();
+        }
+      });
+
+      // Fit boundary button in header & floating panel
+      document.getElementById('btn-fit-boundary').addEventListener('click', fitGardabaniBoundary);
+      document.getElementById('btn-recenter').addEventListener('click', fitGardabaniBoundary);
+
+      // Fullscreen Toggle
+      document.getElementById('btn-fullscreen').addEventListener('click', function() {
+        isFullscreen = !isFullscreen;
+        document.body.classList.toggle('fullscreen-mode', isFullscreen);
+        document.getElementById('fs-icon').textContent = isFullscreen ? '🗗' : '⛶';
+        setTimeout(() => {
+          if (map) map.invalidateSize();
+        }, 200);
+      });
+
+      // Search input live filtering & Enter key to select first result
+      const searchInp = document.getElementById('search-input');
+      searchInp.addEventListener('input', renderSidebar);
+      searchInp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const firstCard = document.querySelector('.loc-card-item');
+          if (firstCard) firstCard.click();
+        }
+      });
+
+      // Admin Modal & Action buttons
+      const btnAddLoc = document.getElementById('btn-add-location');
+      const btnOpenEd = document.getElementById('btn-open-editor');
+      if (btnAddLoc) btnAddLoc.addEventListener('click', openAddLocationModal);
+      if (btnOpenEd) btnOpenEd.addEventListener('click', openBatchEditorModal);
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+
+      document.getElementById('btn-save-config').addEventListener('click', saveModalData);
+      document.getElementById('btn-reset-config').addEventListener('click', resetToDefault);
+      document.getElementById('btn-copy-config').addEventListener('click', copyConfigJson);
+
+      // Header Admin Logout
+      const btnHeaderLogout = document.getElementById('btn-header-logout');
+      if (btnHeaderLogout) {
+        btnHeaderLogout.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          adminLogout('manual');
+        });
+      }
+
+      // Cross-tab / Window Focus Live Sync (instantly updates layers, locations, & admin mode)
+      window.addEventListener('focus', () => {
+        locations = loadSavedLocations();
+        renderMapOverlays();
+        applyLayerSettings();
+        syncAdminUI();
+        renderSidebar();
+      });
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'gardabani_locations') {
+          locations = loadSavedLocations();
+          renderMapOverlays();
+          renderSidebar();
+        }
+        if (e.key === 'gardabani_setting_boundary' || e.key === 'gardabani_setting_radius') {
+          applyLayerSettings();
+        }
+        if (e.key === 'gardabani_admin_session') {
+          syncAdminUI();
+          renderSidebar();
+        }
+        if (e.key === 'theme') {
+          const t = e.newValue || 'light';
+          document.documentElement.setAttribute('data-theme', t);
+          setupThemeToggle();
+          updateMapThemeTiles();
+        }
+      });
+    }
+
+    // ==========================================================================
+    // MODAL DIALOGS (ADMIN ACCESS WITH DATE FIELD)
+    // ==========================================================================
+    let currentModalMode = 'add';
+    let currentEditLocationId = null;
+
+    function openModal() {
+      document.getElementById('edit-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('edit-modal').classList.remove('open');
+      currentEditLocationId = null;
+    }
+
+    function openAddLocationModal() {
+      currentModalMode = 'add';
+      const container = document.getElementById('modal-form-container');
+      container.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">ლოკაციის სახელი (მაგ. სოფ. თელეთი)</label>
+          <input type="text" class="form-input" id="form-name" placeholder="სოფლის ან ლოკაციის სახელი">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">ტიპი</label>
+            <select class="form-input" id="form-type">
+              <option value="village">სოფელი</option>
+              <option value="hub">მთავარი ჰაბი</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">მოკლე სახელი</label>
+            <input type="text" class="form-input" id="form-short" placeholder="მოკლე სახელი">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 ჩატარების თარიღი</label>
+          <input type="date" class="form-input" id="form-date" value="2026-10-15">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">განედი (Latitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="form-lat" value="41.5000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">გრძედი (Longitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="form-lng" value="45.0500">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">აქტივობის სათაური</label>
+          <input type="text" class="form-input" id="form-act-title" placeholder="მაგ. მობილური ვორქშოფი: ეკოლოგია">
+        </div>
+        <div class="form-group">
+          <label class="form-label">აქტივობის აღწერა</label>
+          <textarea class="form-textarea" rows="3" id="form-act-desc" placeholder="აქტივობის დეტალური აღწერა..."></textarea>
+        </div>
+      `;
+      openModal();
+    }
+
+    function openEditLocation(id) {
+      const loc = locations.find(l => l.id === id);
+      if (!loc) return;
+      currentModalMode = 'edit';
+      currentEditLocationId = id;
+      const container = document.getElementById('modal-form-container');
+      container.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">ლოკაციის სახელი</label>
+          <input type="text" class="form-input" id="form-name" value="${loc.name}">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">ტიპი</label>
+            <select class="form-input" id="form-type">
+              <option value="village" ${loc.type === 'village' ? 'selected' : ''}>სოფელი</option>
+              <option value="hub" ${loc.type === 'hub' ? 'selected' : ''}>მთავარი ჰაბი</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">მოკლე სახელი</label>
+            <input type="text" class="form-input" id="form-short" value="${loc.shortName || ''}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 ჩატარების თარიღი</label>
+          <input type="date" class="form-input" id="form-date" value="${loc.date || '2026-10-15'}">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">განედი (Latitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="form-lat" value="${loc.latitude}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">გრძედი (Longitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="form-lng" value="${loc.longitude}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">აქტივობის სათაური</label>
+          <input type="text" class="form-input" id="form-act-title" value="${loc.activityTitle}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">აქტივობის აღწერა</label>
+          <textarea class="form-textarea" rows="3" id="form-act-desc">${loc.activityDescription}</textarea>
+        </div>
+        <div style="margin-top:6px;">
+          <button class="btn btn-outline" style="color:#ef4444; border-color:#fca5a5;" onclick="deleteLocation(${loc.id})">🗑️ ამ ლოკაციის წაშლა</button>
+        </div>
+      `;
+      openModal();
+    }
+
+    function openBatchEditorModal() {
+      currentModalMode = 'json';
+      const container = document.getElementById('modal-form-container');
+      container.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">ლოკაციების სრული JSON კონფიგურაცია</label>
+          <textarea class="form-textarea" id="form-json" rows="14" style="font-family:monospace; font-size:0.75rem;">${JSON.stringify(locations, null, 2)}</textarea>
+        </div>
+      `;
+      openModal();
+    }
+
+    function deleteLocation(id) {
+      if (confirm('ნამდვილად გსურთ ამ ლოკაციის წაშლა?')) {
+        locations = locations.filter(l => l.id !== id);
+        saveLocationsToStorage();
+        renderMapOverlays();
+        renderSidebar();
+        closeModal();
+        showToast('ლოკაცია წარმატებით წაიშალა');
+      }
+    }
+
+    function saveModalData() {
+      if (currentModalMode === 'json') {
+        try {
+          const val = document.getElementById('form-json').value;
+          const parsed = JSON.parse(val);
+          if (Array.isArray(parsed)) {
+            locations = parsed;
+            saveLocationsToStorage();
+            renderMapOverlays();
+            renderSidebar();
+            closeModal();
+            showToast('მონაცემები განახლდა');
+          }
+        } catch (e) {
+          alert('შეცდომა JSON ფორმატში: ' + e.message);
+        }
+        return;
+      }
+
+      const name = document.getElementById('form-name').value.trim();
+      const type = document.getElementById('form-type').value;
+      const shortName = document.getElementById('form-short').value.trim() || name;
+      const date = document.getElementById('form-date').value || '2026-10-15';
+      const lat = parseFloat(document.getElementById('form-lat').value);
+      const lng = parseFloat(document.getElementById('form-lng').value);
+      const actTitle = document.getElementById('form-act-title').value.trim();
+      const actDesc = document.getElementById('form-act-desc').value.trim();
+
+      if (!name || isNaN(lat) || isNaN(lng) || !actTitle) {
+        alert('გთხოვთ შეავსოთ ყველა აუცილებელი ველი!');
+        return;
+      }
+
+      if (currentModalMode === 'add') {
+        const newId = locations.length > 0 ? Math.max(...locations.map(l => l.id)) + 1 : 1;
+        const newLoc = {
+          id: newId,
+          name: name,
+          shortName: shortName,
+          type: type,
+          date: date,
+          latitude: lat,
+          longitude: lng,
+          activityTitle: actTitle,
+          activityDescription: actDesc
+        };
+        locations.push(newLoc);
+        saveLocationsToStorage();
+        syncLocationToSupabase(newLoc);
+        showToast('ახალი ლოკაცია დაემატა');
+      } else if (currentModalMode === 'edit') {
+        const idx = locations.findIndex(l => l.id === currentEditLocationId);
+        if (idx !== -1) {
+          const updatedLoc = {
+            id: currentEditLocationId,
+            name: name,
+            shortName: shortName,
+            type: type,
+            date: date,
+            latitude: lat,
+            longitude: lng,
+            activityTitle: actTitle,
+            activityDescription: actDesc
+          };
+          locations[idx] = updatedLoc;
+          saveLocationsToStorage();
+          syncLocationToSupabase(updatedLoc);
+          showToast('ლოკაციის მონაცემები შეიცვალა');
+        }
+      }
+
+      renderMapOverlays();
+      renderSidebar();
+      closeModal();
+    }
+
+    function resetToDefault() {
+      if (confirm('ნამდვილად გსურთ საწყის 7 ლოკაციაზე დაბრუნება?')) {
+        locations = JSON.parse(JSON.stringify(INITIAL_LOCATIONS));
+        saveLocationsToStorage();
+        renderMapOverlays();
+        renderSidebar();
+        closeModal();
+        showToast('მონაცემები დაბრუნდა საწყისზე');
+      }
+    }
+
+    function copyConfigJson() {
+      navigator.clipboard.writeText(JSON.stringify(locations, null, 2)).then(() => {
+        showToast('JSON მონაცემები დაკოპირდა ბუფერში');
+      }).catch(() => {
+        showToast('კოპირება ვერ მოხერხდა');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // ==========================================================================
+    // INITIALIZATION ON DOM READY
+    // ==========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      renderSidebar();
+      setupControls();
+      setupThemeToggle();
+      syncAdminUI();
+      syncLocationsFromSupabase();
+    });
+  </script>
+</body>
+</html>

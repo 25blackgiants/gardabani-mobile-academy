@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>გარდაბნის მობილური აკადემია — კალენდარი</title>
+  
+  <!-- Immediate Theme Initializer to prevent white flash -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM: CALENDAR PAGE (PURE BLACK DARK THEME)
+       ========================================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-hub: #dc2626;
+      --primary-village: #2563eb;
+      
+      /* Light Mode (default) */
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f8fafc;
+      --bg-hover: #f1f5f9;
+      --bg-nav: #f1f5f9;
+      --bg-input: #f8fafc;
+      
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      
+      --border-light: #e2e8f0;
+      --border-focus: #94a3b8;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+      
+      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    }
+
+    /* True Pure Black Dark Theme (No Blue Tint) */
+    [data-theme="dark"] {
+      --bg-page: #000000;         /* True Pure Black */
+      --bg-card: #0a0a0a;         /* Deep neutral black card */
+      --bg-card-subtle: #141414;  /* Slightly lighter card element */
+      --bg-hover: #1c1c1c;        /* Neutral dark hover */
+      --bg-nav: #0e0e0e;          /* Navigation pill background */
+      --bg-input: #121212;        /* Dark input field */
+      
+      --text-main: #f5f5f5;       /* Crisp clean white text */
+      --text-muted: #a3a3a3;      /* Neutral gray text */
+      --text-subtle: #737373;     /* Muted neutral gray */
+      
+      --border-light: #262626;    /* Dark neutral border, no blue tint */
+      --border-focus: #3b82f6;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.8);
+      --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.9);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px 20px 40px;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    header.header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: inline-flex;
+      background: var(--bg-nav);
+      padding: 3px;
+      border-radius: var(--radius-full);
+      gap: 3px;
+      border: 1px solid var(--border-light);
+    }
+
+    .nav-tab {
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.80rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
+    }
+
+    .nav-tab.active {
+      background: var(--bg-card);
+      color: #2563eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] .nav-tab.active {
+      color: #60a5fa;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-nav);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.80rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-focus);
+    }
+
+    .btn-return-map {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.80rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-return-map:hover {
+      background: #dbeafe;
+    }
+
+    [data-theme="dark"] .btn-return-map {
+      background: #172554;
+      border-color: #1e40af;
+      color: #93c5fd;
+    }
+
+    /* Hero section */
+    .calendar-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 22px 26px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.74rem;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    [data-theme="dark"] .hero-badge {
+      background: #141414;
+      color: #ffffff;
+      border-color: #333333;
+    }
+
+    .hero-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .hero-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 860px;
+      line-height: 1.55;
+    }
+
+    /* ==========================================================================
+       MAIN CALENDAR 2-COLUMN LAYOUT
+       ========================================================================== */
+    .calendar-layout {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .calendar-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    /* Month Navigation Bar */
+    .month-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .month-heading {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .month-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .month-btn {
+      background: var(--bg-nav);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 5px 11px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.80rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .month-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-focus);
+    }
+
+    /* Weekday Headers */
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .weekday-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-subtle);
+      padding: 6px 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .weekday-label.weekend {
+      color: #ef4444;
+    }
+
+    /* Calendar Days Grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .calendar-day-cell {
+      aspect-ratio: 1 / 1;
+      min-height: 52px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 5px 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .calendar-day-cell:hover {
+      background: var(--bg-hover);
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .calendar-day-cell.other-month {
+      opacity: 0.35;
+      background: transparent;
+    }
+
+    .calendar-day-cell.selected {
+      border-color: #2563eb !important;
+      background: #eff6ff !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    }
+
+    [data-theme="dark"] .calendar-day-cell.selected {
+      border-color: #3b82f6 !important;
+      background: #172554 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+    }
+
+    .calendar-day-cell.today .day-number {
+      background: #2563eb;
+      color: #ffffff;
+      border-radius: var(--radius-full);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* Day with Event Highlight */
+    .calendar-day-cell.has-event {
+      border-color: #93c5fd;
+      background: rgba(37, 99, 235, 0.04);
+      font-weight: 800;
+    }
+
+    [data-theme="dark"] .calendar-day-cell.has-event {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .calendar-day-cell.has-hub {
+      border-color: #fca5a5;
+      background: rgba(220, 38, 38, 0.05);
+    }
+
+    [data-theme="dark"] .calendar-day-cell.has-hub {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.09);
+    }
+
+    .day-number {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .event-dots-wrap {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .event-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .event-dot.hub {
+      background: #dc2626;
+      box-shadow: 0 0 5px rgba(220, 38, 38, 0.6);
+    }
+
+    .event-dot.village {
+      background: #2563eb;
+      box-shadow: 0 0 5px rgba(37, 99, 235, 0.6);
+    }
+
+    /* Selected Day Details Card (Right Column) */
+    .details-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 10px;
+    }
+
+    .details-date-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .events-count-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    [data-theme="dark"] .events-count-badge {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    .day-events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 160px;
+    }
+
+    .event-detail-item {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .event-detail-item.hub {
+      border-left: 4px solid var(--primary-hub);
+    }
+
+    .event-detail-item.village {
+      border-left: 4px solid var(--primary-village);
+    }
+
+    .event-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .event-location-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .event-type-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .event-type-badge.hub {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    [data-theme="dark"] .event-type-badge.hub {
+      background: #350808;
+      color: #fca5a5;
+      border-color: #7f1d1d;
+    }
+
+    .event-type-badge.village {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    [data-theme="dark"] .event-type-badge.village {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    .event-activity-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .event-activity-desc {
+      font-size: 0.80rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .event-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-light);
+    }
+
+    .btn-goto-map {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-goto-map:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .empty-events-state {
+      padding: 30px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-subtle);
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      opacity: 0.7;
+    }
+
+    .empty-text {
+      font-size: 0.84rem;
+      max-width: 280px;
+      line-height: 1.4;
+    }
+
+    /* All Activities Timeline Table */
+    .timeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .timeline-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    .timeline-item-card {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .timeline-item-card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-date-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+      width: fit-content;
+      border: 1px solid #bfdbfe;
+    }
+
+    [data-theme="dark"] .timeline-date-chip {
+      background: #172554;
+      color: #93c5fd;
+      border-color: #1e40af;
+    }
+
+    /* Stealth Admin Modal */
+    .stealth-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: stealthFadeIn 0.2s ease-out;
+    }
+    @keyframes stealthFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .stealth-modal-window {
+      background: var(--bg-card);
+      border: 1px solid #2563eb;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(37, 99, 235, 0.3);
+      overflow: hidden;
+      animation: stealthSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] .stealth-modal-window {
+      background: #0a0a0a;
+      border-color: #3b82f6;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 25px rgba(59, 130, 246, 0.25);
+    }
+    @keyframes stealthSlideUp {
+      from { transform: translateY(20px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .stealth-modal-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stealth-header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stealth-shield-icon {
+      font-size: 1.5rem;
+    }
+    .stealth-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+    .stealth-badge {
+      display: block;
+      font-size: 0.70rem;
+      color: #3b82f6;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .stealth-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-subtle);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .stealth-close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+    .stealth-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .stealth-desc {
+      font-size: 0.82rem;
+      color: var(--text-subtle);
+      line-height: 1.45;
+      margin: 0;
+    }
+    .stealth-lockout-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ef4444;
+    }
+    .lockout-icon {
+      font-size: 1.6rem;
+    }
+    .lockout-heading {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #f87171;
+    }
+    .lockout-sub {
+      font-size: 0.80rem;
+      font-family: monospace;
+      font-weight: 700;
+      margin-top: 2px;
+      color: #ef4444;
+    }
+    .stealth-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .stealth-input-wrapper .form-input {
+      width: 100%;
+      padding-right: 40px;
+      box-sizing: border-box;
+    }
+    .stealth-toggle-pw {
+      position: absolute;
+      right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 1rem;
+      opacity: 0.7;
+      color: var(--text-main);
+    }
+    .stealth-toggle-pw:hover {
+      opacity: 1;
+    }
+    .stealth-attempts-info {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .stealth-error-alert {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.80rem;
+      margin-top: 6px;
+      font-weight: 600;
+      animation: shake 0.35s ease;
+    }
+    .stealth-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .btn-indicator-logout {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #ef4444;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      cursor: pointer;
+      margin-left: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-indicator-logout:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="header-title" id="header-brand-title" style="cursor:pointer;" title="გარდაბნის მობილური აკადემია">
+          <span class="header-logo" id="header-logo">🚐</span>
+          <span>გარდაბნის მობილური აკადემია</span>
+        </h1>
+        <nav class="nav-tabs">
+          <a href="index.html" class="nav-tab">მთავარი გვერდი</a>
+          <a href="calendar.html" class="nav-tab active">კალენდარი</a>
+          <a href="mentors.html" class="nav-tab">მენტორები</a>
+          <a href="settings.html" class="nav-tab">პარამეტრები</a>
+        </nav>
+      </div>
+
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
+          <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
+        </button>
+        <a href="index.html" class="btn-return-map">
+          ← მთავარ გვერდზე დაბრუნება
+        </a>
+      </div>
+    </header>
+
+    <!-- CALENDAR 2-COLUMN VIEW -->
+    <main class="calendar-layout">
+
+      <!-- LEFT COLUMN: INTERACTIVE MONTH CALENDAR -->
+      <section class="card calendar-card">
+        
+        <!-- Month Navigator -->
+        <div class="month-nav-bar">
+          <div class="month-heading">
+            <span>📅</span>
+            <span id="month-display-title">ოქტომბერი 2026</span>
+          </div>
+          <div class="month-controls">
+            <button class="month-btn" id="btn-prev-month" title="წინა თვე">‹</button>
+            <button class="month-btn" id="btn-today-month">დღეს</button>
+            <button class="month-btn" id="btn-next-month" title="შემდეგი თვე">›</button>
+          </div>
+        </div>
+
+        <!-- Weekday Headers -->
+        <div class="calendar-weekdays">
+          <div class="weekday-label">ორშ</div>
+          <div class="weekday-label">სამ</div>
+          <div class="weekday-label">ოთხ</div>
+          <div class="weekday-label">ხუთ</div>
+          <div class="weekday-label">პარ</div>
+          <div class="weekday-label weekend">შაბ</div>
+          <div class="weekday-label weekend">კვი</div>
+        </div>
+
+        <!-- Days Grid -->
+        <div class="calendar-grid" id="calendar-days-grid">
+          <!-- Dynamically populated -->
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: SELECTED DAY ACTIVITIES -->
+      <section class="card day-events-card">
+        <div class="details-header">
+          <h3 class="details-date-title" id="selected-date-title">
+            <span>📅</span> <span id="selected-date-text">3 ოქტომბერი, 2026</span>
+          </h3>
+          <span class="events-count-badge" id="selected-events-count">1 აქტივობა</span>
+        </div>
+
+        <!-- Activities on Selected Day -->
+        <div class="day-events-list" id="day-events-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ALL UPCOMING ACTIVITIES TIMELINE -->
+    <section class="timeline-card">
+      <h3 class="timeline-title">
+        <span>📋</span> ყველა დაგეგმილი აქტივობა
+      </h3>
+      <div class="timeline-grid" id="timeline-container">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+  </div>
+
+
+  <!-- STEALTH ADMIN ACCESS MODAL (TRIGGERED ONLY BY CTRL+SHIFT+A+L OR 5 CLICKS ON LOGO) -->
+  <div class="stealth-modal-backdrop" id="stealth-admin-modal" style="display:none;">
+    <div class="stealth-modal-window">
+      <div class="stealth-modal-header">
+        <div class="stealth-header-title">
+          <span class="stealth-shield-icon">🛡️</span>
+          <div>
+            <h3 class="stealth-title">ადმინისტრატორის დაცული წვდომა</h3>
+            <span class="stealth-badge" id="stealth-security-badge">SHA-256 დაცული • Rate-Limited</span>
+          </div>
+        </div>
+        <button class="stealth-close-btn" id="stealth-close-btn" title="დახურვა">✕</button>
+      </div>
+
+      <div class="stealth-modal-body">
+        <p class="stealth-desc" id="stealth-desc-text">
+          შეიყვანეთ ადმინისტრატორის საიდუმლო კოდი. კოდი მოწმდება კლიენტის კრიპტოგრაფიული ჰეშით. 3 არასწორი მცდელობის შემდეგ სისტემა დროებით დაიბლოკება.
+        </p>
+
+        <!-- Lockout Banner (shown during lockout) -->
+        <div class="stealth-lockout-box" id="stealth-lockout-box" style="display:none;">
+          <div class="lockout-icon">🔒</div>
+          <div class="lockout-info">
+            <div class="lockout-heading">სისტემა დროებით დაბლოკილია!</div>
+            <div class="lockout-sub" id="stealth-lockout-timer">დარჩენილი დრო: 05:00</div>
+          </div>
+        </div>
+
+        <!-- Optional Email Input (visible in Supabase mode) -->
+        <div class="stealth-input-group" id="stealth-email-group" style="display:none; margin-bottom:12px;">
+          <label class="form-label" for="stealth-email-input">ადმინისტრატორის ელ-ფოსტა</label>
+          <div class="stealth-input-wrapper">
+            <input type="email" class="form-input" id="stealth-email-input" placeholder="admin@gardabani.ge" autocomplete="username">
+          </div>
+        </div>
+
+        <!-- Input Row -->
+        <div class="stealth-input-group" id="stealth-input-group">
+          <label class="form-label" for="stealth-pass-input" id="stealth-pass-label">ადმინისტრატორის კოდი</label>
+          <div class="stealth-input-wrapper">
+            <input type="password" class="form-input" id="stealth-pass-input" placeholder="შეიყვანეთ კოდი..." autocomplete="current-password">
+            <button class="stealth-toggle-pw" id="stealth-toggle-pw" type="button" title="პაროლის ჩვენება/დამალვა">👁️</button>
+          </div>
+          <div class="stealth-attempts-info" id="stealth-attempts-info">
+            დარჩენილია 3 მცდელობა
+          </div>
+          <div class="stealth-error-alert" id="stealth-error-alert" style="display:none;"></div>
+        </div>
+
+        <div class="stealth-modal-footer">
+          <button class="btn btn-outline" id="stealth-cancel-btn">გაუქმება</button>
+          <button class="btn btn-primary" id="stealth-submit-btn">
+            <span>🔑</span> შესვლა
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Supabase JS Client & Project Configuration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase_config.js"></script>
+
+  <script>
+
+    // ==========================================================================
+    // STEALTH ADMIN ACCESS LOGIC (SHA-256, RATE LIMIT, INACTIVITY TIMEOUT & SUPABASE)
+    // ==========================================================================
+    const ADMIN_HASH = 'c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672';
+    const LOCKOUT_TIERS = [5, 10, 15]; // Minutes: 1st lockout = 5m, 2nd = 10m, 3rd+ = 15m
+    const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+    let lockoutTimerInterval = null;
+    let inactivityTimeoutId = null;
+    let supabaseClient = null;
+
+    // Cryptographic SHA-256 via Web Crypto API
+    async function computeSHA256(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuf = await crypto.subtle.digest('SHA-256', data);
+      const hashArr = Array.from(new Uint8Array(hashBuf));
+      return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function isSupabaseConfigured() {
+      return typeof SUPABASE_CONFIG !== 'undefined' &&
+             typeof SUPABASE_CONFIG.url === 'string' &&
+             SUPABASE_CONFIG.url.startsWith('https://') &&
+             !SUPABASE_CONFIG.url.includes('YOUR_SUPABASE') &&
+             typeof SUPABASE_CONFIG.anonKey === 'string' &&
+             SUPABASE_CONFIG.anonKey.length > 20 &&
+             !SUPABASE_CONFIG.anonKey.includes('YOUR_SUPABASE') &&
+             typeof supabase !== 'undefined' &&
+             typeof supabase.createClient === 'function';
+    }
+
+    function initSupabase() {
+      if (isSupabaseConfigured() && !supabaseClient) {
+        try {
+          supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        } catch (e) {
+          console.warn('Supabase init error:', e);
+          supabaseClient = null;
+        }
+      }
+      return supabaseClient;
+    }
+
+    function isAdminMode() {
+      return sessionStorage.getItem('gardabani_admin_session') === 'true';
+    }
+
+    function getLockoutUntil() {
+      const val = parseInt(localStorage.getItem('gardabani_lockout_until') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function isLockedOut() {
+      return Date.now() < getLockoutUntil();
+    }
+
+    function getFailedAttempts() {
+      const val = parseInt(localStorage.getItem('gardabani_failed_attempts') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function getLockoutLevel() {
+      const val = parseInt(localStorage.getItem('gardabani_lockout_level') || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function recordFailedAttempt() {
+      const attempts = getFailedAttempts() + 1;
+      localStorage.setItem('gardabani_failed_attempts', attempts.toString());
+
+      if (attempts >= 3) {
+        const level = getLockoutLevel() + 1;
+        localStorage.setItem('gardabani_lockout_level', level.toString());
+        const minutes = LOCKOUT_TIERS[Math.min(level - 1, LOCKOUT_TIERS.length - 1)];
+        const until = Date.now() + minutes * 60 * 1000;
+        localStorage.setItem('gardabani_lockout_until', until.toString());
+        return { locked: true, minutes: minutes, remaining: 0 };
+      }
+
+      return { locked: false, remaining: 3 - attempts };
+    }
+
+    function resetAdminLockout() {
+      localStorage.removeItem('gardabani_failed_attempts');
+      localStorage.removeItem('gardabani_lockout_until');
+      localStorage.removeItem('gardabani_lockout_level');
+    }
+
+    function updateLockoutUI() {
+      const until = getLockoutUntil();
+      const now = Date.now();
+      const box = document.getElementById('stealth-lockout-box');
+      const timerEl = document.getElementById('stealth-lockout-timer');
+      const passInput = document.getElementById('stealth-pass-input');
+      const emailInput = document.getElementById('stealth-email-input');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+      const attemptsEl = document.getElementById('stealth-attempts-info');
+
+      if (now < until) {
+        const diffSec = Math.ceil((until - now) / 1000);
+        const m = Math.floor(diffSec / 60).toString().padStart(2, '0');
+        const s = (diffSec % 60).toString().padStart(2, '0');
+        if (box) box.style.display = 'flex';
+        if (timerEl) timerEl.textContent = 'დარჩენილი დრო: ' + m + ':' + s;
+        if (emailInput) emailInput.disabled = true;
+        if (passInput) passInput.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (attemptsEl) attemptsEl.style.display = 'none';
+
+        if (!lockoutTimerInterval) {
+          lockoutTimerInterval = setInterval(updateLockoutUI, 1000);
+        }
+      } else {
+        if (lockoutTimerInterval) {
+          clearInterval(lockoutTimerInterval);
+          lockoutTimerInterval = null;
+        }
+        if (until > 0) {
+          localStorage.removeItem('gardabani_lockout_until');
+          localStorage.setItem('gardabani_failed_attempts', '0');
+        }
+        if (box) box.style.display = 'none';
+        if (emailInput) emailInput.disabled = false;
+        if (passInput) passInput.disabled = false;
+        if (submitBtn) submitBtn.disabled = false;
+        if (attemptsEl) {
+          attemptsEl.style.display = 'block';
+          const rem = 3 - getFailedAttempts();
+          attemptsEl.textContent = 'დარჩენილია ' + rem + ' მცდელობა';
+        }
+      }
+    }
+
+    function openStealthAdminModal() {
+      const modal = document.getElementById('stealth-admin-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      const errorAlert = document.getElementById('stealth-error-alert');
+      if (errorAlert) errorAlert.style.display = 'none';
+      updateLockoutUI();
+
+      const emailGroup = document.getElementById('stealth-email-group');
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const passLabel = document.getElementById('stealth-pass-label');
+      const badgeEl = document.getElementById('stealth-security-badge');
+      const descEl = document.getElementById('stealth-desc-text');
+
+      if (isSupabaseConfigured()) {
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (passLabel) passLabel.textContent = 'ადმინისტრატორის პაროლი';
+        if (badgeEl) badgeEl.textContent = 'Supabase Cloud Auth • RLS დაცული';
+        if (descEl) descEl.textContent = 'შეიყვანეთ Supabase ადმინისტრატორის ელ-ფოსტა და პაროლი სრული ღრუბლოვანი წვდომისთვის.';
+        if (emailInput) {
+          const savedEmail = localStorage.getItem('gardabani_admin_saved_email') || (typeof SUPABASE_CONFIG !== 'undefined' ? SUPABASE_CONFIG.adminEmail : '') || '';
+          emailInput.value = savedEmail;
+        }
+      } else {
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (passLabel) passLabel.textContent = 'ადმინისტრატორის კოდი';
+        if (badgeEl) badgeEl.textContent = 'SHA-256 დაცული • Rate-Limited';
+        if (descEl) descEl.textContent = 'შეიყვანეთ ადმინისტრატორის საიდუმლო კოდი. კოდი მოწმდება კლიენტის კრიპტოგრაფიული ჰეშით. 3 არასწორი მცდელობის შემდეგ სისტემა დროებით დაიბლოკება.';
+      }
+
+      if (passInput && !isLockedOut()) {
+        passInput.value = '';
+        setTimeout(() => {
+          if (isSupabaseConfigured() && emailInput && !emailInput.value) {
+            emailInput.focus();
+          } else {
+            passInput.focus();
+          }
+        }, 150);
+      }
+    }
+
+    function closeStealthAdminModal() {
+      const modal = document.getElementById('stealth-admin-modal');
+      if (modal) modal.style.display = 'none';
+      if (lockoutTimerInterval) {
+        clearInterval(lockoutTimerInterval);
+        lockoutTimerInterval = null;
+      }
+    }
+
+    async function handleStealthLogin() {
+      if (isLockedOut()) return;
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const errorAlert = document.getElementById('stealth-error-alert');
+      const attemptsEl = document.getElementById('stealth-attempts-info');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+
+      const enteredEmail = (emailInput ? emailInput.value : '').trim();
+      const enteredPass = (passInput ? passInput.value : '').trim();
+
+      if (!enteredPass) {
+        if (errorAlert) {
+          errorAlert.textContent = 'გთხოვთ შეიყვანოთ კოდი / პაროლი.';
+          errorAlert.style.display = 'block';
+        }
+        return;
+      }
+
+      // 1. Supabase Cloud Authentication (if configured & email provided)
+      if (isSupabaseConfigured() && enteredEmail) {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>⏳</span> მოწმდება...';
+        }
+        try {
+          const client = initSupabase();
+          const { data, error } = await client.auth.signInWithPassword({
+            email: enteredEmail,
+            password: enteredPass
+          });
+
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🔑</span> შესვლა';
+          }
+
+          if (error) {
+            const res = recordFailedAttempt();
+            if (res.locked) {
+              updateLockoutUI();
+              showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
+            } else {
+              if (errorAlert) {
+                errorAlert.textContent = '❌ ' + (error.message === 'Invalid login credentials' ? 'არასწორი ელ-ფოსტა ან პაროლი!' : error.message) + ' (დარჩა ' + res.remaining + ')';
+                errorAlert.style.display = 'block';
+              }
+              if (attemptsEl) attemptsEl.textContent = 'დარჩენილია ' + res.remaining + ' მცდელობა';
+              if (passInput) {
+                passInput.classList.add('shake');
+                setTimeout(() => passInput.classList.remove('shake'), 400);
+                passInput.focus();
+                passInput.select();
+              }
+            }
+            return;
+          }
+
+          // Supabase Auth Success
+          resetAdminLockout();
+          localStorage.setItem('gardabani_admin_saved_email', enteredEmail);
+          sessionStorage.setItem('gardabani_admin_session', 'true');
+          sessionStorage.setItem('gardabani_admin_mode_type', 'supabase');
+          sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+          closeStealthAdminModal();
+          startInactivityWatcher();
+          if (typeof syncAdminUI === 'function') syncAdminUI();
+          if (typeof syncAdminView === 'function') syncAdminView();
+          if (typeof renderSidebar === 'function') renderSidebar();
+          if (typeof renderMarkers === 'function') renderMarkers();
+          showToast('🛡️ Supabase Cloud Admin რეჟიმი გააქტიურდა!');
+          return;
+        } catch (authErr) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🔑</span> შესვლა';
+          }
+          console.warn('Supabase Auth error, attempting local check...', authErr);
+        }
+      }
+
+      // 2. Cryptographic SHA-256 Check (Local Prototype / Fallback)
+      const hash = await computeSHA256(enteredPass);
+      if (hash === ADMIN_HASH) {
+        // Success
+        resetAdminLockout();
+        sessionStorage.setItem('gardabani_admin_session', 'true');
+        sessionStorage.setItem('gardabani_admin_mode_type', 'local');
+        sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+        closeStealthAdminModal();
+        startInactivityWatcher();
+        if (typeof syncAdminUI === 'function') syncAdminUI();
+        if (typeof syncAdminView === 'function') syncAdminView();
+        if (typeof renderSidebar === 'function') renderSidebar();
+        if (typeof renderMarkers === 'function') renderMarkers();
+        showToast('🛡️ ადმინისტრატორის სესია წარმატებით გააქტიურდა!');
+      } else {
+        // Fail
+        const res = recordFailedAttempt();
+        if (res.locked) {
+          updateLockoutUI();
+          showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
+        } else {
+          if (errorAlert) {
+            errorAlert.textContent = '❌ არასწორი კოდი! დარჩენილია ' + res.remaining + ' მცდელობა.';
+            errorAlert.style.display = 'block';
+          }
+          if (attemptsEl) {
+            attemptsEl.textContent = 'დარჩენილია ' + res.remaining + ' მცდელობა';
+          }
+          if (passInput) {
+            passInput.classList.add('shake');
+            setTimeout(() => passInput.classList.remove('shake'), 400);
+            passInput.focus();
+            passInput.select();
+          }
+        }
+      }
+    }
+
+    async function adminLogout(reason) {
+      sessionStorage.removeItem('gardabani_admin_session');
+      sessionStorage.removeItem('gardabani_admin_mode_type');
+      sessionStorage.removeItem('gardabani_last_active');
+      const client = initSupabase();
+      if (client) {
+        try {
+          await client.auth.signOut();
+        } catch (e) {}
+      }
+      clearTimeout(inactivityTimeoutId);
+      if (typeof syncAdminUI === 'function') syncAdminUI();
+      if (typeof syncAdminView === 'function') syncAdminView();
+      if (typeof renderSidebar === 'function') renderSidebar();
+      if (typeof renderMarkers === 'function') renderMarkers();
+      if (reason === 'inactivity') {
+        showToast('⚠️ უმოქმედობის გამო (15 წთ) ადმინისტრატორის სესია დასრულდა');
+      } else {
+        showToast('ადმინისტრატორის რეჟიმი გაითიშა 🔒');
+      }
+    }
+
+    function recordActivity() {
+      if (!isAdminMode()) return;
+      sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+      resetInactivityTimer();
+    }
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimeoutId);
+      if (!isAdminMode()) return;
+      inactivityTimeoutId = setTimeout(() => {
+        adminLogout('inactivity');
+      }, INACTIVITY_TIMEOUT_MS);
+    }
+
+    function startInactivityWatcher() {
+      if (isAdminMode()) {
+        const last = parseInt(sessionStorage.getItem('gardabani_last_active') || '0', 10);
+        if (last && (Date.now() - last > INACTIVITY_TIMEOUT_MS)) {
+          adminLogout('inactivity');
+          return;
+        }
+        recordActivity();
+      }
+    }
+
+    // Attach listeners
+    ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        const now = Date.now();
+        const last = parseInt(sessionStorage.getItem('gardabani_last_active') || '0', 10);
+        if (now - last > 10000) {
+          recordActivity();
+        }
+      }, { passive: true });
+    });
+
+    // 1. Secret Key Shortcut: Ctrl + Shift + A + L
+    const activeKeys = new Set();
+    let chordSeq = [];
+    let chordTimer = null;
+
+    window.addEventListener('keydown', (e) => {
+      activeKeys.add(e.key.toLowerCase());
+      activeKeys.add(e.code.toLowerCase());
+
+      const isCtrl = e.ctrlKey || activeKeys.has('control');
+      const isShift = e.shiftKey || activeKeys.has('shift');
+      const hasA = activeKeys.has('a') || activeKeys.has('keya');
+      const hasL = activeKeys.has('l') || activeKeys.has('keyl');
+
+      if (isCtrl && isShift && hasA && hasL) {
+        e.preventDefault();
+        openStealthAdminModal();
+        return;
+      }
+
+      if (isCtrl && isShift) {
+        const k = e.key.toLowerCase();
+        if (k === 'a' || k === 'l') {
+          chordSeq.push(k);
+          clearTimeout(chordTimer);
+          chordTimer = setTimeout(() => { chordSeq = []; }, 2000);
+          if (chordSeq.includes('a') && chordSeq.includes('l')) {
+            e.preventDefault();
+            chordSeq = [];
+            openStealthAdminModal();
+          }
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      activeKeys.delete(e.key.toLowerCase());
+      activeKeys.delete(e.code.toLowerCase());
+    });
+
+    // 2. Secret Door: 5 Rapid Clicks on Logo
+    let rapidLogoClicks = 0;
+    let rapidLogoTimer = null;
+
+    function setupSecretLogoDoor() {
+      const logoEl = document.getElementById('header-brand-title') || document.getElementById('header-logo') || document.querySelector('.header-title');
+      if (logoEl) {
+        logoEl.style.cursor = 'pointer';
+        logoEl.title = 'გარდაბნის მობილური აკადემია';
+        logoEl.addEventListener('click', (e) => {
+          rapidLogoClicks++;
+          clearTimeout(rapidLogoTimer);
+          rapidLogoTimer = setTimeout(() => {
+            rapidLogoClicks = 0;
+          }, 3000);
+
+          if (rapidLogoClicks >= 5) {
+            e.preventDefault();
+            e.stopPropagation();
+            rapidLogoClicks = 0;
+            openStealthAdminModal();
+          }
+        });
+      }
+    }
+
+    // Modal DOM Events
+    function setupStealthModalDOM() {
+      const closeBtn = document.getElementById('stealth-close-btn');
+      const cancelBtn = document.getElementById('stealth-cancel-btn');
+      const submitBtn = document.getElementById('stealth-submit-btn');
+      const togglePw = document.getElementById('stealth-toggle-pw');
+      const emailInput = document.getElementById('stealth-email-input');
+      const passInput = document.getElementById('stealth-pass-input');
+      const modal = document.getElementById('stealth-admin-modal');
+
+      if (closeBtn) closeBtn.onclick = closeStealthAdminModal;
+      if (cancelBtn) cancelBtn.onclick = closeStealthAdminModal;
+      if (submitBtn) submitBtn.onclick = handleStealthLogin;
+      if (togglePw && passInput) {
+        togglePw.onclick = () => {
+          const isPw = passInput.type === 'password';
+          passInput.type = isPw ? 'text' : 'password';
+          togglePw.textContent = isPw ? '🙈' : '👁️';
+        };
+      }
+      if (emailInput) {
+        emailInput.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            if (passInput) passInput.focus();
+          }
+          if (e.key === 'Escape') closeStealthAdminModal();
+        };
+      }
+      if (passInput) {
+        passInput.onkeydown = (e) => {
+          if (e.key === 'Enter') handleStealthLogin();
+          if (e.key === 'Escape') closeStealthAdminModal();
+        };
+      }
+      if (modal) {
+        modal.onclick = (e) => {
+          if (e.target === modal) closeStealthAdminModal();
+        };
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setupSecretLogoDoor();
+      setupStealthModalDOM();
+      startInactivityWatcher();
+    });
+
+    // ==========================================================================
+    // GEORGIAN CALENDAR LOCALIZATION & INITIAL LOCATIONS
+    // ==========================================================================
+    const GEORGIAN_MONTHS = [
+      'იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი',
+      'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'
+    ];
+
+    const INITIAL_LOCATIONS = [
+      {
+        id: 1,
+        name: "მთავარი ჰაბი — ქ. გარდაბანი",
+        shortName: "ქ. გარდაბანი",
+        type: "hub",
+        date: "2026-10-03",
+        latitude: 41.4589,
+        longitude: 45.0928,
+        activityTitle: "ცენტრალური საგანმანათლებლო პროგრამა და კოორდინაცია",
+        activityDescription: "პროგრამის ძირითადი შტაბი და ცენტრალური შეხვედრების სივრცე. ქართველ და აზერბაიჯანელ ახალგაზრდებს შორის კულტურული დიალოგი, ენობრივი გაცვლა და ტექნოლოგიური ვორქშოფები."
+      },
+      {
+        id: 2,
+        name: "ლოკაცია 1: სოფ. კესალო",
+        shortName: "კესალო",
+        type: "village",
+        date: "2026-10-07",
+        latitude: 41.4360,
+        longitude: 45.0315,
+        activityTitle: "მობილური ვორქშოფი: შემოქმედებითი უნარები და გუნდურობა",
+        activityDescription: "ახალგაზრდული გუნდური პროექტები, ხელოვნების თერაპია, დებატები და ერთობლივი ინიციატივების დაგეგმვა ადგილობრივი თემის მონაწილეობით."
+      },
+      {
+        id: 3,
+        name: "ლოკაცია 2: სოფ. ნაზარლო",
+        shortName: "ნაზარლო",
+        type: "village",
+        date: "2026-10-12",
+        latitude: 41.4085,
+        longitude: 45.0740,
+        activityTitle: "მობილური ვორქშოფი: სამოქალაქო ჩართულობა და მედიაწიგნიერება",
+        activityDescription: "ტრენინგები კრიტიკულ აზროვნებაში, ციფრული უსაფრთხოება, ადგილობრივი საჭიროებების ადვოკატირება და სამოქალაქო აქტივიზმი."
+      },
+      {
+        id: 4,
+        name: "ლოკაცია 3: სოფ. სართიჭალა",
+        shortName: "სართიჭალა",
+        type: "village",
+        date: "2026-10-16",
+        latitude: 41.7145,
+        longitude: 45.1820,
+        activityTitle: "მობილური ვორქშოფი: ტექნოლოგიები და კარიერული ორიენტაცია",
+        activityDescription: "ციფრული უნარების განვითარება, თანამედროვე პროფესიების გაცნობა, CV-ის შედგენა და პროფესიული განათლების შესაძლებლობები."
+      },
+      {
+        id: 5,
+        name: "ლოკაცია 4: სოფ. კუმისი",
+        shortName: "კუმისი",
+        type: "village",
+        date: "2026-10-21",
+        latitude: 41.5860,
+        longitude: 44.8380,
+        activityTitle: "მობილური ვორქშოფი: ეკოლოგია და გარემოსდაცვითი ინიციატივები",
+        activityDescription: "ერთობლივი ეკო-აქტივობები, კუმისის ტბის მიმდებარე ტერიტორიის დასუფთავების აქცია და გარემოსდაცვითი ცნობიერების ამაღლება."
+      },
+      {
+        id: 6,
+        name: "ლოკაცია 5: სოფ. ყარაჯალარი",
+        shortName: "ყარაჯალარი",
+        type: "village",
+        date: "2026-10-25",
+        latitude: 41.5650,
+        longitude: 45.0220,
+        activityTitle: "მობილური ვორქშოფი: ქართულ-აზერბაიჯანული ენობრივი კლუბი",
+        activityDescription: "ინტერაქტიული ენობრივი თამაშები, ორმხრივი ენის პრაქტიკა, კულტურათაშორისი დიალოგი და ახალგაზრდების დამეგობრების კლუბი."
+      },
+      {
+        id: 7,
+        name: "ლოკაცია 6: სოფ. ვახტანგისი",
+        shortName: "ვახტანგისი",
+        type: "village",
+        date: "2026-10-29",
+        latitude: 41.3480,
+        longitude: 45.1050,
+        activityTitle: "მობილური ვორქშოფი: სოციალური მეწარმეობა და იდეების ბანკი",
+        activityDescription: "სასაზღვრო რეგიონის ახალგაზრდებისთვის მცირე სოციალური ბიზნეს-იდეების გენერირება და სათემო პროექტების დაფინანსების შესაძლებლობები."
+      }
+    ];
+
+    function loadLocations() {
+      try {
+        const saved = localStorage.getItem('gardabani_locations');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(INITIAL_LOCATIONS));
+    }
+
+    let locations = loadLocations();
+
+    // Asynchronous Cloud Sync with Supabase for Calendar
+    async function syncLocationsFromSupabase() {
+      const client = initSupabase();
+      if (!client) return;
+      try {
+        const { data, error } = await client
+          .from('locations')
+          .select('*')
+          .order('id', { ascending: true });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          locations = data.map(r => ({
+            id: Number(r.id),
+            name: r.name,
+            shortName: r.short_name,
+            type: r.type,
+            date: r.date,
+            latitude: Number(r.latitude),
+            longitude: Number(r.longitude),
+            activityTitle: r.activity_title,
+            activityDescription: r.activity_description
+          }));
+          try {
+            localStorage.setItem('gardabani_locations', JSON.stringify(locations));
+          } catch (e) {}
+          renderCalendar();
+          console.log('✅ Supabase: კალენდარი სინქრონიზებულია (' + locations.length + ' ლოკაცია)');
+        }
+      } catch (err) {
+        console.warn('Supabase fetch notice in calendar:', err);
+      }
+    }
+
+    // Default viewing month: October 2026 (or current)
+    let viewYear = 2026;
+    let viewMonth = 9; // 0-indexed: 9 = October
+    let selectedDateStr = "2026-10-03"; // Default selection on Hub event
+
+    function formatGeorgianDate(dateStr) {
+      if (!dateStr) return 'თარიღი უცნობია';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const day = parseInt(parts[2], 10);
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const year = parts[0];
+      return day + ' ' + (GEORGIAN_MONTHS[monthIdx] || '') + ', ' + year;
+    }
+
+    function renderCalendar() {
+      const monthTitle = document.getElementById('month-display-title');
+      monthTitle.textContent = (GEORGIAN_MONTHS[viewMonth] || '') + ' ' + viewYear;
+
+      const grid = document.getElementById('calendar-days-grid');
+      grid.innerHTML = '';
+
+      // First day of month (0 = Sunday, 1 = Monday, ...)
+      const firstDayDate = new Date(viewYear, viewMonth, 1);
+      let startingDay = firstDayDate.getDay();
+      // Shift so Monday is index 0
+      startingDay = startingDay === 0 ? 6 : startingDay - 1;
+
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+
+      // Pad previous month days
+      for (let i = startingDay - 1; i >= 0; i--) {
+        const prevDay = daysInPrevMonth - i;
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day-cell other-month';
+        cell.innerHTML = `<span class="day-number">${prevDay}</span>`;
+        grid.appendChild(cell);
+      }
+
+      // Today reference
+      const today = new Date();
+      const isCurrentMonthView = today.getFullYear() === viewYear && today.getMonth() === viewMonth;
+      const todayDate = today.getDate();
+
+      // Days in Current Month
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayStr = String(d).padStart(2, '0');
+        const monthStr = String(viewMonth + 1).padStart(2, '0');
+        const fullDateStr = `${viewYear}-${monthStr}-${dayStr}`;
+
+        // Check matching activities
+        const matchingLocs = locations.filter(l => l.date === fullDateStr);
+        const hasEvents = matchingLocs.length > 0;
+        const hasHub = matchingLocs.some(l => l.type === 'hub');
+
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day-cell';
+        if (hasEvents) cell.classList.add('has-event');
+        if (hasHub) cell.classList.add('has-hub');
+        if (isCurrentMonthView && d === todayDate) cell.classList.add('today');
+        if (fullDateStr === selectedDateStr) cell.classList.add('selected');
+
+        let dotsHtml = '';
+        if (hasEvents) {
+          dotsHtml = '<div class="event-dots-wrap">';
+          matchingLocs.forEach(loc => {
+            dotsHtml += `<span class="event-dot ${loc.type === 'hub' ? 'hub' : 'village'}" title="${loc.name}"></span>`;
+          });
+          dotsHtml += '</div>';
+        }
+
+        cell.innerHTML = `
+          <span class="day-number">${d}</span>
+          ${dotsHtml}
+        `;
+
+        cell.addEventListener('click', () => {
+          selectedDateStr = fullDateStr;
+          document.querySelectorAll('.calendar-day-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          renderSelectedDayDetails();
+        });
+
+        grid.appendChild(cell);
+      }
+
+      renderSelectedDayDetails();
+      renderTimeline();
+    }
+
+    function renderSelectedDayDetails() {
+      const container = document.getElementById('day-events-container');
+      const dateText = document.getElementById('selected-date-text');
+      const countBadge = document.getElementById('selected-events-count');
+
+      dateText.textContent = formatGeorgianDate(selectedDateStr);
+
+      const events = locations.filter(l => l.date === selectedDateStr);
+      countBadge.textContent = events.length + ' აქტივობა';
+
+      container.innerHTML = '';
+
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div class="empty-events-state">
+            <div class="empty-icon">📅</div>
+            <p class="empty-text">ამ დღეს აქტივობა არ არის დაგეგმილი. აირჩიეთ წერტილებით მონიშნული დღეები კალენდარში.</p>
+          </div>
+        `;
+        return;
+      }
+
+      events.forEach(loc => {
+        const isHub = loc.type === 'hub';
+        const item = document.createElement('div');
+        item.className = `event-detail-item ${isHub ? 'hub' : 'village'}`;
+        item.innerHTML = `
+          <div class="event-top-row">
+            <div>
+              <h4 class="event-location-name">${isHub ? '★' : '📍'} ${loc.name}</h4>
+              <div style="font-size:0.72rem; color:var(--text-subtle); margin-top:2px;">
+                საკოორდინაციო წერტილი: ${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}
+              </div>
+            </div>
+            <span class="event-type-badge ${isHub ? 'hub' : 'village'}">${isHub ? 'მთავარი ჰაბი' : 'სოფელი'}</span>
+          </div>
+
+          <div>
+            <div class="event-activity-title">🎯 ${loc.activityTitle}</div>
+            <p class="event-activity-desc">${loc.activityDescription}</p>
+          </div>
+
+          <div class="event-bottom-row">
+            <span style="font-size:0.74rem; font-weight:700; color:var(--text-muted);">
+              სტატუსი: დაგეგმილია
+            </span>
+            <a href="index.html?loc=${loc.id}" class="btn-goto-map">
+              <span>🗺️</span> რუკაზე ნახვა
+            </a>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById('timeline-container');
+      container.innerHTML = '';
+
+      // Sort by date
+      const sorted = [...locations].sort((a, b) => {
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return a.date.localeCompare(b.date);
+      });
+
+      sorted.forEach(loc => {
+        const isHub = loc.type === 'hub';
+        const card = document.createElement('div');
+        card.className = 'timeline-item-card';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="timeline-date-chip">📅 ${formatGeorgianDate(loc.date)}</span>
+            <span class="event-type-badge ${isHub ? 'hub' : 'village'}">${isHub ? 'ჰაბი' : 'სოფელი'}</span>
+          </div>
+          <div>
+            <h4 style="font-size:0.92rem; font-weight:800; color:var(--text-main); margin-bottom:2px;">${loc.name}</h4>
+            <div style="font-size:0.80rem; font-weight:700; color:var(--text-muted);">🎯 ${loc.activityTitle}</div>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-subtle); line-height:1.4;">${loc.activityDescription}</p>
+          <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+            <a href="index.html?loc=${loc.id}" class="btn-goto-map">
+              <span>🗺️</span> რუკაზე ნახვა
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ==========================================================================
+    // INITIALIZATION & EVENT LISTENERS
+    // ==========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCalendar();
+      syncLocationsFromSupabase();
+
+      // Month Navigation Buttons
+      document.getElementById('btn-prev-month').addEventListener('click', () => {
+        viewMonth--;
+        if (viewMonth < 0) {
+          viewMonth = 11;
+          viewYear--;
+        }
+        renderCalendar();
+      });
+
+      document.getElementById('btn-next-month').addEventListener('click', () => {
+        viewMonth++;
+        if (viewMonth > 11) {
+          viewMonth = 0;
+          viewYear++;
+        }
+        renderCalendar();
+      });
+
+      document.getElementById('btn-today-month').addEventListener('click', () => {
+        const now = new Date();
+        viewYear = now.getFullYear();
+        viewMonth = now.getMonth();
+        const d = String(now.getDate()).padStart(2, '0');
+        const m = String(viewMonth + 1).padStart(2, '0');
+        selectedDateStr = `${viewYear}-${m}-${d}`;
+        renderCalendar();
+      });
+
+      // Day & Night mode toggle
+      const themeBtn = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
+
+      function syncUI(theme) {
+        if (theme === 'dark') {
+          themeIcon.textContent = '☀️';
+          themeText.textContent = 'დღე';
+          themeBtn.title = 'დღის რეჟიმზე გადართვა';
+        } else {
+          themeIcon.textContent = '🌙';
+          themeText.textContent = 'ღამე';
+          themeBtn.title = 'ღამის რეჟიმზე გადართვა';
+        }
+      }
+
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      syncUI(currentTheme);
+
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        syncUI(newTheme);
+      });
+
+      // Cross-tab / Window Focus Live Sync (updates events if admin edited them on map page)
+      window.addEventListener('focus', () => {
+        locations = loadLocations();
+        renderCalendar();
+        syncLocationsFromSupabase();
+      });
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'gardabani_locations') {
+          locations = loadLocations();
+          renderCalendar();
+        }
+        if (e.key === 'theme') {
+          const t = e.newValue || 'light';
+          document.documentElement.setAttribute('data-theme', t);
+          syncUI(t);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
