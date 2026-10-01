@@ -8650,13 +8650,33 @@ async function loadAndRenderAnalytics() {
         const desc = document.getElementById('cookie-status-desc');
         const c = localStorage.getItem('gardabani_cookie_consent');
         if (desc) {
-          if (c === 'accepted') {
-            desc.innerHTML = '<span style="color:#16a34a; font-weight:600;">მიღებულია ✅</span> (სრული ანალიტიკა და ქსელის ხარისხი აქტიურია)';
-          } else if (c === 'rejected') {
-            desc.innerHTML = '<span style="color:#dc2626; font-weight:600;">შეზღუდულია ❌</span> (მხოლოდ აუცილებელი ტექნიკური ფუნქციონალი)';
-          } else {
-            desc.innerHTML = '<span style="color:#ca8a04; font-weight:600;">ჯერ არ არის არჩეული ⏳</span> (გადაწყვეტილება მოსალოდნელია)';
+          if (!c) {
+            desc.innerHTML = '<span style="color:#ca8a04; font-weight:600;">არჩევანი მოლოდინშია ⏳</span> (საიტი მუშაობს Zero-Cookie რეჟიმში)';
+            return;
           }
+          let analytics = false;
+          let preferences = false;
+          let marketing = false;
+          if (c === 'accepted') {
+            analytics = true;
+            preferences = true;
+          } else if (c === 'rejected') {
+            analytics = false;
+            preferences = false;
+          } else {
+            try {
+              const p = JSON.parse(c);
+              analytics = !!p.analytics;
+              preferences = !!p.preferences;
+              marketing = !!p.marketing;
+            } catch(e) {}
+          }
+          const activeBadges = [];
+          activeBadges.push('<span style="color:#10b981; font-weight:600;">აუცილებელი ✓</span>');
+          if (preferences) activeBadges.push('<span style="color:#3b82f6; font-weight:600;">პრეფერენციები ✓</span>');
+          if (analytics) activeBadges.push('<span style="color:#8b5cf6; font-weight:600;">ანალიტიკა ✓</span>');
+          if (marketing) activeBadges.push('<span style="color:#f59e0b; font-weight:600;">მარკეტინგი ✓</span>');
+          desc.innerHTML = 'აქტიური კატეგორიები: ' + activeBadges.join(' | ') + (!analytics && !preferences ? ' (მხოლოდ აუცილებელი)' : '');
         }
       }
 

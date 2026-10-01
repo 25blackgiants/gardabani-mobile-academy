@@ -1,17 +1,33 @@
 // ============================================================================
-// LIGHTWEIGHT PRIVACY-FIRST ANALYTICS TRACKER (WITH COOKIE CONSENT AWARENESS)
-// Anonymous, Non-invasive, Client-side session and visit logger
+// LIGHTWEIGHT PRIVACY-FIRST ANALYTICS TRACKER (GDPR COMPLIANT)
+// Anonymous, Client-side session and visit logger with Strict Prior Consent
 // Works with Supabase and has automatic LocalStorage offline resilience
 // ============================================================================
 
 (function() {
   try {
-    // 1. Consent State
-    function getConsentStatus() {
-      return localStorage.getItem('gardabani_cookie_consent') || 'pending';
+    // 1. Consent State (GDPR Categorization & Prior Consent Awareness)
+    function getConsentData() {
+      try {
+        const raw = localStorage.getItem('gardabani_cookie_consent');
+        if (!raw) return { status: 'pending', analytics: false, preferences: false, marketing: false };
+        if (raw === 'accepted') return { status: 'accepted', analytics: true, preferences: true, marketing: false };
+        if (raw === 'rejected') return { status: 'rejected', analytics: false, preferences: false, marketing: false };
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            status: parsed.analytics ? 'accepted' : 'rejected',
+            analytics: !!parsed.analytics,
+            preferences: !!parsed.preferences,
+            marketing: !!parsed.marketing
+          };
+        }
+      } catch (e) {}
+      return { status: 'pending', analytics: false, preferences: false, marketing: false };
     }
 
-    let consentStatus = getConsentStatus();
+    let consentData = getConsentData();
+    let consentStatus = consentData.status;
 
     // 2. Ephemeral & Anonymous Session Token (SessionStorage - strictly necessary for page transitions)
     let sessionId = sessionStorage.getItem('gma_session_id');
@@ -20,14 +36,15 @@
       sessionStorage.setItem('gma_session_id', sessionId);
     }
 
-    // 3. Persistent Visitor ID & Retention (Enabled only if consent is accepted)
+    // 3. Persistent Visitor ID & Retention (Enabled only if analytics consent is granted)
     let visitorId = '';
     let visitCount = 1;
     let isReturning = false;
 
     function evaluateVisitorIdentity() {
-      consentStatus = getConsentStatus();
-      if (consentStatus === 'accepted') {
+      consentData = getConsentData();
+      consentStatus = consentData.status;
+      if (consentData.analytics) {
         visitorId = localStorage.getItem('gma_visitor_id');
         if (!visitorId) {
           visitorId = 'usr_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
@@ -45,11 +62,11 @@
         }
         isReturning = visitCount > 1;
       } else {
-        // If rejected, remove any persistent ID
+        // Zero-cookieless state / withdrawal: purge persistent tracking IDs
         visitorId = '';
         visitCount = 1;
         isReturning = false;
-        if (consentStatus === 'rejected') {
+        if (consentStatus === 'rejected' || !consentData.analytics) {
           localStorage.removeItem('gma_visitor_id');
           localStorage.removeItem('gma_visit_count');
           document.cookie = 'gma_vid=; path=/; max-age=0; SameSite=Lax';
@@ -103,7 +120,7 @@
       }
     }
 
-    // 6. Network Quality (Only if consent is accepted or for technical diagnosis)
+    // 6. Network Quality (Only if analytics consent is granted)
     let networkType = 'wifi/broadband';
     try {
       const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -227,65 +244,91 @@
       }, 250);
     });
 
-    const now = new Date();
-    const visitRecord = {
-      id: Date.now() + Math.floor(Math.random() * 1000),
-      session_id: sessionId,
-      visitor_id: visitorId,
-      consent_status: consentStatus,
-      is_returning: isReturning,
-      visit_count: visitCount,
-      network_type: networkType,
-      scroll_depth: maxScrollDepth,
-      scroll_milestones: Array.from(scrollMilestones),
-      page_path: pagePath,
-      page_title: pageTitle,
-      referrer: referrer,
-      device_type: deviceType,
-      os: os,
-      browser: browser,
-      screen_resolution: screenRes,
-      screen_size: screenSizeCategory,
-      device_memory: deviceMemory,
-      cpu_cores: cpuCores,
-      data_saver: dataSaver,
-      screen_orientation: screenOrientation,
-      system_theme_pref: systemThemePref,
-      timezone: timeZone,
-      language: rawLang,
-      browser_lang: normalizedLang,
-      load_time_seconds: loadTimeSec,
-      duration_seconds: duration,
-      active_seconds: activeSeconds,
-      hour_of_day: now.getHours(),
-      day_of_week: now.getDay(),
-      created_at: now.toISOString()
-    };
-
-    // 8. Save to Local Storage Log (Offline Fallback & Instant Access)
-    try {
-      let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
-      localLogs.unshift(visitRecord);
-      if (localLogs.length > 500) localLogs = localLogs.slice(0, 500);
-      localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
-    } catch (e) {}
-
-    // Daily visit count summary (accumulates permanently)
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const dailyLog = JSON.parse(localStorage.getItem('gardabani_daily_log') || '{}');
-      if (!dailyLog[today]) dailyLog[today] = 0;
-      dailyLog[today] += 1;
-      localStorage.setItem('gardabani_daily_log', JSON.stringify(dailyLog));
-    } catch(e) {}
-
-    // 9. Cloud Sync with Supabase (if configured)
+    // Tracking state flags
+    let hasRecordedVisit = false;
     let cloudRecordId = null;
+    let heartbeatTimer = null;
+
+    // GDPR Core: Record Analytics Session ONLY upon active opt-in
+    function recordAnalyticsSession() {
+      if (hasRecordedVisit) return;
+      consentData = getConsentData();
+      if (!consentData.analytics) return; // Zero-cookieless block
+
+      hasRecordedVisit = true;
+      evaluateVisitorIdentity();
+
+      const now = new Date();
+      const visitRecord = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        session_id: sessionId,
+        visitor_id: visitorId,
+        consent_status: consentStatus,
+        is_returning: isReturning,
+        visit_count: visitCount,
+        network_type: networkType,
+        scroll_depth: maxScrollDepth,
+        scroll_milestones: Array.from(scrollMilestones),
+        page_path: pagePath,
+        page_title: pageTitle,
+        referrer: referrer,
+        device_type: deviceType,
+        os: os,
+        browser: browser,
+        screen_resolution: screenRes,
+        screen_size: screenSizeCategory,
+        device_memory: deviceMemory,
+        cpu_cores: cpuCores,
+        data_saver: dataSaver,
+        screen_orientation: screenOrientation,
+        system_theme_pref: systemThemePref,
+        timezone: timeZone,
+        language: rawLang,
+        browser_lang: normalizedLang,
+        load_time_seconds: loadTimeSec,
+        duration_seconds: duration,
+        active_seconds: activeSeconds,
+        hour_of_day: now.getHours(),
+        day_of_week: now.getDay(),
+        created_at: now.toISOString()
+      };
+
+      // Save to Local Storage Log (Offline Fallback & Instant Access)
+      try {
+        let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
+        localLogs.unshift(visitRecord);
+        if (localLogs.length > 500) localLogs = localLogs.slice(0, 500);
+        localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
+      } catch (e) {}
+
+      // Daily visit count summary
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const dailyLog = JSON.parse(localStorage.getItem('gardabani_daily_log') || '{}');
+        if (!dailyLog[today]) dailyLog[today] = 0;
+        dailyLog[today] += 1;
+        localStorage.setItem('gardabani_daily_log', JSON.stringify(dailyLog));
+      } catch(e) {}
+
+      // Cloud Sync with Supabase (if configured)
+      setTimeout(syncVisitToSupabase, 800);
+
+      // Start Heartbeat Timer
+      if (!heartbeatTimer) {
+        heartbeatTimer = setInterval(() => {
+          updateTime();
+          flushAnalyticsUpdate();
+        }, 10000);
+      }
+    }
+
     async function syncVisitToSupabase() {
+      if (!hasRecordedVisit) return;
       if (typeof initSupabase !== 'function') return;
       const client = initSupabase();
       if (!client) return;
       try {
+        const now = new Date();
         const { data, error } = await client
           .from('site_analytics')
           .insert([{
@@ -310,8 +353,8 @@
             load_time_seconds: loadTimeSec,
             duration_seconds: duration,
             active_seconds: activeSeconds,
-            hour_of_day: visitRecord.hour_of_day,
-            day_of_week: visitRecord.day_of_week
+            hour_of_day: now.getHours(),
+            day_of_week: now.getDay()
           }])
           .select('id')
           .single();
@@ -324,13 +367,8 @@
       }
     }
 
-    // Active Session Duration & Scroll Heartbeat
-    const heartbeatTimer = setInterval(() => {
-      updateTime();
-      flushAnalyticsUpdate();
-    }, 10000);
-
     async function flushAnalyticsUpdate() {
+      if (!hasRecordedVisit) return;
       calculateScrollDepth();
       if (loadTimeSec === 0) measureLoadTime();
       updateTime();
@@ -343,7 +381,7 @@
           localLogs[0].active_seconds = activeSeconds;
           localLogs[0].scroll_depth = maxScrollDepth;
           localLogs[0].scroll_milestones = Array.from(scrollMilestones);
-          localLogs[0].consent_status = getConsentStatus();
+          localLogs[0].consent_status = consentStatus;
           if (visitorId) localLogs[0].visitor_id = visitorId;
           localLogs[0].is_returning = isReturning;
           localLogs[0].visit_count = visitCount;
@@ -362,7 +400,7 @@
               active_seconds: activeSeconds,
               scroll_depth: maxScrollDepth,
               scroll_milestones: Array.from(scrollMilestones),
-              consent_status: getConsentStatus(),
+              consent_status: consentStatus,
               visitor_id: visitorId,
               is_returning: isReturning,
               visit_count: visitCount,
@@ -377,6 +415,9 @@
     // Global Event Tracking Helper for Villages and Navigation Clicks
     window.gmaTrackEvent = function(eventType, details) {
       try {
+        consentData = getConsentData();
+        if (!consentData.analytics) return; // Strict Prior Consent
+
         const events = JSON.parse(localStorage.getItem('gardabani_analytics_events') || '[]');
         const targetName = (details && (details.village_name || details.name || details.target)) || '';
         const evtRecord = {
@@ -406,19 +447,36 @@
       } catch (e) {}
     };
 
+    // Prior Consent Execution Check
+    if (consentData.analytics) {
+      recordAnalyticsSession();
+    }
+
     // Listen for cookie consent changes in real-time
     window.addEventListener('cookie_consent_changed', (e) => {
-      evaluateVisitorIdentity();
-      flushAnalyticsUpdate();
+      consentData = getConsentData();
+      consentStatus = consentData.status;
+      if (consentData.analytics) {
+        if (!hasRecordedVisit) {
+          recordAnalyticsSession();
+        } else {
+          evaluateVisitorIdentity();
+          flushAnalyticsUpdate();
+        }
+      } else {
+        // Consent withdrawn
+        evaluateVisitorIdentity();
+        if (heartbeatTimer) {
+          clearInterval(heartbeatTimer);
+          heartbeatTimer = null;
+        }
+      }
     });
 
     window.addEventListener('beforeunload', () => {
-      clearInterval(heartbeatTimer);
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
       flushAnalyticsUpdate();
     });
-
-    // Send after brief delay
-    setTimeout(syncVisitToSupabase, 800);
 
   } catch (err) {
     // Total silence for analytics errors
