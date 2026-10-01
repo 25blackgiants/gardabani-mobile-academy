@@ -8153,7 +8153,7 @@ async function loadAndRenderAnalytics() {
            document.body.removeChild(link);
         });
       }
-\n      const btnClearLocalAnalytics = document.getElementById('btn-clear-local-analytics');
+      const btnClearLocalAnalytics = document.getElementById('btn-clear-local-analytics');
       if (btnClearLocalAnalytics) {
         btnClearLocalAnalytics.addEventListener('click', () => {
           if (confirm('ნამდვილად გსურთ ლოკალური ჟურნალის გასუფთავება?')) {
