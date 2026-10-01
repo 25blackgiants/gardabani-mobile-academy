@@ -32,7 +32,7 @@ ${COOKIE_CONSENT_JS}
 // ============================================================================
 // STEALTH ADMIN ACCESS CONFIG & COMPONENT (SHA-256, RATE LIMIT, INACTIVITY)
 // ============================================================================
-const ADMIN_SHA256_HASH = 'c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672';
+const ADMIN_SHA256_HASH = '451e2daf6aaa290f28cb4933ddbad57c1c9247c53a84202cb13192de6f234a57';
 
 const STEALTH_ADMIN_CSS = `
     /* Stealth Admin Modal - Perfectly Centered in Viewport */

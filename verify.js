@@ -91,8 +91,8 @@ const tests = [
   },
   {
     name: '13. Cryptographic SHA-256 hash implemented across platform',
-    check: index.includes('c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672') &&
-           settings.includes('c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672') &&
+    check: index.includes('451e2daf6aaa290f28cb4933ddbad57c1c9247c53a84202cb13192de6f234a57') &&
+           settings.includes('451e2daf6aaa290f28cb4933ddbad57c1c9247c53a84202cb13192de6f234a57') &&
            index.includes('crypto.subtle.digest') &&
            settings.includes('crypto.subtle.digest')
   },
