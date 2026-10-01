@@ -1619,6 +1619,9 @@
           </p>
         </div>
         <div class="analytics-header-actions">
+          <button class="btn btn-outline" id="btn-simulate-analytics" style="padding:6px 12px; font-size:12.5px; border-color:var(--primary); color:var(--primary);" title="სატესტო ვიზიტების სიმულაცია">
+            <span>🧪</span> ტესტ-სიმულაცია
+          </button>
           <button class="btn btn-outline" id="btn-export-csv" style="padding:6px 12px; font-size:12.5px;" title="მონაცემების ექსპორტი">
             <span>📥</span> CSV ექსპორტი
           </button>
@@ -3299,6 +3302,12 @@ async function loadAndRenderAnalytics() {
           } catch (e) {
             records = [];
           }
+          if (records.length === 0 && !localStorage.getItem('gardabani_cleared_by_user')) {
+            generateSimulatedVisits();
+            try {
+              records = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
+            } catch (e) {}
+          }
         }
 
         if (events.length === 0) {
@@ -3350,12 +3359,231 @@ async function loadAndRenderAnalytics() {
           showToast('CSV ექსპორტი დასრულდა 📥');
         });
       }
+      function generateSimulatedVisits() {
+        const now = Date.now();
+        const demoRecords = [
+          {
+            id: now - 1000 * 60 * 5,
+            session_id: 'sess_t1',
+            visitor_id: 'usr_t1',
+            consent_status: 'accepted',
+            is_returning: true,
+            visit_count: 4,
+            network_type: '4G',
+            scroll_depth: 85,
+            page_path: 'index.html',
+            page_title: 'მთავარი გვერდი (რუკა)',
+            referrer: 'Facebook',
+            device_type: 'Mobile',
+            os: 'iOS',
+            browser: 'Safari',
+            screen_resolution: '390x844',
+            browser_lang: 'ka',
+            load_time_seconds: 0.9,
+            duration_seconds: 145,
+            hour_of_day: 14,
+            created_at: new Date(now - 1000 * 60 * 5).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 25,
+            session_id: 'sess_t2',
+            visitor_id: 'usr_t2',
+            consent_status: 'accepted',
+            is_returning: false,
+            visit_count: 1,
+            network_type: '4G',
+            scroll_depth: 100,
+            page_path: 'calendar.html',
+            page_title: 'აქტივობების კალენდარი',
+            referrer: 'პირდაპირი (Direct)',
+            device_type: 'Mobile',
+            os: 'Android',
+            browser: 'Chrome',
+            screen_resolution: '412x915',
+            browser_lang: 'az',
+            load_time_seconds: 1.2,
+            duration_seconds: 220,
+            hour_of_day: 13,
+            created_at: new Date(now - 1000 * 60 * 25).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 60,
+            session_id: 'sess_t3',
+            visitor_id: 'usr_t3',
+            consent_status: 'accepted',
+            is_returning: true,
+            visit_count: 2,
+            network_type: 'WIFI',
+            scroll_depth: 60,
+            page_path: 'mentors.html',
+            page_title: 'აკადემიის მენტორები',
+            referrer: 'Google',
+            device_type: 'Desktop',
+            os: 'Windows',
+            browser: 'Chrome',
+            screen_resolution: '1920x1080',
+            browser_lang: 'ka',
+            load_time_seconds: 0.7,
+            duration_seconds: 180,
+            hour_of_day: 12,
+            created_at: new Date(now - 1000 * 60 * 60).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 120,
+            session_id: 'sess_t4',
+            visitor_id: 'usr_t4',
+            consent_status: 'accepted',
+            is_returning: false,
+            visit_count: 1,
+            network_type: '3G',
+            scroll_depth: 70,
+            page_path: 'index.html',
+            page_title: 'მთავარი გვერდი (რუკა)',
+            referrer: 'Facebook',
+            device_type: 'Mobile',
+            os: 'Android',
+            browser: 'Samsung Internet',
+            screen_resolution: '384x854',
+            browser_lang: 'az',
+            load_time_seconds: 1.8,
+            duration_seconds: 95,
+            hour_of_day: 11,
+            created_at: new Date(now - 1000 * 60 * 120).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 200,
+            session_id: 'sess_t5',
+            visitor_id: 'usr_t5',
+            consent_status: 'accepted',
+            is_returning: true,
+            visit_count: 5,
+            network_type: 'WIFI',
+            scroll_depth: 90,
+            page_path: 'settings.html',
+            page_title: 'პარამეტრები',
+            referrer: 'პირდაპირი (Direct)',
+            device_type: 'Desktop',
+            os: 'macOS',
+            browser: 'Safari',
+            screen_resolution: '1440x900',
+            browser_lang: 'en',
+            load_time_seconds: 1.0,
+            duration_seconds: 310,
+            hour_of_day: 10,
+            created_at: new Date(now - 1000 * 60 * 200).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 300,
+            session_id: 'sess_t6',
+            visitor_id: 'usr_t6',
+            consent_status: 'accepted',
+            is_returning: false,
+            visit_count: 1,
+            network_type: '4G',
+            scroll_depth: 50,
+            page_path: 'index.html',
+            page_title: 'მთავარი გვერდი (რუკა)',
+            referrer: 'Instagram',
+            device_type: 'Mobile',
+            os: 'iOS',
+            browser: 'Instagram Webview',
+            screen_resolution: '375x812',
+            browser_lang: 'ka',
+            load_time_seconds: 1.1,
+            duration_seconds: 60,
+            hour_of_day: 8,
+            created_at: new Date(now - 1000 * 60 * 300).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 450,
+            session_id: 'sess_t7',
+            visitor_id: 'usr_t7',
+            consent_status: 'accepted',
+            is_returning: true,
+            visit_count: 3,
+            network_type: '4G',
+            scroll_depth: 95,
+            page_path: 'calendar.html',
+            page_title: 'აქტივობების კალენდარი',
+            referrer: 'Telegram',
+            device_type: 'Mobile',
+            os: 'Android',
+            browser: 'Chrome',
+            screen_resolution: '412x915',
+            browser_lang: 'az',
+            load_time_seconds: 1.3,
+            duration_seconds: 190,
+            hour_of_day: 6,
+            created_at: new Date(now - 1000 * 60 * 450).toISOString()
+          },
+          {
+            id: now - 1000 * 60 * 600,
+            session_id: 'sess_t8',
+            visitor_id: 'usr_t8',
+            consent_status: 'accepted',
+            is_returning: false,
+            visit_count: 1,
+            network_type: 'WIFI',
+            scroll_depth: 80,
+            page_path: 'index.html',
+            page_title: 'მთავარი გვერდი (რუკა)',
+            referrer: 'Google',
+            device_type: 'Tablet',
+            os: 'iPadOS',
+            browser: 'Safari',
+            screen_resolution: '810x1080',
+            browser_lang: 'en',
+            load_time_seconds: 0.8,
+            duration_seconds: 130,
+            hour_of_day: 4,
+            created_at: new Date(now - 1000 * 60 * 600).toISOString()
+          }
+        ];
+
+        const demoEvents = [
+          { id: now - 10000, session_id: 'sess_t1', event_type: 'village_view', target_name: 'სოფ. კესალო', page_path: 'index.html', created_at: new Date(now - 10000).toISOString() },
+          { id: now - 20000, session_id: 'sess_t1', event_type: 'nav_click', target_name: 'სოფ. კესალო', page_path: 'index.html', created_at: new Date(now - 20000).toISOString() },
+          { id: now - 50000, session_id: 'sess_t2', event_type: 'village_view', target_name: 'სოფ. ნაზარლო', page_path: 'index.html', created_at: new Date(now - 50000).toISOString() },
+          { id: now - 90000, session_id: 'sess_t3', event_type: 'village_view', target_name: 'სოფ. სართიჭალა', page_path: 'index.html', created_at: new Date(now - 90000).toISOString() },
+          { id: now - 120000, session_id: 'sess_t4', event_type: 'nav_click', target_name: 'სოფ. სართიჭალა', page_path: 'index.html', created_at: new Date(now - 120000).toISOString() },
+          { id: now - 180000, session_id: 'sess_t5', event_type: 'village_view', target_name: 'სოფ. ყარაჯალარი', page_path: 'index.html', created_at: new Date(now - 180000).toISOString() },
+          { id: now - 240000, session_id: 'sess_t6', event_type: 'village_view', target_name: 'სოფ. კუმისი', page_path: 'index.html', created_at: new Date(now - 240000).toISOString() },
+          { id: now - 300000, session_id: 'sess_t7', event_type: 'nav_click', target_name: 'მთავარი ჰაბი — ქ. გარდაბანი', page_path: 'index.html', created_at: new Date(now - 300000).toISOString() }
+        ];
+
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const yKey = new Date(now - 86400000).toISOString().slice(0, 10);
+        const y2Key = new Date(now - 86400000 * 2).toISOString().slice(0, 10);
+        const y3Key = new Date(now - 86400000 * 3).toISOString().slice(0, 10);
+        const dailyLog = {};
+        dailyLog[todayKey] = 8;
+        dailyLog[yKey] = 14;
+        dailyLog[y2Key] = 11;
+        dailyLog[y3Key] = 6;
+
+        localStorage.setItem('gardabani_analytics_log', JSON.stringify(demoRecords));
+        localStorage.setItem('gardabani_analytics_events', JSON.stringify(demoEvents));
+        localStorage.setItem('gardabani_daily_log', JSON.stringify(dailyLog));
+        localStorage.removeItem('gardabani_cleared_by_user');
+      }
+
+      const btnSimulateAnalytics = document.getElementById('btn-simulate-analytics');
+      if (btnSimulateAnalytics) {
+        btnSimulateAnalytics.addEventListener('click', () => {
+          generateSimulatedVisits();
+          loadAndRenderAnalytics();
+          showToast('სატესტო მონაცემები წარმატებით დაგენერირდა! 📊');
+        });
+      }
+
       const btnClearLocalAnalytics = document.getElementById('btn-clear-local-analytics');
       if (btnClearLocalAnalytics) {
         btnClearLocalAnalytics.addEventListener('click', () => {
           if (confirm('ნამდვილად გსურთ ლოკალური ჟურნალის გასუფთავება?')) {
             localStorage.removeItem('gardabani_analytics_log');
             localStorage.removeItem('gardabani_analytics_events');
+            localStorage.removeItem('gardabani_daily_log');
+            localStorage.setItem('gardabani_cleared_by_user', 'true');
             loadAndRenderAnalytics();
             showToast('ლოკალური ჟურნალი გასუფთავდა 🗑️');
           }
