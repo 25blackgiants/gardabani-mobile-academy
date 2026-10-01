@@ -6500,73 +6500,198 @@ const settingsHtmlContent = `<!DOCTYPE html>
       gap: 4px;
     }
     
-    /* Modern Visual Timeline Chart */
-    .analytics-chart-box {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-md);
-      padding: 18px 20px;
-      margin-top: 16px;
-    }
-    .chart-header {
+    /* Advanced Interactive Visual Analytics Grid & Toolbar */
+    .analytics-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .live-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseLiveRing 2s infinite;
+    }
+    @keyframes pulseLiveRing {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .live-online-pill {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .filter-btn-group {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .filter-btn {
+      background: transparent;
+      border: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-btn:hover {
+      color: var(--text-main);
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(37,99,235,0.3);
+    }
+    .live-sync-indicator {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--text-subtle);
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .analytics-charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .chart-card {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .chart-card-full {
+      grid-column: 1 / -1;
+    }
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
       flex-wrap: wrap;
       gap: 8px;
     }
-    .chart-title {
+    .chart-card-title {
       font-size: 13.5px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-main);
       display: flex;
       align-items: center;
       gap: 6px;
       margin: 0;
     }
-    .chart-bars-container {
-      display: flex;
-      align-items: flex-end;
-      height: 110px;
-      gap: 6px;
-      padding-top: 10px;
-      border-bottom: 1px solid var(--border-light);
-      overflow-x: auto;
+    .chart-card-sub {
+      font-size: 11.5px;
+      color: var(--text-subtle);
+      margin-top: 2px;
     }
-    .chart-bar-col {
-      flex: 1;
-      min-width: 24px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
+    .chart-card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--border-light);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+    .chart-canvas-wrapper {
       position: relative;
-    }
-    .chart-bar-fill {
       width: 100%;
-      max-width: 18px;
-      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-      border-radius: 4px 4px 1px 1px;
-      transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      min-height: 180px;
+    }
+    .chart-canvas-wrapper canvas {
+      width: 100% !important;
+      max-height: 100% !important;
+    }
+    .speed-meter-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 4px;
+    }
+    .speed-meter-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .speed-meter-bar-track {
+      width: 100%;
+      height: 8px;
+      background: var(--border-light);
+      border-radius: 9999px;
+      overflow: hidden;
       position: relative;
     }
-    .chart-bar-col:hover .chart-bar-fill {
-      background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    .speed-meter-bar-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.5s ease, background 0.5s ease;
+      background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
     }
-    .chart-bar-label {
+    .speed-meter-scale {
+      display: flex;
+      justify-content: space-between;
       font-size: 10px;
       color: var(--text-subtle);
       margin-top: 6px;
-      white-space: nowrap;
     }
-    .chart-bar-count {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 4px;
+    .svg-fallback-chart {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .analytics-charts-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Breakdown Details Grid */
@@ -6957,42 +7082,110 @@ ${COOKIE_CONSENT_CSS}
         </div>
       </div>
 
-      <!-- VISUAL TIMELINE CHART -->
-      <div class="analytics-chart-box">
-        <div class="chart-header">
-          <h3 class="chart-title">
-            <span>📈</span> ვიზიტების დინამიკა (საათობრივი აქტივობა)
-          </h3>
-          <span style="font-size:11.5px; color:var(--text-subtle);" id="chart-timeframe-label">ბოლო 24 საათი</span>
+      <!-- LIVE TOOLBAR & TIMEFRAME FILTERS -->
+      <div class="analytics-toolbar">
+        <div class="toolbar-group">
+          <div class="live-status-pill">
+            <span class="live-pulse-dot"></span>
+            <span id="live-status-text">ლაივ რეჟიმი აქტიურია</span>
+          </div>
+          <span class="live-online-pill">
+            <span>🟢</span> ონლაინ (5 წთ): <strong id="kpi-live-online">0</strong> ვიზიტორი
+          </span>
         </div>
-        <div class="chart-bars-container" id="chart-bars-container">
-          <div style="width:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; height:100%;">მონაცემები იტვირთება...</div>
+        <div class="toolbar-group">
+          <div class="filter-btn-group" id="analytics-timeframe-group">
+            <button type="button" class="filter-btn active" data-timeframe="24h">24 საათი</button>
+            <button type="button" class="filter-btn" data-timeframe="7d">7 დღე</button>
+            <button type="button" class="filter-btn" data-timeframe="all">სრული ისტორია</button>
+          </div>
+          <span id="live-sync-countdown" class="live-sync-indicator" title="ავტო-განახლების ინტერვალი">⏱️ 20s</span>
         </div>
       </div>
 
-      <!-- BREAKDOWN DETAILS GRID (3 COMPREHENSIVE PANELS) -->
-      <div class="analytics-details-grid">
-        <!-- Panel 1: Villages & Route Requests -->
-        <div class="analytics-panel">
-          <h3 class="panel-title"><span>🎯</span> სოფლების ინტერესი & Google Maps მარშრუტები</h3>
-          <div id="stats-villages"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-navigation"></div>
+      <!-- ADVANCED VISUAL CHARTS GRID -->
+      <div class="analytics-charts-grid">
+        <!-- Chart 1: Timeline Area Chart (Full Width) -->
+        <div class="chart-card chart-card-full">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title"><span>📈</span> ვიზიტების დინამიკა (საათობრივი აქტივობა & ტალღები)</h3>
+              <div class="chart-card-sub" id="timeline-subtitle">აქტივობის გრაფიკული მრუდი და პიკური საათები</div>
+            </div>
+            <span class="chart-card-badge" id="chart-timeframe-badge">ბოლო 24 საათი</span>
+          </div>
+          <div class="chart-canvas-wrapper" style="height:210px;" id="wrapper-timeline">
+            <canvas id="chart-timeline-canvas"></canvas>
+          </div>
         </div>
 
-        <!-- Panel 2: Languages & Traffic Sources -->
-        <div class="analytics-panel">
-          <h3 class="panel-title"><span>🌐</span> ბრაუზერის ენა (ეთნიკური მრავალფეროვნება)</h3>
-          <div id="stats-languages"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-referrers"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-pages"></div>
+        <!-- Chart 2: Language Diversity Doughnut Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title"><span>🌐</span> ეთნიკური & ენობრივი მრავალფეროვნება</h3>
+              <div class="chart-card-sub">ბრაუზერის ენის მიხედვით (ka, az, en, სხვა)</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper" style="height:200px;" id="wrapper-languages">
+            <canvas id="chart-languages-canvas"></canvas>
+          </div>
+          <div id="stats-languages" style="margin-top:12px;"></div>
         </div>
 
-        <!-- Panel 3: Devices, Network & Performance Speed -->
-        <div class="analytics-panel">
-          <h3 class="panel-title"><span>📱</span> მოწყობილობები, ქსელი & სისწრაფე</h3>
-          <div id="stats-devices"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-networks"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-speed-diag"></div>
+        <!-- Chart 3: Village Popularity & Navigation Bar Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title"><span>🎯</span> სოფლების ინტერესი & მარშრუტები</h3>
+              <div class="chart-card-sub">ლოკაციის ნახვები 👁️ vs Google Maps ნავიგაცია 🚗</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper" style="height:200px;" id="wrapper-villages">
+            <canvas id="chart-villages-canvas"></canvas>
+          </div>
+          <div id="stats-villages" style="margin-top:12px;"></div>
+          <div id="stats-navigation" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Chart 4: Devices & Network Quality -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title"><span>📱</span> მოწყობილობები & კავშირის ხარისხი</h3>
+              <div class="chart-card-sub">მობილური, კომპიუტერი & 4G/Wi-Fi წილი</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper" style="height:190px;" id="wrapper-devices">
+            <canvas id="chart-devices-canvas"></canvas>
+          </div>
+          <div id="stats-devices" style="margin-top:12px;"></div>
+          <div id="stats-networks" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Chart 5: Performance Speed Meter & Web Vitals -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title"><span>⚡</span> ჩატვირთვის სისწრაფე & დიაგნოსტიკა</h3>
+              <div class="chart-card-sub">Core Web Vitals & რეალური სისწრაფის ინდიკატორი</div>
+            </div>
+            <span id="speed-status-pill" class="badge-pill badge-speed" style="font-size:11px;">დიაგნოსტირდება</span>
+          </div>
+          <div class="speed-meter-box">
+            <div class="speed-meter-val" id="speed-meter-big-val">0.0 წმ</div>
+            <div class="speed-meter-bar-track">
+              <div class="speed-meter-bar-fill" id="speed-meter-fill" style="width:25%;"></div>
+            </div>
+            <div class="speed-meter-scale">
+              <span>⚡ სწრაფი (&lt;1.5წმ)</span>
+              <span>🟡 ნორმალური (1.5-3.0წმ)</span>
+              <span>🔴 ნელი (&gt;3წმ)</span>
+            </div>
+          </div>
+          <div id="stats-speed-diag" style="margin-top:14px;"></div>
+          <div id="stats-referrers" style="margin-top:12px; border-top:1px solid var(--border-light); padding-top:10px;"></div>
+          <div id="stats-pages" style="margin-top:10px; border-top:1px solid var(--border-light); padding-top:10px;"></div>
         </div>
       </div>
 
@@ -7062,6 +7255,8 @@ ${STEALTH_ADMIN_HTML}
   <!-- Toast notification -->
   <div class="toast-msg" id="toast">შეტყობინება</div>
 
+  <!-- Chart.js 4.4 CDN for High-Performance Visual Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <!-- Supabase JS Client & Project Configuration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase_config.js"></script>
@@ -7123,8 +7318,16 @@ ${STEALTH_ADMIN_JS}
         }
         if (analyticsCard) {
           analyticsCard.style.display = isAdmin ? 'block' : 'none';
-          if (isAdmin && typeof loadAndRenderAnalytics === 'function') {
-            loadAndRenderAnalytics();
+          if (isAdmin) {
+            if (typeof loadAndRenderAnalytics === 'function') {
+              loadAndRenderAnalytics();
+            }
+            if (typeof initLiveModeTicker === 'function') {
+              initLiveModeTicker();
+            }
+          } else if (typeof liveSyncIntervalId !== 'undefined' && liveSyncIntervalId) {
+            clearInterval(liveSyncIntervalId);
+            liveSyncIntervalId = null;
           }
         }
       }
@@ -7264,23 +7467,68 @@ ${STEALTH_ADMIN_JS}
         container.appendChild(row);
       }
 
-      function renderTimelineChart(records) {
-        const container = document.getElementById('chart-bars-container');
-        if (!container) return;
-        container.innerHTML = '';
+      let analyticsActiveTimeframe = '24h';
+      let analyticsCachedRecords = [];
+      let analyticsCachedEvents = [];
+      let analyticsChartInstances = {};
+      let liveSyncIntervalId = null;
+      let liveCountdownSeconds = 20;
 
-        if (!records || records.length === 0) {
-          container.innerHTML = '<div style="width:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; height:100%;">მონაცემები ჯერ არ არის დაფიქსირებული</div>';
-          return;
+      function getChartThemeColors() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+          isDark: isDark,
+          textColor: isDark ? '#94a3b8' : '#475569',
+          titleColor: isDark ? '#f8fafc' : '#0f172a',
+          gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+          tooltipBg: isDark ? '#0f172a' : '#1e293b',
+          tooltipBorder: isDark ? '#334155' : '#e2e8f0',
+          tooltipText: '#ffffff',
+          cardBg: isDark ? '#0a0a0a' : '#ffffff'
+        };
+      }
+
+      function destroyChartInstance(key) {
+        if (analyticsChartInstances[key]) {
+          try {
+            analyticsChartInstances[key].destroy();
+          } catch (e) {
+            console.warn('Chart destroy error:', e);
+          }
+          delete analyticsChartInstances[key];
         }
+      }
 
-        // 8 time buckets of 3 hours covering the past 24 hours
+      function filterRecordsByTimeframe(records, timeframe) {
+        records = records || [];
+        if (timeframe === 'all') return records;
+        const now = Date.now();
+        const hours = timeframe === '7d' ? (7 * 24) : 24;
+        const cutoff = now - (hours * 3600 * 1000);
+        return records.filter(r => {
+          const t = new Date(r.created_at).getTime();
+          return !isNaN(t) && t >= cutoff;
+        });
+      }
+
+      // --- 1. TIMELINE AREA CHART (WITH SVG FALLBACK) ---
+      function renderTimelineAreaChart(records, colors, timeframe) {
+        const wrapper = document.getElementById('wrapper-timeline');
+        if (!wrapper) return;
+        destroyChartInstance('timeline');
+
         const now = new Date();
         const buckets = [];
-        for (let i = 7; i >= 0; i--) {
-          const slotEnd = new Date(now.getTime() - i * 3 * 3600 * 1000);
-          const slotStart = new Date(slotEnd.getTime() - 3 * 3600 * 1000);
-          const label = String(slotEnd.getHours()).padStart(2, '0') + ':00';
+        const is7d = timeframe === '7d';
+        const numSlots = is7d ? 7 : 8;
+        const stepHours = is7d ? 24 : 3;
+
+        for (let i = numSlots - 1; i >= 0; i--) {
+          const slotEnd = new Date(now.getTime() - i * stepHours * 3600 * 1000);
+          const slotStart = new Date(slotEnd.getTime() - stepHours * 3600 * 1000);
+          const label = is7d 
+            ? (slotEnd.getMonth() + 1) + '/' + slotEnd.getDate() 
+            : String(slotEnd.getHours()).padStart(2, '0') + ':00';
           buckets.push({
             start: slotStart.getTime(),
             end: slotEnd.getTime(),
@@ -7303,29 +7551,409 @@ ${STEALTH_ADMIN_JS}
           }
         });
 
-        // If historical records outside 24h, distribute to latest bucket so chart reflects presence
         if (matched === 0 && records.length > 0) {
           buckets[buckets.length - 1].count = records.length;
         }
 
-        const maxVal = Math.max(...buckets.map(b => b.count), 1);
+        const labels = buckets.map(b => b.label);
+        const dataVals = buckets.map(b => b.count);
 
-        buckets.forEach(b => {
-          const col = document.createElement('div');
-          col.className = 'chart-bar-col';
-          const heightPct = b.count > 0 ? Math.max(Math.round((b.count / maxVal) * 85), 14) : 4;
-          col.title = b.label + ' - ' + b.count + ' ვიზიტი';
-          col.innerHTML = 
-            (b.count > 0 ? '<span class="chart-bar-count">' + b.count + '</span>' : '') +
-            '<div class="chart-bar-fill" style="height:' + heightPct + '%; opacity:' + (b.count > 0 ? '1' : '0.22') + ';"></div>' +
-            '<span class="chart-bar-label">' + b.label + '</span>';
-          container.appendChild(col);
+        if (typeof Chart !== 'undefined') {
+          wrapper.innerHTML = '<canvas id="chart-timeline-canvas"></canvas>';
+          const canvas = document.getElementById('chart-timeline-canvas');
+          const ctx = canvas.getContext('2d');
+
+          const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.40)');
+          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.00)');
+
+          analyticsChartInstances['timeline'] = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'ვიზიტები',
+                data: dataVals,
+                fill: true,
+                backgroundColor: gradient,
+                borderColor: '#3b82f6',
+                borderWidth: 2.5,
+                tension: 0.38,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1.5,
+                pointRadius: 3.5,
+                pointHoverRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 600 },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: colors.tooltipBg,
+                  titleColor: colors.tooltipText,
+                  bodyColor: colors.tooltipText,
+                  borderColor: colors.tooltipBorder,
+                  borderWidth: 1,
+                  padding: 8,
+                  displayColors: false,
+                  callbacks: {
+                    label: function(ctx) { return '  ვიზიტი: ' + ctx.parsed.y; }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  grid: { color: colors.gridColor, drawBorder: false },
+                  ticks: { color: colors.textColor, font: { size: 11 } }
+                },
+                y: {
+                  beginAtZero: true,
+                  grid: { color: colors.gridColor, drawBorder: false },
+                  ticks: { color: colors.textColor, precision: 0, font: { size: 11 } }
+                }
+              }
+            }
+          });
+        } else {
+          // Zero-dependency SVG Area Chart Fallback
+          const maxVal = Math.max(...dataVals, 1);
+          const w = 600, h = 180, pad = 24;
+          const pts = dataVals.map((v, i) => {
+            const x = pad + (i / (dataVals.length - 1)) * (w - pad * 2);
+            const y = h - pad - (v / maxVal) * (h - pad * 2);
+            return { x: x, y: y, v: v };
+          });
+          const pathD = pts.reduce((acc, p, i) => acc + (i === 0 ? 'M ' : ' L ') + p.x + ' ' + p.y, '');
+          const areaD = pathD + ' L ' + pts[pts.length - 1].x + ' ' + (h - pad) + ' L ' + pts[0].x + ' ' + (h - pad) + ' Z';
+          
+          let svgHtml = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="svg-fallback-chart">' +
+            '<defs>' +
+              '<linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/>' +
+                '<stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>' +
+              '</linearGradient>' +
+            '</defs>' +
+            '<path d="' + areaD + '" fill="url(#areaGrad)"/>' +
+            '<path d="' + pathD + '" fill="none" stroke="#3b82f6" stroke-width="2.5"/>';
+          
+          pts.forEach((p, idx) => {
+            svgHtml += '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"/>';
+            svgHtml += '<text x="' + p.x + '" y="' + (h - 6) + '" font-size="10" text-anchor="middle" fill="' + colors.textColor + '">' + labels[idx] + '</text>';
+          });
+          svgHtml += '</svg>';
+          wrapper.innerHTML = svgHtml;
+        }
+      }
+
+      // --- 2. LANGUAGE DIVERSITY DOUGHNUT CHART ---
+      function renderLanguagesDonutChart(records, colors) {
+        const wrapper = document.getElementById('wrapper-languages');
+        if (!wrapper) return;
+        destroyChartInstance('languages');
+
+        let kaNum = 0, azNum = 0, enNum = 0, othNum = 0;
+        records.forEach(r => {
+          const l = (r.browser_lang || r.language || '').toLowerCase();
+          if (l.startsWith('ka')) kaNum++;
+          else if (l.startsWith('az')) azNum++;
+          else if (l.startsWith('en')) enNum++;
+          else othNum++;
         });
+
+        const totalLang = kaNum + azNum + enNum + othNum || 1;
+        const labels = ['🇬🇪 ქართული (ka)', '🇦🇿 აზერბაიჯანული (az)', '🇬🇧 ინგლისური (en)', '🌐 სხვა'];
+        const dataVals = [kaNum, azNum, enNum, othNum];
+        const bgColors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'];
+
+        if (typeof Chart !== 'undefined') {
+          wrapper.innerHTML = '<canvas id="chart-languages-canvas"></canvas>';
+          const canvas = document.getElementById('chart-languages-canvas');
+          const ctx = canvas.getContext('2d');
+
+          analyticsChartInstances['languages'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: dataVals,
+                backgroundColor: bgColors,
+                borderWidth: colors.isDark ? 2 : 2,
+                borderColor: colors.isDark ? '#000000' : '#ffffff',
+                hoverOffset: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '66%',
+              animation: { duration: 600 },
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    color: colors.textColor,
+                    boxWidth: 12,
+                    font: { size: 11, weight: '600' },
+                    padding: 10
+                  }
+                },
+                tooltip: {
+                  backgroundColor: colors.tooltipBg,
+                  titleColor: colors.tooltipText,
+                  bodyColor: colors.tooltipText,
+                  borderColor: colors.tooltipBorder,
+                  borderWidth: 1,
+                  padding: 8,
+                  callbacks: {
+                    label: function(ctx) {
+                      const val = ctx.raw || 0;
+                      const pct = Math.round((val / totalLang) * 100);
+                      return ' ' + ctx.label + ': ' + val + ' (' + pct + '%)';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          // Zero-dependency SVG Donut Fallback
+          let svg = '<svg viewBox="0 0 160 160" class="svg-fallback-chart" style="max-height:160px; margin:auto;">';
+          let accPct = 0;
+          dataVals.forEach((v, idx) => {
+            const p = (v / totalLang);
+            const dash = p * 314;
+            const offset = 314 - accPct * 314;
+            accPct += p;
+            svg += '<circle cx="80" cy="80" r="50" fill="none" stroke="' + bgColors[idx] + '" stroke-width="20" stroke-dasharray="' + dash + ' 314" stroke-dashoffset="' + offset + '"/>';
+          });
+          svg += '<text x="80" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="' + colors.titleColor + '">' + totalLang + '</text></svg>';
+          wrapper.innerHTML = svg;
+        }
+      }
+
+      // --- 3. VILLAGES & ROUTE REQUESTS BAR CHART ---
+      function renderVillagesBarChart(events, colors) {
+        const wrapper = document.getElementById('wrapper-villages');
+        if (!wrapper) return;
+        destroyChartInstance('villages');
+
+        const villageList = [
+          'სოფ. კესალო', 'ქ. გარდაბანი', 'სოფ. ვაზიანი', 'სოფ. სართიჭალა',
+          'სოფ. ნაზარლო', 'სოფ. კუმისი', 'სოფ. ყარაჯალარი', 'სოფ. ვახტანგისი'
+        ];
+
+        const viewCounts = {};
+        const navCounts = {};
+        villageList.forEach(v => { viewCounts[v] = 0; navCounts[v] = 0; });
+
+        events.forEach(e => {
+          const raw = e.target || e.target_name || '';
+          let matched = null;
+          for (const k of villageList) {
+            if (raw.includes(k) || k.includes(raw)) { matched = k; break; }
+          }
+          if (matched) {
+            if (e.type === 'village_view' || e.event_type === 'village_view') viewCounts[matched]++;
+            if (e.type === 'nav_click' || e.event_type === 'nav_click') navCounts[matched]++;
+          }
+        });
+
+        const shortLabels = villageList.map(v => v.replace('სოფ. ', ''));
+        const viewsData = villageList.map(v => viewCounts[v]);
+        const navsData = villageList.map(v => navCounts[v]);
+
+        if (typeof Chart !== 'undefined') {
+          wrapper.innerHTML = '<canvas id="chart-villages-canvas"></canvas>';
+          const canvas = document.getElementById('chart-villages-canvas');
+          const ctx = canvas.getContext('2d');
+
+          analyticsChartInstances['villages'] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: shortLabels,
+              datasets: [
+                {
+                  label: '👁️ ნახვები',
+                  data: viewsData,
+                  backgroundColor: '#3b82f6',
+                  borderRadius: 4
+                },
+                {
+                  label: '🚗 Maps ნავიგაცია',
+                  data: navsData,
+                  backgroundColor: '#10b981',
+                  borderRadius: 4
+                }
+              ]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 600 },
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { color: colors.textColor, font: { size: 11, weight: '600' }, boxWidth: 12 }
+                },
+                tooltip: {
+                  backgroundColor: colors.tooltipBg,
+                  titleColor: colors.tooltipText,
+                  bodyColor: colors.tooltipText,
+                  borderColor: colors.tooltipBorder,
+                  borderWidth: 1
+                }
+              },
+              scales: {
+                x: {
+                  beginAtZero: true,
+                  grid: { color: colors.gridColor, drawBorder: false },
+                  ticks: { color: colors.textColor, precision: 0, font: { size: 10 } }
+                },
+                y: {
+                  grid: { display: false },
+                  ticks: { color: colors.textColor, font: { size: 10, weight: '600' } }
+                }
+              }
+            }
+          });
+        } else {
+          let svg = '<div style="font-size:11px; padding:4px;">';
+          villageList.slice(0, 5).forEach((v, idx) => {
+            const tot = (viewCounts[v] || 0) + (navCounts[v] || 0);
+            svg += '<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>' + v + '</span><span>' + tot + ' აქტივობა</span></div>';
+          });
+          svg += '</div>';
+          wrapper.innerHTML = svg;
+        }
+      }
+
+      // --- 4. DEVICES & NETWORK DOUGHNUT CHART ---
+      function renderDevicesDonutChart(records, colors) {
+        const wrapper = document.getElementById('wrapper-devices');
+        if (!wrapper) return;
+        destroyChartInstance('devices');
+
+        let mob = 0, desk = 0, tab = 0;
+        records.forEach(r => {
+          if (r.device_type === 'Mobile') mob++;
+          else if (r.device_type === 'Tablet') tab++;
+          else desk++;
+        });
+
+        const devLabels = ['📱 მობილური', '💻 კომპიუტერი', '📟 პლანშეტი'];
+        const devData = [mob, desk, tab];
+        const devColors = ['#3b82f6', '#8b5cf6', '#06b6d4'];
+        const totalDev = mob + desk + tab || 1;
+
+        if (typeof Chart !== 'undefined') {
+          wrapper.innerHTML = '<canvas id="chart-devices-canvas"></canvas>';
+          const canvas = document.getElementById('chart-devices-canvas');
+          const ctx = canvas.getContext('2d');
+
+          analyticsChartInstances['devices'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: devLabels,
+              datasets: [{
+                data: devData,
+                backgroundColor: devColors,
+                borderWidth: colors.isDark ? 2 : 2,
+                borderColor: colors.isDark ? '#000000' : '#ffffff',
+                hoverOffset: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '66%',
+              animation: { duration: 600 },
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    color: colors.textColor,
+                    boxWidth: 12,
+                    font: { size: 11, weight: '600' },
+                    padding: 10
+                  }
+                },
+                tooltip: {
+                  backgroundColor: colors.tooltipBg,
+                  titleColor: colors.tooltipText,
+                  bodyColor: colors.tooltipText,
+                  borderColor: colors.tooltipBorder,
+                  borderWidth: 1,
+                  callbacks: {
+                    label: function(ctx) {
+                      const val = ctx.raw || 0;
+                      const pct = Math.round((val / totalDev) * 100);
+                      return ' ' + ctx.label + ': ' + val + ' (' + pct + '%)';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          let svg = '<div style="padding:10px; font-size:12px; color:' + colors.textColor + ';">მობილური: ' + mob + ' | დესკტოპი: ' + desk + '</div>';
+          wrapper.innerHTML = svg;
+        }
+      }
+
+      // --- 5. PERFORMANCE SPEED METER ---
+      function renderSpeedMeter(records) {
+        const bigValEl = document.getElementById('speed-meter-big-val');
+        const fillEl = document.getElementById('speed-meter-fill');
+        const statusPill = document.getElementById('speed-status-pill');
+
+        const validSpeeds = records.map(r => Number(r.load_time_seconds)).filter(s => s > 0 && s < 30);
+        const avgSpeed = validSpeeds.length > 0
+          ? (validSpeeds.reduce((a, b) => a + b, 0) / validSpeeds.length).toFixed(1)
+          : (records.length > 0 ? '1.1' : '0.0');
+
+        const numSpeed = parseFloat(avgSpeed) || 1.1;
+
+        if (bigValEl) bigValEl.textContent = avgSpeed + ' წმ';
+
+        if (fillEl) {
+          const pct = Math.min(Math.max(Math.round((numSpeed / 4.0) * 100), 15), 100);
+          fillEl.style.width = pct + '%';
+          if (numSpeed < 1.5) {
+            fillEl.style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+          } else if (numSpeed < 3.0) {
+            fillEl.style.background = 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)';
+          } else {
+            fillEl.style.background = 'linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)';
+          }
+        }
+
+        if (statusPill) {
+          if (numSpeed < 1.5) {
+            statusPill.textContent = '⚡ სწრაფი & ოპტიმიზებული';
+            statusPill.style.color = '#10b981';
+            statusPill.style.background = 'rgba(16, 185, 129, 0.12)';
+          } else if (numSpeed < 3.0) {
+            statusPill.textContent = '🟡 ნორმალური სისწრაფე';
+            statusPill.style.color = '#f59e0b';
+            statusPill.style.background = 'rgba(245, 158, 11, 0.12)';
+          } else {
+            statusPill.textContent = '🔴 შედარებით ნელი';
+            statusPill.style.color = '#ef4444';
+            statusPill.style.background = 'rgba(239, 68, 68, 0.12)';
+          }
+        }
       }
 
       function renderAnalyticsUI(records, events) {
         records = records || [];
         events = events || [];
+        analyticsCachedRecords = records;
+        analyticsCachedEvents = events;
 
         const totalViewsEl = document.getElementById('kpi-total-views');
         const uniqueSessionsEl = document.getElementById('kpi-unique-sessions');
@@ -7335,6 +7963,7 @@ ${STEALTH_ADMIN_JS}
         const avgDurationEl = document.getElementById('kpi-avg-duration');
         const navClicksEl = document.getElementById('kpi-nav-clicks');
         const mobilePctEl = document.getElementById('kpi-mobile-pct');
+        const liveOnlineEl = document.getElementById('kpi-live-online');
 
         const villagesContainer = document.getElementById('stats-villages');
         const navigationContainer = document.getElementById('stats-navigation');
@@ -7349,7 +7978,7 @@ ${STEALTH_ADMIN_JS}
 
         if (!totalViewsEl) return;
 
-        // 1. KPI Calculations
+        // 1. KPI Calculations across full set
         const totalViews = records.length;
         const uniqueSet = new Set(records.map(r => r.visitor_id || r.session_id));
         const uniqueSessions = uniqueSet.size;
@@ -7364,20 +7993,26 @@ ${STEALTH_ADMIN_JS}
         const returningCount = records.filter(r => r.is_returning === true || (Number(r.visit_count) > 1)).length;
         const retentionRate = totalViews > 0 ? Math.round((returningCount / totalViews) * 100) : 0;
 
-        // Load speed calculations (seconds)
         const validSpeeds = records.map(r => Number(r.load_time_seconds)).filter(s => s > 0 && s < 30);
         const avgSpeedVal = validSpeeds.length > 0
           ? (validSpeeds.reduce((a, b) => a + b, 0) / validSpeeds.length).toFixed(1)
           : (totalViews > 0 ? '1.1' : '0.0');
 
-        // Navigation clicks from events
+        // Live Online Visitors (within last 5 minutes)
+        const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+        const onlineSessions = new Set(
+          records.filter(r => new Date(r.created_at).getTime() >= fiveMinAgo).map(r => r.visitor_id || r.session_id)
+        );
+        if (liveOnlineEl) {
+          liveOnlineEl.textContent = Math.max(onlineSessions.size, totalViews > 0 ? 1 : 0);
+        }
+
+        // Navigation clicks & village view events
         const navClickEvents = events.filter(e => e.type === 'nav_click' || e.event_type === 'nav_click');
         const totalNavClicks = navClickEvents.length;
-
-        // Village view events
         const villageViewEvents = events.filter(e => e.type === 'village_view' || e.event_type === 'village_view');
 
-        // Update KPI values
+        // Update KPI card text
         totalViewsEl.textContent = totalViews.toLocaleString('ka-GE');
         uniqueSessionsEl.textContent = uniqueSessions.toLocaleString('ka-GE');
         if (retentionRateEl) retentionRateEl.textContent = retentionRate + '%';
@@ -7387,109 +8022,117 @@ ${STEALTH_ADMIN_JS}
         if (navClicksEl) navClicksEl.textContent = totalNavClicks + ' მოთხოვნა';
         mobilePctEl.textContent = mobilePct + '%';
 
-        // 2. Timeline chart
-        renderTimelineChart(records);
+        // 2. Filter records for charts by selected timeframe
+        const filteredRecords = filterRecordsByTimeframe(records, analyticsActiveTimeframe);
+        const colors = getChartThemeColors();
 
-        // 3. Panel 1: Villages & Route Requests
-        if (villagesContainer) {
-          villagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🏆 ტოპ ლოკაციები (ინტერესის რეიტინგი):</div>';
-          const villageCounts = {
-            'სოფ. კესალო': 0,
-            'ქ. გარდაბანი': 0,
-            'სოფ. ვაზიანი': 0,
-            'სოფ. სართიჭალა': 0,
-            'სოფ. ნაზარლო': 0,
-            'სოფ. კუმისი': 0,
-            'სოფ. ყარაჯალარი': 0,
-            'სოფ. ვახტანგისი': 0
-          };
+        // 3. Render 5 Visual Real Charts
+        renderTimelineAreaChart(filteredRecords, colors, analyticsActiveTimeframe);
+        renderLanguagesDonutChart(filteredRecords, colors);
+        renderVillagesBarChart(events, colors);
+        renderDevicesDonutChart(filteredRecords, colors);
+        renderSpeedMeter(filteredRecords);
 
-          villageViewEvents.forEach(e => {
-            const rawTarget = e.target || e.target_name || '';
-            let matchedKey = null;
-            for (const k of Object.keys(villageCounts)) {
-              if (rawTarget.includes(k) || k.includes(rawTarget)) {
-                matchedKey = k;
-                break;
-              }
-            }
-            if (matchedKey) villageCounts[matchedKey]++;
-            else if (rawTarget) villageCounts[rawTarget] = (villageCounts[rawTarget] || 0) + 1;
-          });
-
-          const totalVillageViews = Object.values(villageCounts).reduce((a, b) => a + b, 0) || 1;
-          const sortedVillages = Object.entries(villageCounts).sort((a, b) => b[1] - a[1]);
-          const medals = ['🥇 #1', '🥈 #2', '🥉 #3', '#4', '#5', '#6', '#7', '#8'];
-
-          sortedVillages.slice(0, 5).forEach(([vName, vCount], idx) => {
-            const labelWithRank = medals[idx] + ' ' + vName;
-            const barColor = idx === 0 ? '#f59e0b' : (idx === 1 ? '#3b82f6' : (idx === 2 ? '#10b981' : null));
-            renderRankRow(villagesContainer, labelWithRank, vCount, totalVillageViews, null, barColor);
-          });
-        }
-
-        if (navigationContainer) {
-          navigationContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🚗 Google Maps ნავიგაციის მოთხოვნები:</div>';
-          if (totalNavClicks === 0) {
-            navigationContainer.innerHTML += '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მარშრუტი ჯერ არ არის მოთხოვნილი</div>';
-          } else {
-            const navCounts = {};
-            navClickEvents.forEach(e => {
-              const dest = e.target || e.target_name || 'მთავარი ლოკაცია';
-              navCounts[dest] = (navCounts[dest] || 0) + 1;
-            });
-            Object.entries(navCounts).sort((a, b) => b[1] - a[1]).slice(0, 4).forEach(([dest, count]) => {
-              renderRankRow(navigationContainer, '📍 ' + dest, count, totalNavClicks, null, '#10b981');
-            });
-          }
-        }
-
-        // 4. Panel 2: Languages & Traffic Sources
+        // 4. Detailed Ranked Breakdowns (Under Charts)
         if (languagesContainer) {
-          languagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 ბრაუზერის ენა (ეთნიკური მრავალფეროვნება):</div>';
+          languagesContainer.innerHTML = '';
           let kaNum = 0, azNum = 0, enNum = 0, othNum = 0;
-          records.forEach(r => {
+          filteredRecords.forEach(r => {
             const l = (r.browser_lang || r.language || '').toLowerCase();
             if (l.startsWith('ka')) kaNum++;
             else if (l.startsWith('az')) azNum++;
             else if (l.startsWith('en')) enNum++;
             else othNum++;
           });
-
-          const baseTotal = totalViews || 1;
-          const kaPct = Math.round((kaNum / baseTotal) * 100);
-          const azPct = Math.round((azNum / baseTotal) * 100);
-          const enPct = Math.round((enNum / baseTotal) * 100);
-          const othPct = Math.max(0, 100 - kaPct - azPct - enPct);
-
-          let langMultiBarHtml = '<div class="multi-segment-bar">' +
-            (kaPct > 0 ? '<div class="bar-segment seg-ka" style="width:' + kaPct + '%;" title="ქართული: ' + kaPct + '%"></div>' : '') +
-            (azPct > 0 ? '<div class="bar-segment seg-az" style="width:' + azPct + '%;" title="აზერბაიჯანული: ' + azPct + '%"></div>' : '') +
-            (enPct > 0 ? '<div class="bar-segment seg-en" style="width:' + enPct + '%;" title="ინგლისური: ' + enPct + '%"></div>' : '') +
-            (othPct > 0 ? '<div class="bar-segment seg-other" style="width:' + othPct + '%;" title="სხვა: ' + othPct + '%"></div>' : '') +
-            '</div>';
-
-          languagesContainer.innerHTML += langMultiBarHtml;
+          const baseTotal = filteredRecords.length || 1;
           renderRankRow(languagesContainer, '🇬🇪 ქართული (ka)', kaNum, baseTotal, null, '#3b82f6');
           renderRankRow(languagesContainer, '🇦🇿 აზერბაიჯანული (az)', azNum, baseTotal, null, '#10b981');
           renderRankRow(languagesContainer, '🇬🇧 ინგლისური (en)', enNum, baseTotal, null, '#8b5cf6');
           if (othNum > 0) renderRankRow(languagesContainer, '🌐 სხვა ენები / რეგიონული', othNum, baseTotal, null, '#f59e0b');
         }
 
+        if (villagesContainer) {
+          villagesContainer.innerHTML = '<div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text-main);">🏆 ტოპ ლოკაციები:</div>';
+          const villageCounts = {
+            'სოფ. კესალო': 0, 'ქ. გარდაბანი': 0, 'სოფ. ვაზიანი': 0, 'სოფ. სართიჭალა': 0,
+            'სოფ. ნაზარლო': 0, 'სოფ. კუმისი': 0, 'სოფ. ყარაჯალარი': 0, 'სოფ. ვახტანგისი': 0
+          };
+          villageViewEvents.forEach(e => {
+            const rawTarget = e.target || e.target_name || '';
+            let matchedKey = null;
+            for (const k of Object.keys(villageCounts)) {
+              if (rawTarget.includes(k) || k.includes(rawTarget)) { matchedKey = k; break; }
+            }
+            if (matchedKey) villageCounts[matchedKey]++;
+            else if (rawTarget) villageCounts[rawTarget] = (villageCounts[rawTarget] || 0) + 1;
+          });
+          const totalVillageViews = Object.values(villageCounts).reduce((a, b) => a + b, 0) || 1;
+          const sortedVillages = Object.entries(villageCounts).sort((a, b) => b[1] - a[1]);
+          const medals = ['🥇 #1', '🥈 #2', '🥉 #3', '#4', '#5'];
+          sortedVillages.slice(0, 5).forEach(([vName, vCount], idx) => {
+            const barColor = idx === 0 ? '#f59e0b' : (idx === 1 ? '#3b82f6' : (idx === 2 ? '#10b981' : null));
+            renderRankRow(villagesContainer, medals[idx] + ' ' + vName, vCount, totalVillageViews, null, barColor);
+          });
+        }
+
+        if (navigationContainer) {
+          navigationContainer.innerHTML = '<div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text-main);">🚗 Google Maps მარშრუტები:</div>';
+          if (totalNavClicks === 0) {
+            navigationContainer.innerHTML += '<div style="font-size:11.5px; color:var(--text-muted); padding:2px 0;">მარშრუტი ჯერ არ არის მოთხოვნილი</div>';
+          } else {
+            const navCounts = {};
+            navClickEvents.forEach(e => {
+              const dest = e.target || e.target_name || 'მთავარი ლოკაცია';
+              navCounts[dest] = (navCounts[dest] || 0) + 1;
+            });
+            Object.entries(navCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).forEach(([dest, count]) => {
+              renderRankRow(navigationContainer, '📍 ' + dest, count, totalNavClicks, null, '#10b981');
+            });
+          }
+        }
+
+        if (devicesContainer) {
+          devicesContainer.innerHTML = '';
+          let mobNum = 0, deskNum = 0, tabNum = 0;
+          filteredRecords.forEach(r => {
+            if (r.device_type === 'Mobile') mobNum++;
+            else if (r.device_type === 'Tablet') tabNum++;
+            else deskNum++;
+          });
+          const baseDevTotal = filteredRecords.length || 1;
+          renderRankRow(devicesContainer, '📱 მობილური', mobNum, baseDevTotal, null, '#3b82f6');
+          renderRankRow(devicesContainer, '💻 კომპიუტერი', deskNum, baseDevTotal, null, '#8b5cf6');
+          if (tabNum > 0) renderRankRow(devicesContainer, '📟 პლანშეტი', tabNum, baseDevTotal, null, '#06b6d4');
+        }
+
+        if (networksContainer) {
+          networksContainer.innerHTML = '';
+          const netCounts = {};
+          filteredRecords.forEach(r => {
+            const net = (r.network_type || 'WIFI/LAN').toUpperCase();
+            netCounts[net] = (netCounts[net] || 0) + 1;
+          });
+          const baseNetTotal = filteredRecords.length || 1;
+          Object.entries(netCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
+            const color = k.includes('4G') ? '#10b981' : (k.includes('3G') ? '#f59e0b' : '#3b82f6');
+            renderRankRow(networksContainer, '📶 ' + k, v, baseNetTotal, null, color);
+          });
+        }
+
         if (referrersContainer) {
-          referrersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🌐 ტრაფიკის წყაროები:</div>';
+          referrersContainer.innerHTML = '<div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text-main);">🌐 ტრაფიკის წყაროები:</div>';
           const refCounts = {};
           records.forEach(r => {
             const ref = r.referrer || 'პირდაპირი (Direct)';
             refCounts[ref] = (refCounts[ref] || 0) + 1;
           });
-          Object.entries(refCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
+          Object.entries(refCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
             renderRankRow(referrersContainer, k, v, totalViews || 1);
           });
         }
 
         if (pagesContainer) {
-          pagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📄 მონახულებული გვერდები:</div>';
+          pagesContainer.innerHTML = '<div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text-main);">📄 მონახულებული გვერდები:</div>';
           const pageCounts = {};
           records.forEach(r => {
             const info = getPageInfo(r.page_path);
@@ -7501,72 +8144,7 @@ ${STEALTH_ADMIN_JS}
           });
         }
 
-        // 5. Panel 3: Devices, Network & Performance Speed
-        if (devicesContainer) {
-          let mobNum = 0, deskNum = 0, tabNum = 0;
-          records.forEach(r => {
-            if (r.device_type === 'Mobile') mobNum++;
-            else if (r.device_type === 'Tablet') tabNum++;
-            else deskNum++;
-          });
-          const baseDevTotal = totalViews || 1;
-          const mobPct = Math.round((mobNum / baseDevTotal) * 100);
-          const deskPct = Math.round((deskNum / baseDevTotal) * 100);
-          const tabPct = Math.max(0, 100 - mobPct - deskPct);
-
-          let devMultiBarHtml = '<div class="multi-segment-bar">' +
-            (mobPct > 0 ? '<div class="bar-segment seg-mobile" style="width:' + mobPct + '%;" title="მობილური: ' + mobPct + '%"></div>' : '') +
-            (deskPct > 0 ? '<div class="bar-segment seg-desktop" style="width:' + deskPct + '%;" title="დესკტოპი: ' + deskPct + '%"></div>' : '') +
-            (tabPct > 0 ? '<div class="bar-segment seg-tablet" style="width:' + tabPct + '%;" title="პლანშეტი: ' + tabPct + '%"></div>' : '') +
-            '</div>';
-
-          devicesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">მოწყობილობის ტიპი:</div>' + devMultiBarHtml;
-          renderRankRow(devicesContainer, '📱 მობილური (Mobile)', mobNum, baseDevTotal, null, '#3b82f6');
-          renderRankRow(devicesContainer, '💻 კომპიუტერი (Desktop)', deskNum, baseDevTotal, null, '#8b5cf6');
-          if (tabNum > 0) renderRankRow(devicesContainer, '📟 პლანშეტი (Tablet)', tabNum, baseDevTotal, null, '#06b6d4');
-        }
-
-        if (networksContainer) {
-          const netCounts = {};
-          records.forEach(r => {
-            const net = (r.network_type || 'WIFI/LAN').toUpperCase();
-            netCounts[net] = (netCounts[net] || 0) + 1;
-          });
-          const g4Num = netCounts['4G'] || 0;
-          const wifiNum = (netCounts['WIFI'] || 0) + (netCounts['WIFI/LAN'] || 0);
-          const g3Num = (netCounts['3G'] || 0) + (netCounts['2G'] || 0);
-          const baseNetTotal = totalViews || 1;
-
-          const g4Pct = Math.round((g4Num / baseNetTotal) * 100);
-          const wifiPct = Math.round((wifiNum / baseNetTotal) * 100);
-          const g3Pct = Math.max(0, 100 - g4Pct - wifiPct);
-
-          let netMultiBarHtml = '<div class="multi-segment-bar">' +
-            (g4Pct > 0 ? '<div class="bar-segment seg-4g" style="width:' + g4Pct + '%;" title="4G: ' + g4Pct + '%"></div>' : '') +
-            (wifiPct > 0 ? '<div class="bar-segment seg-wifi" style="width:' + wifiPct + '%;" title="WIFI: ' + wifiPct + '%"></div>' : '') +
-            (g3Pct > 0 ? '<div class="bar-segment seg-3g" style="width:' + g3Pct + '%;" title="3G/ნელი: ' + g3Pct + '%"></div>' : '') +
-            '</div>';
-
-          networksContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📶 ქსელის კავშირი:</div>' + netMultiBarHtml;
-          Object.entries(netCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
-            const color = k.includes('4G') ? '#10b981' : (k.includes('3G') ? '#f59e0b' : '#3b82f6');
-            renderRankRow(networksContainer, k, v, baseNetTotal, null, color);
-          });
-        }
-
-        if (speedDiagContainer) {
-          const numSpeed = parseFloat(avgSpeedVal) || 1.1;
-          const speedStatus = numSpeed < 1.5 ? 'მაღალი (სწრაფი ⚡)' : (numSpeed < 3.0 ? 'საშუალო (ნორმალური 🟡)' : 'ნელი (შედარებით დაბალი 🔴)');
-          const speedColor = numSpeed < 1.5 ? '#10b981' : (numSpeed < 3.0 ? '#f59e0b' : '#ef4444');
-          speedDiagContainer.innerHTML = 
-            '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">⚡ საიტის ჩატვირთვის სისწრაფე:</div>' +
-            '<div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">' +
-              '<span style="font-size:12px; color:var(--text-muted);">საშ. ჩატვირთვა: <strong>' + avgSpeedVal + ' წმ</strong></span>' +
-              '<span style="font-size:11px; font-weight:700; color:' + speedColor + '; background:rgba(16,185,129,0.1); padding:3px 8px; border-radius:9999px;">' + speedStatus + '</span>' +
-            '</div>';
-        }
-
-        // 6. Activity Feed / Stream
+        // 5. Activity Feed / Stream
         if (feedContainer) {
           feedContainer.innerHTML = '';
           if (feedCountEl) feedCountEl.textContent = records.length + ' ჩანაწერი';
@@ -7583,7 +8161,6 @@ ${STEALTH_ADMIN_JS}
               const item = document.createElement('div');
               item.className = 'activity-item';
 
-              // Language pill
               const rLang = (r.browser_lang || r.language || 'ka').toLowerCase();
               let langLabel = '🇬🇪 ka';
               if (rLang.startsWith('az')) langLabel = '🇦🇿 az';
@@ -7690,7 +8267,62 @@ ${STEALTH_ADMIN_JS}
         });
       }
 
-      // Cookie Consent settings sync
+      function initLiveModeTicker() {
+        if (liveSyncIntervalId) clearInterval(liveSyncIntervalId);
+        liveCountdownSeconds = 20;
+        const countdownEl = document.getElementById('live-sync-countdown');
+        if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
+
+        liveSyncIntervalId = setInterval(() => {
+          if (!isAdminMode()) {
+            clearInterval(liveSyncIntervalId);
+            liveSyncIntervalId = null;
+            return;
+          }
+          liveCountdownSeconds--;
+          if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
+          if (liveCountdownSeconds <= 0) {
+            liveCountdownSeconds = 20;
+            loadAndRenderAnalytics();
+            const dot = document.querySelector('.live-pulse-dot');
+            if (dot) {
+              dot.style.transform = 'scale(1.4)';
+              setTimeout(() => { dot.style.transform = 'scale(1)'; }, 350);
+            }
+          }
+        }, 1000);
+      }
+
+      // Timeframe Switcher
+      const timeframeGroup = document.getElementById('analytics-timeframe-group');
+      if (timeframeGroup) {
+        timeframeGroup.addEventListener('click', (e) => {
+          const btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          timeframeGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          analyticsActiveTimeframe = btn.dataset.timeframe || '24h';
+          const badgeEl = document.getElementById('chart-timeframe-badge');
+          if (badgeEl) {
+            badgeEl.textContent = analyticsActiveTimeframe === '24h' 
+              ? 'ბოლო 24 საათი' 
+              : (analyticsActiveTimeframe === '7d' ? 'ბოლო 7 დღე' : 'სრული ისტორია');
+          }
+          renderAnalyticsUI(analyticsCachedRecords, analyticsCachedEvents);
+        });
+      }
+
+      // Theme Change Dynamic Redraw
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          setTimeout(() => {
+            if (isAdminMode() && analyticsCachedRecords.length > 0) {
+              renderAnalyticsUI(analyticsCachedRecords, analyticsCachedEvents);
+            }
+          }, 60);
+        });
+      }
       function syncCookieSettingsUI() {
         const desc = document.getElementById('cookie-status-desc');
         const c = localStorage.getItem('gardabani_cookie_consent');
