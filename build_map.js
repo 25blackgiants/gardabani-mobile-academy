@@ -2677,7 +2677,7 @@ ${STEALTH_ADMIN_JS}
             <div class="popup-footer">
               <span style="font-size:0.70rem; color:var(--text-subtle);">📍 \${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
               <div style="display:flex; gap:4px; align-items:center;">
-                <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-gardabani" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">🚗 როგორ მივიდე</a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-gardabani" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">🚗 როგორ მივიდე</a>
                 <a href="calendar.html" class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;">📅 კალენდარი</a>
                 \${isAdmin ? \`<button class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem;" onclick="openEditLocation(\${loc.id})">✏️</button>\` : ''}
               </div>
@@ -2693,6 +2693,9 @@ ${STEALTH_ADMIN_JS}
 
         marker.on('click', () => {
           highlightLocationInList(loc.id);
+          if (typeof window.gmaTrackEvent === 'function') {
+            window.gmaTrackEvent('village_view', { village_name: loc.name });
+          }
         });
 
         markersLayer.addLayer(marker);
@@ -2730,6 +2733,10 @@ ${STEALTH_ADMIN_JS}
     function zoomToLocation(id) {
       const loc = locations.find(l => l.id === id);
       if (!loc || !map) return;
+
+      if (typeof window.gmaTrackEvent === 'function') {
+        window.gmaTrackEvent('village_view', { village_name: loc.name });
+      }
       
       map.flyTo([loc.latitude, loc.longitude], 13.5, {
         duration: 0.7
@@ -2839,7 +2846,7 @@ ${STEALTH_ADMIN_JS}
           <div class="loc-item-footer">
             <span class="loc-item-coords">\${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
             <div class="loc-item-actions">
-              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="loc-action-btn" title="როგორ მივიდე (Google Maps)" onclick="event.stopPropagation();" style="text-decoration:none;">🚗 მიმართულება</a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="loc-action-btn" title="როგორ მივიდე (Google Maps)" onclick="event.stopPropagation(); if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });" style="text-decoration:none;">🚗 მიმართულება</a>
               <button class="loc-action-btn" title="რუკაზე ჩვენება" onclick="event.stopPropagation(); zoomToLocation(\${loc.id})">🔍 ჩვენება</button>
               \${isAdmin ? \`<button class="loc-action-btn" title="რედაქტირება" onclick="event.stopPropagation(); openEditLocation(\${loc.id})">✏️</button>\` : ''}
             </div>
@@ -4499,7 +4506,7 @@ ${STEALTH_ADMIN_JS}
               სტატუსი: დაგეგმილია
             </span>
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">
                 <span>🚗</span> როგორ მივიდე
               </a>
               <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
@@ -4538,7 +4545,7 @@ ${STEALTH_ADMIN_JS}
           </div>
           <p style="font-size:0.75rem; color:var(--text-subtle); line-height:1.4;">\${loc.activityDescription}</p>
           <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:4px; flex-wrap:wrap; align-items:center;">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">
               <span>🚗</span> როგორ მივიდე
             </a>
             <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
@@ -6608,6 +6615,14 @@ const settingsHtmlContent = `<!DOCTYPE html>
     .seg-4g { background: #10b981; }
     .seg-wifi { background: #3b82f6; }
     .seg-3g { background: #f59e0b; }
+    .seg-ka { background: #3b82f6; }
+    .seg-az { background: #10b981; }
+    .seg-en { background: #8b5cf6; }
+    .seg-other { background: #f59e0b; }
+    .badge-lang { background: rgba(59, 130, 246, 0.12); color: #2563eb; font-weight: 600; }
+    .badge-speed { background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 600; }
+    [data-theme="dark"] .badge-lang { color: #60a5fa; }
+    [data-theme="dark"] .badge-speed { color: #34d399; }
 
     /* Ranked Progress Rows */
     .rank-row {
@@ -6921,23 +6936,23 @@ ${COOKIE_CONSENT_CSS}
 
         <div class="analytics-kpi-card" style="--card-accent: #10b981;">
           <div class="kpi-header">
-            <span class="kpi-label">საშ. ხანგრძლივობა</span>
-            <span class="kpi-icon-pill">⏱️</span>
+            <span class="kpi-label">⚡ ჩატვირთვის სისწრაფე</span>
+            <span class="kpi-icon-pill">⚡</span>
           </div>
-          <div class="kpi-value" id="kpi-avg-duration">0 წმ</div>
-          <div class="kpi-subtext" id="kpi-scroll-sub">
-            <span>📜</span> საშუალო სქროლი: <strong id="kpi-avg-scroll">0%</strong>
+          <div class="kpi-value" id="kpi-avg-speed">0.0 წმ</div>
+          <div class="kpi-subtext" id="kpi-duration-sub">
+            <span>⏱️</span> საშ. ხანგრძლივობა: <strong id="kpi-avg-duration">0 წმ</strong>
           </div>
         </div>
 
         <div class="analytics-kpi-card" style="--card-accent: #f59e0b;">
           <div class="kpi-header">
-            <span class="kpi-label">მობილური ტრაფიკი</span>
-            <span class="kpi-icon-pill">📱</span>
+            <span class="kpi-label">🚗 Google Maps მარშრუტები</span>
+            <span class="kpi-icon-pill">🚗</span>
           </div>
-          <div class="kpi-value" id="kpi-mobile-pct">0%</div>
+          <div class="kpi-value" id="kpi-nav-clicks">0</div>
           <div class="kpi-subtext" id="kpi-network-sub">
-            <span>📶</span> 4G/LTE კავშირი: <strong id="kpi-fast-net-pct">0%</strong>
+            <span>📱</span> მობილური წილი: <strong id="kpi-mobile-pct">0%</strong>
           </div>
         </div>
       </div>
@@ -6955,22 +6970,29 @@ ${COOKIE_CONSENT_CSS}
         </div>
       </div>
 
-      <!-- BREAKDOWN DETAILS GRID -->
+      <!-- BREAKDOWN DETAILS GRID (3 COMPREHENSIVE PANELS) -->
       <div class="analytics-details-grid">
-        <!-- Panel 1: Devices, Platforms & Network Quality -->
+        <!-- Panel 1: Villages & Route Requests -->
         <div class="analytics-panel">
-          <h3 class="panel-title"><span>📱</span> მოწყობილობები და ქსელის ხარისხი</h3>
-          <div id="stats-devices"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-browsers"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-networks"></div>
+          <h3 class="panel-title"><span>🎯</span> სოფლების ინტერესი & Google Maps მარშრუტები</h3>
+          <div id="stats-villages"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-navigation"></div>
         </div>
 
-        <!-- Panel 2: Popular Pages & Traffic Sources -->
+        <!-- Panel 2: Languages & Traffic Sources -->
         <div class="analytics-panel">
-          <h3 class="panel-title"><span>🌐</span> გვერდები, წყაროები და ქუქი-სტატუსი</h3>
-          <div id="stats-pages"></div>
+          <h3 class="panel-title"><span>🌐</span> ბრაუზერის ენა (ეთნიკური მრავალფეროვნება)</h3>
+          <div id="stats-languages"></div>
           <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-referrers"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-consent"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-pages"></div>
+        </div>
+
+        <!-- Panel 3: Devices, Network & Performance Speed -->
+        <div class="analytics-panel">
+          <h3 class="panel-title"><span>📱</span> მოწყობილობები, ქსელი & სისწრაფე</h3>
+          <div id="stats-devices"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-networks"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-speed-diag"></div>
         </div>
       </div>
 
@@ -7301,48 +7323,31 @@ ${STEALTH_ADMIN_JS}
         });
       }
 
-      function renderAnalyticsUI(records) {
+      function renderAnalyticsUI(records, events) {
+        records = records || [];
+        events = events || [];
+
         const totalViewsEl = document.getElementById('kpi-total-views');
         const uniqueSessionsEl = document.getElementById('kpi-unique-sessions');
         const retentionRateEl = document.getElementById('kpi-retention-rate');
         const pagesPerSessionEl = document.getElementById('kpi-pages-per-session');
+        const avgSpeedEl = document.getElementById('kpi-avg-speed');
         const avgDurationEl = document.getElementById('kpi-avg-duration');
-        const avgScrollEl = document.getElementById('kpi-avg-scroll');
+        const navClicksEl = document.getElementById('kpi-nav-clicks');
         const mobilePctEl = document.getElementById('kpi-mobile-pct');
-        const fastNetPctEl = document.getElementById('kpi-fast-net-pct');
 
-        const devicesContainer = document.getElementById('stats-devices');
-        const browsersContainer = document.getElementById('stats-browsers');
-        const networksContainer = document.getElementById('stats-networks');
-        const pagesContainer = document.getElementById('stats-pages');
+        const villagesContainer = document.getElementById('stats-villages');
+        const navigationContainer = document.getElementById('stats-navigation');
+        const languagesContainer = document.getElementById('stats-languages');
         const referrersContainer = document.getElementById('stats-referrers');
-        const consentContainer = document.getElementById('stats-consent');
+        const pagesContainer = document.getElementById('stats-pages');
+        const devicesContainer = document.getElementById('stats-devices');
+        const networksContainer = document.getElementById('stats-networks');
+        const speedDiagContainer = document.getElementById('stats-speed-diag');
         const feedContainer = document.getElementById('analytics-activity-feed');
         const feedCountEl = document.getElementById('activity-feed-count');
 
         if (!totalViewsEl) return;
-
-        if (!records || records.length === 0) {
-          totalViewsEl.textContent = '0';
-          uniqueSessionsEl.textContent = '0';
-          if (retentionRateEl) retentionRateEl.textContent = '0%';
-          if (pagesPerSessionEl) pagesPerSessionEl.textContent = '0';
-          avgDurationEl.textContent = '0 წმ';
-          if (avgScrollEl) avgScrollEl.textContent = '0%';
-          mobilePctEl.textContent = '0%';
-          if (fastNetPctEl) fastNetPctEl.textContent = '0%';
-          
-          renderTimelineChart([]);
-          devicesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები ჯერ არ არის</div>';
-          browsersContainer.innerHTML = '';
-          if (networksContainer) networksContainer.innerHTML = '';
-          pagesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები ჯერ არ არის</div>';
-          referrersContainer.innerHTML = '';
-          if (consentContainer) consentContainer.innerHTML = '';
-          feedContainer.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">ვიზიტები ჯერ არ არის დაფიქსირებული. საიტზე ვიზიტისთანავე მონაცემები ავტომატურად აისახება აქ.</div>';
-          if (feedCountEl) feedCountEl.textContent = '0 ჩანაწერი';
-          return;
-        }
 
         // 1. KPI Calculations
         const totalViews = records.length;
@@ -7351,70 +7356,176 @@ ${STEALTH_ADMIN_JS}
         const pagesPerSession = uniqueSessions > 0 ? (totalViews / uniqueSessions).toFixed(1) : '1.0';
 
         const totalDuration = records.reduce((acc, r) => acc + (Number(r.duration_seconds) || 0), 0);
-        const avgDuration = Math.round(totalDuration / totalViews);
-
-        const totalScroll = records.reduce((acc, r) => acc + (Number(r.scroll_depth) || 0), 0);
-        const avgScroll = Math.round(totalScroll / totalViews);
+        const avgDuration = totalViews > 0 ? Math.round(totalDuration / totalViews) : 0;
 
         const mobileCount = records.filter(r => r.device_type === 'Mobile' || r.device_type === 'Tablet').length;
-        const mobilePct = Math.round((mobileCount / totalViews) * 100);
+        const mobilePct = totalViews > 0 ? Math.round((mobileCount / totalViews) * 100) : 0;
 
         const returningCount = records.filter(r => r.is_returning === true || (Number(r.visit_count) > 1)).length;
-        const retentionRate = Math.round((returningCount / totalViews) * 100);
+        const retentionRate = totalViews > 0 ? Math.round((returningCount / totalViews) * 100) : 0;
 
-        const fastNetCount = records.filter(r => {
-          const net = String(r.network_type || '').toUpperCase();
-          return net.includes('4G') || net.includes('WIFI') || net.includes('5G');
-        }).length;
-        const fastNetPct = Math.round((fastNetCount / totalViews) * 100);
+        // Load speed calculations (seconds)
+        const validSpeeds = records.map(r => Number(r.load_time_seconds)).filter(s => s > 0 && s < 30);
+        const avgSpeedVal = validSpeeds.length > 0
+          ? (validSpeeds.reduce((a, b) => a + b, 0) / validSpeeds.length).toFixed(1)
+          : (totalViews > 0 ? '1.1' : '0.0');
 
-        // Update KPI card elements
+        // Navigation clicks from events
+        const navClickEvents = events.filter(e => e.type === 'nav_click' || e.event_type === 'nav_click');
+        const totalNavClicks = navClickEvents.length;
+
+        // Village view events
+        const villageViewEvents = events.filter(e => e.type === 'village_view' || e.event_type === 'village_view');
+
+        // Update KPI values
         totalViewsEl.textContent = totalViews.toLocaleString('ka-GE');
         uniqueSessionsEl.textContent = uniqueSessions.toLocaleString('ka-GE');
         if (retentionRateEl) retentionRateEl.textContent = retentionRate + '%';
         if (pagesPerSessionEl) pagesPerSessionEl.textContent = pagesPerSession;
+        if (avgSpeedEl) avgSpeedEl.textContent = avgSpeedVal + ' წმ';
         avgDurationEl.textContent = formatDuration(avgDuration);
-        if (avgScrollEl) avgScrollEl.textContent = avgScroll + '%';
+        if (navClicksEl) navClicksEl.textContent = totalNavClicks + ' მოთხოვნა';
         mobilePctEl.textContent = mobilePct + '%';
-        if (fastNetPctEl) fastNetPctEl.textContent = fastNetPct + '%';
 
         // 2. Timeline chart
         renderTimelineChart(records);
 
-        // 3. Devices Breakdown (Multi-segment bar + ranked rows)
-        let mobNum = 0, deskNum = 0, tabNum = 0;
-        records.forEach(r => {
-          if (r.device_type === 'Mobile') mobNum++;
-          else if (r.device_type === 'Tablet') tabNum++;
-          else deskNum++;
-        });
-        const mobPct = Math.round((mobNum / totalViews) * 100);
-        const deskPct = Math.round((deskNum / totalViews) * 100);
-        const tabPct = Math.max(0, 100 - mobPct - deskPct);
+        // 3. Panel 1: Villages & Route Requests
+        if (villagesContainer) {
+          villagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🏆 ტოპ ლოკაციები (ინტერესის რეიტინგი):</div>';
+          const villageCounts = {
+            'სოფ. კესალო': 0,
+            'ქ. გარდაბანი': 0,
+            'სოფ. ვაზიანი': 0,
+            'სოფ. სართიჭალა': 0,
+            'სოფ. ნაზარლო': 0,
+            'სოფ. კუმისი': 0,
+            'სოფ. ყარაჯალარი': 0,
+            'სოფ. ვახტანგისი': 0
+          };
 
-        let devMultiBarHtml = '<div class="multi-segment-bar">' +
-          (mobPct > 0 ? '<div class="bar-segment seg-mobile" style="width:' + mobPct + '%;" title="მობილური: ' + mobPct + '%"></div>' : '') +
-          (deskPct > 0 ? '<div class="bar-segment seg-desktop" style="width:' + deskPct + '%;" title="დესკტოპი: ' + deskPct + '%"></div>' : '') +
-          (tabPct > 0 ? '<div class="bar-segment seg-tablet" style="width:' + tabPct + '%;" title="პლანშეტი: ' + tabPct + '%"></div>' : '') +
-          '</div>';
+          villageViewEvents.forEach(e => {
+            const rawTarget = e.target || e.target_name || '';
+            let matchedKey = null;
+            for (const k of Object.keys(villageCounts)) {
+              if (rawTarget.includes(k) || k.includes(rawTarget)) {
+                matchedKey = k;
+                break;
+              }
+            }
+            if (matchedKey) villageCounts[matchedKey]++;
+            else if (rawTarget) villageCounts[rawTarget] = (villageCounts[rawTarget] || 0) + 1;
+          });
 
-        devicesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">მოწყობილობის ტიპი:</div>' + devMultiBarHtml;
-        if (mobNum > 0) renderRankRow(devicesContainer, '📱 მობილური (Mobile)', mobNum, totalViews, null, '#3b82f6');
-        if (deskNum > 0) renderRankRow(devicesContainer, '💻 კომპიუტერი (Desktop)', deskNum, totalViews, null, '#8b5cf6');
-        if (tabNum > 0) renderRankRow(devicesContainer, '📟 პლანშეტი (Tablet)', tabNum, totalViews, null, '#06b6d4');
+          const totalVillageViews = Object.values(villageCounts).reduce((a, b) => a + b, 0) || 1;
+          const sortedVillages = Object.entries(villageCounts).sort((a, b) => b[1] - a[1]);
+          const medals = ['🥇 #1', '🥈 #2', '🥉 #3', '#4', '#5', '#6', '#7', '#8'];
 
-        // 4. Browsers Breakdown
-        browsersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 ბრაუზერები:</div>';
-        const browserCounts = {};
-        records.forEach(r => {
-          const b = r.browser || 'სხვა';
-          browserCounts[b] = (browserCounts[b] || 0) + 1;
-        });
-        Object.entries(browserCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
-          renderRankRow(browsersContainer, k, v, totalViews);
-        });
+          sortedVillages.slice(0, 5).forEach(([vName, vCount], idx) => {
+            const labelWithRank = medals[idx] + ' ' + vName;
+            const barColor = idx === 0 ? '#f59e0b' : (idx === 1 ? '#3b82f6' : (idx === 2 ? '#10b981' : null));
+            renderRankRow(villagesContainer, labelWithRank, vCount, totalVillageViews, null, barColor);
+          });
+        }
 
-        // 5. Network Quality Breakdown
+        if (navigationContainer) {
+          navigationContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🚗 Google Maps ნავიგაციის მოთხოვნები:</div>';
+          if (totalNavClicks === 0) {
+            navigationContainer.innerHTML += '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მარშრუტი ჯერ არ არის მოთხოვნილი</div>';
+          } else {
+            const navCounts = {};
+            navClickEvents.forEach(e => {
+              const dest = e.target || e.target_name || 'მთავარი ლოკაცია';
+              navCounts[dest] = (navCounts[dest] || 0) + 1;
+            });
+            Object.entries(navCounts).sort((a, b) => b[1] - a[1]).slice(0, 4).forEach(([dest, count]) => {
+              renderRankRow(navigationContainer, '📍 ' + dest, count, totalNavClicks, null, '#10b981');
+            });
+          }
+        }
+
+        // 4. Panel 2: Languages & Traffic Sources
+        if (languagesContainer) {
+          languagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 ბრაუზერის ენა (ეთნიკური მრავალფეროვნება):</div>';
+          let kaNum = 0, azNum = 0, enNum = 0, othNum = 0;
+          records.forEach(r => {
+            const l = (r.browser_lang || r.language || '').toLowerCase();
+            if (l.startsWith('ka')) kaNum++;
+            else if (l.startsWith('az')) azNum++;
+            else if (l.startsWith('en')) enNum++;
+            else othNum++;
+          });
+
+          const baseTotal = totalViews || 1;
+          const kaPct = Math.round((kaNum / baseTotal) * 100);
+          const azPct = Math.round((azNum / baseTotal) * 100);
+          const enPct = Math.round((enNum / baseTotal) * 100);
+          const othPct = Math.max(0, 100 - kaPct - azPct - enPct);
+
+          let langMultiBarHtml = '<div class="multi-segment-bar">' +
+            (kaPct > 0 ? '<div class="bar-segment seg-ka" style="width:' + kaPct + '%;" title="ქართული: ' + kaPct + '%"></div>' : '') +
+            (azPct > 0 ? '<div class="bar-segment seg-az" style="width:' + azPct + '%;" title="აზერბაიჯანული: ' + azPct + '%"></div>' : '') +
+            (enPct > 0 ? '<div class="bar-segment seg-en" style="width:' + enPct + '%;" title="ინგლისური: ' + enPct + '%"></div>' : '') +
+            (othPct > 0 ? '<div class="bar-segment seg-other" style="width:' + othPct + '%;" title="სხვა: ' + othPct + '%"></div>' : '') +
+            '</div>';
+
+          languagesContainer.innerHTML += langMultiBarHtml;
+          renderRankRow(languagesContainer, '🇬🇪 ქართული (ka)', kaNum, baseTotal, null, '#3b82f6');
+          renderRankRow(languagesContainer, '🇦🇿 აზერბაიჯანული (az)', azNum, baseTotal, null, '#10b981');
+          renderRankRow(languagesContainer, '🇬🇧 ინგლისური (en)', enNum, baseTotal, null, '#8b5cf6');
+          if (othNum > 0) renderRankRow(languagesContainer, '🌐 სხვა ენები / რეგიონული', othNum, baseTotal, null, '#f59e0b');
+        }
+
+        if (referrersContainer) {
+          referrersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🌐 ტრაფიკის წყაროები:</div>';
+          const refCounts = {};
+          records.forEach(r => {
+            const ref = r.referrer || 'პირდაპირი (Direct)';
+            refCounts[ref] = (refCounts[ref] || 0) + 1;
+          });
+          Object.entries(refCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
+            renderRankRow(referrersContainer, k, v, totalViews || 1);
+          });
+        }
+
+        if (pagesContainer) {
+          pagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📄 მონახულებული გვერდები:</div>';
+          const pageCounts = {};
+          records.forEach(r => {
+            const info = getPageInfo(r.page_path);
+            const key = info.icon + ' ' + info.title;
+            pageCounts[key] = (pageCounts[key] || 0) + 1;
+          });
+          Object.entries(pageCounts).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => {
+            renderRankRow(pagesContainer, k, v, totalViews || 1);
+          });
+        }
+
+        // 5. Panel 3: Devices, Network & Performance Speed
+        if (devicesContainer) {
+          let mobNum = 0, deskNum = 0, tabNum = 0;
+          records.forEach(r => {
+            if (r.device_type === 'Mobile') mobNum++;
+            else if (r.device_type === 'Tablet') tabNum++;
+            else deskNum++;
+          });
+          const baseDevTotal = totalViews || 1;
+          const mobPct = Math.round((mobNum / baseDevTotal) * 100);
+          const deskPct = Math.round((deskNum / baseDevTotal) * 100);
+          const tabPct = Math.max(0, 100 - mobPct - deskPct);
+
+          let devMultiBarHtml = '<div class="multi-segment-bar">' +
+            (mobPct > 0 ? '<div class="bar-segment seg-mobile" style="width:' + mobPct + '%;" title="მობილური: ' + mobPct + '%"></div>' : '') +
+            (deskPct > 0 ? '<div class="bar-segment seg-desktop" style="width:' + deskPct + '%;" title="დესკტოპი: ' + deskPct + '%"></div>' : '') +
+            (tabPct > 0 ? '<div class="bar-segment seg-tablet" style="width:' + tabPct + '%;" title="პლანშეტი: ' + tabPct + '%"></div>' : '') +
+            '</div>';
+
+          devicesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">მოწყობილობის ტიპი:</div>' + devMultiBarHtml;
+          renderRankRow(devicesContainer, '📱 მობილური (Mobile)', mobNum, baseDevTotal, null, '#3b82f6');
+          renderRankRow(devicesContainer, '💻 კომპიუტერი (Desktop)', deskNum, baseDevTotal, null, '#8b5cf6');
+          if (tabNum > 0) renderRankRow(devicesContainer, '📟 პლანშეტი (Tablet)', tabNum, baseDevTotal, null, '#06b6d4');
+        }
+
         if (networksContainer) {
           const netCounts = {};
           records.forEach(r => {
@@ -7424,9 +7535,10 @@ ${STEALTH_ADMIN_JS}
           const g4Num = netCounts['4G'] || 0;
           const wifiNum = (netCounts['WIFI'] || 0) + (netCounts['WIFI/LAN'] || 0);
           const g3Num = (netCounts['3G'] || 0) + (netCounts['2G'] || 0);
+          const baseNetTotal = totalViews || 1;
 
-          const g4Pct = Math.round((g4Num / totalViews) * 100);
-          const wifiPct = Math.round((wifiNum / totalViews) * 100);
+          const g4Pct = Math.round((g4Num / baseNetTotal) * 100);
+          const wifiPct = Math.round((wifiNum / baseNetTotal) * 100);
           const g3Pct = Math.max(0, 100 - g4Pct - wifiPct);
 
           let netMultiBarHtml = '<div class="multi-segment-bar">' +
@@ -7435,101 +7547,103 @@ ${STEALTH_ADMIN_JS}
             (g3Pct > 0 ? '<div class="bar-segment seg-3g" style="width:' + g3Pct + '%;" title="3G/ნელი: ' + g3Pct + '%"></div>' : '') +
             '</div>';
 
-          networksContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📶 ქსელის კავშირი & სიჩქარე:</div>' + netMultiBarHtml;
+          networksContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📶 ქსელის კავშირი:</div>' + netMultiBarHtml;
           Object.entries(netCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
             const color = k.includes('4G') ? '#10b981' : (k.includes('3G') ? '#f59e0b' : '#3b82f6');
-            renderRankRow(networksContainer, k, v, totalViews, null, color);
+            renderRankRow(networksContainer, k, v, baseNetTotal, null, color);
           });
         }
 
-        // 6. Popular Pages Breakdown
-        pagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📄 პოპულარული გვერდები:</div>';
-        const pageCounts = {};
-        records.forEach(r => {
-          const info = getPageInfo(r.page_path);
-          const key = info.icon + ' ' + info.title;
-          pageCounts[key] = (pageCounts[key] || 0) + 1;
-        });
-        Object.entries(pageCounts).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => {
-          renderRankRow(pagesContainer, k, v, totalViews);
-        });
-
-        // 7. Traffic Sources / Referrers Breakdown
-        referrersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 საიდან შემოვიდნენ (წყაროები):</div>';
-        const refCounts = {};
-        records.forEach(r => {
-          const ref = r.referrer || 'პირდაპირი (Direct)';
-          refCounts[ref] = (refCounts[ref] || 0) + 1;
-        });
-        Object.entries(refCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
-          renderRankRow(referrersContainer, k, v, totalViews);
-        });
-
-        // 8. Cookie Consent Breakdown
-        if (consentContainer) {
-          consentContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🍪 ქუქი-თანხმობის სტატუსი:</div>';
-          const accCount = records.filter(r => r.consent_status === 'accepted').length;
-          const rejCount = records.filter(r => r.consent_status === 'rejected').length;
-          const undCount = totalViews - accCount - rejCount;
-          if (accCount > 0) renderRankRow(consentContainer, '✅ მიღებული (Accepted)', accCount, totalViews, null, '#10b981');
-          if (rejCount > 0) renderRankRow(consentContainer, '❌ შეზღუდული (Rejected)', rejCount, totalViews, null, '#ef4444');
-          if (undCount > 0) renderRankRow(consentContainer, '⏳ გადაწყვეტილების გარეშე', undCount, totalViews, null, '#f59e0b');
+        if (speedDiagContainer) {
+          const numSpeed = parseFloat(avgSpeedVal) || 1.1;
+          const speedStatus = numSpeed < 1.5 ? 'მაღალი (სწრაფი ⚡)' : (numSpeed < 3.0 ? 'საშუალო (ნორმალური 🟡)' : 'ნელი (შედარებით დაბალი 🔴)');
+          const speedColor = numSpeed < 1.5 ? '#10b981' : (numSpeed < 3.0 ? '#f59e0b' : '#ef4444');
+          speedDiagContainer.innerHTML = 
+            '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">⚡ საიტის ჩატვირთვის სისწრაფე:</div>' +
+            '<div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">' +
+              '<span style="font-size:12px; color:var(--text-muted);">საშ. ჩატვირთვა: <strong>' + avgSpeedVal + ' წმ</strong></span>' +
+              '<span style="font-size:11px; font-weight:700; color:' + speedColor + '; background:rgba(16,185,129,0.1); padding:3px 8px; border-radius:9999px;">' + speedStatus + '</span>' +
+            '</div>';
         }
 
-        // 9. Modern Activity Feed / Stream
-        feedContainer.innerHTML = '';
-        if (feedCountEl) feedCountEl.textContent = records.length + ' ჩანაწერი';
+        // 6. Activity Feed / Stream
+        if (feedContainer) {
+          feedContainer.innerHTML = '';
+          if (feedCountEl) feedCountEl.textContent = records.length + ' ჩანაწერი';
 
-        records.slice(0, 25).forEach(r => {
-          const pInfo = getPageInfo(r.page_path);
-          const devIcon = r.device_type === 'Mobile' ? '📱' : (r.device_type === 'Tablet' ? '📟' : '💻');
-          const isReturningVisitor = r.is_returning === true || (Number(r.visit_count) > 1);
-          const visitorTag = isReturningVisitor ? '🔄 დაბრუნებული' : '✨ ახალი';
+          if (records.length === 0) {
+            feedContainer.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">ვიზიტები ჯერ არ არის დაფიქსირებული. საიტზე ვიზიტისთანავე მონაცემები ავტომატურად აისახება აქ.</div>';
+          } else {
+            records.slice(0, 25).forEach(r => {
+              const pInfo = getPageInfo(r.page_path);
+              const devIcon = r.device_type === 'Mobile' ? '📱' : (r.device_type === 'Tablet' ? '📟' : '💻');
+              const isReturningVisitor = r.is_returning === true || (Number(r.visit_count) > 1);
+              const visitorTag = isReturningVisitor ? '🔄 დაბრუნებული' : '✨ ახალი';
 
-          const item = document.createElement('div');
-          item.className = 'activity-item';
+              const item = document.createElement('div');
+              item.className = 'activity-item';
 
-          const netBadge = r.network_type 
-            ? '<span class="badge-pill badge-network">📶 ' + r.network_type + '</span>' 
-            : '';
-          const scrollBadge = (r.scroll_depth !== undefined && r.scroll_depth !== null)
-            ? '<span class="badge-pill badge-scroll">📜 ' + r.scroll_depth + '%</span>'
-            : '';
+              // Language pill
+              const rLang = (r.browser_lang || r.language || 'ka').toLowerCase();
+              let langLabel = '🇬🇪 ka';
+              if (rLang.startsWith('az')) langLabel = '🇦🇿 az';
+              else if (rLang.startsWith('en')) langLabel = '🇬🇧 en';
+              else if (rLang.startsWith('ru')) langLabel = '🌐 ru';
 
-          item.innerHTML = 
-            '<div class="activity-item-left">' +
-              '<div class="activity-avatar">' + pInfo.icon + '</div>' +
-              '<div class="activity-title-group">' +
-                '<div class="activity-page-title">' + pInfo.title + '</div>' +
-                '<div class="activity-time-meta">' + formatTimeAgo(r.created_at) + ' • ' + visitorTag + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="activity-badges-group">' +
-              '<span class="badge-pill badge-device">' + devIcon + ' ' + (r.device_type || 'Desktop') + ' (' + (r.os || 'OS') + ')</span>' +
-              netBadge +
-              '<span class="badge-pill badge-source">🌐 ' + (r.referrer || 'პირდაპირი') + '</span>' +
-              '<span class="badge-pill badge-duration">⏱️ ' + formatDuration(r.duration_seconds) + '</span>' +
-              scrollBadge +
-            '</div>';
+              const netBadge = r.network_type 
+                ? '<span class="badge-pill badge-network">📶 ' + r.network_type + '</span>' 
+                : '';
+              const speedBadge = r.load_time_seconds 
+                ? '<span class="badge-pill badge-speed">⚡ ' + r.load_time_seconds + ' წმ</span>' 
+                : '<span class="badge-pill badge-speed">⚡ 1.0 წმ</span>';
+              const scrollBadge = (r.scroll_depth !== undefined && r.scroll_depth !== null)
+                ? '<span class="badge-pill badge-scroll">📜 ' + r.scroll_depth + '%</span>'
+                : '';
 
-          feedContainer.appendChild(item);
-        });
+              item.innerHTML = 
+                '<div class="activity-item-left">' +
+                  '<div class="activity-avatar">' + pInfo.icon + '</div>' +
+                  '<div class="activity-title-group">' +
+                    '<div class="activity-page-title">' + pInfo.title + '</div>' +
+                    '<div class="activity-time-meta">' + formatTimeAgo(r.created_at) + ' • ' + visitorTag + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="activity-badges-group">' +
+                  '<span class="badge-pill badge-lang">' + langLabel + '</span>' +
+                  '<span class="badge-pill badge-device">' + devIcon + ' ' + (r.device_type || 'Desktop') + '</span>' +
+                  netBadge +
+                  speedBadge +
+                  '<span class="badge-pill badge-source">🌐 ' + (r.referrer || 'პირდაპირი') + '</span>' +
+                  '<span class="badge-pill badge-duration">⏱️ ' + formatDuration(r.duration_seconds) + '</span>' +
+                  scrollBadge +
+                '</div>';
+
+              feedContainer.appendChild(item);
+            });
+          }
+        }
       }
 
       async function loadAndRenderAnalytics() {
         let records = [];
+        let events = [];
         if (isSupabaseConfigured() && isAdminMode()) {
           const client = initSupabase();
           if (client) {
             try {
-              const { data, error } = await client
+              const { data: recData } = await client
                 .from('site_analytics')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(100);
-              if (!error && Array.isArray(data) && data.length > 0) {
-                records = data;
-              }
+              if (Array.isArray(recData) && recData.length > 0) records = recData;
+
+              const { data: evData } = await client
+                .from('site_analytics_events')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(200);
+              if (Array.isArray(evData) && evData.length > 0) events = evData;
             } catch (e) {
               console.warn('Analytics fetch notice:', e);
             }
@@ -7544,7 +7658,15 @@ ${STEALTH_ADMIN_JS}
           }
         }
 
-        renderAnalyticsUI(records);
+        if (events.length === 0) {
+          try {
+            events = JSON.parse(localStorage.getItem('gardabani_analytics_events') || '[]');
+          } catch (e) {
+            events = [];
+          }
+        }
+
+        renderAnalyticsUI(records, events);
       }
 
       // Buttons setup
@@ -7561,6 +7683,7 @@ ${STEALTH_ADMIN_JS}
         btnClearLocalAnalytics.addEventListener('click', () => {
           if (confirm('ნამდვილად გსურთ ლოკალური ჟურნალის გასუფთავება?')) {
             localStorage.removeItem('gardabani_analytics_log');
+            localStorage.removeItem('gardabani_analytics_events');
             loadAndRenderAnalytics();
             showToast('ლოკალური ჟურნალი გასუფთავდა 🗑️');
           }

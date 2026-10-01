@@ -132,7 +132,35 @@
     setTimeout(calculateScrollDepth, 1500);
 
     const screenRes = (window.screen.width || 0) + 'x' + (window.screen.height || 0);
-    const lang = navigator.language || 'ka';
+    const rawLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'ka').toLowerCase();
+    let normalizedLang = 'other';
+    if (rawLang.startsWith('ka')) normalizedLang = 'ka';
+    else if (rawLang.startsWith('az')) normalizedLang = 'az';
+    else if (rawLang.startsWith('en')) normalizedLang = 'en';
+    else if (rawLang.startsWith('ru')) normalizedLang = 'ru';
+
+    // Measure page load time in seconds
+    let loadTimeSec = 0;
+    function measureLoadTime() {
+      try {
+        const perf = window.performance;
+        if (perf) {
+          const navEntries = (typeof perf.getEntriesByType === 'function') && perf.getEntriesByType('navigation');
+          if (navEntries && navEntries.length > 0 && navEntries[0].duration > 0) {
+            loadTimeSec = Math.round((navEntries[0].duration / 1000) * 10) / 10;
+          } else if (perf.timing && perf.timing.loadEventEnd > 0) {
+            loadTimeSec = Math.round(((perf.timing.loadEventEnd - perf.timing.navigationStart) / 1000) * 10) / 10;
+          }
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        measureLoadTime();
+        if (loadTimeSec > 0) flushAnalyticsUpdate(duration);
+      }, 250);
+    });
 
     const visitRecord = {
       id: Date.now() + Math.floor(Math.random() * 1000),
@@ -150,7 +178,9 @@
       os: os,
       browser: browser,
       screen_resolution: screenRes,
-      language: lang,
+      language: rawLang,
+      browser_lang: normalizedLang,
+      load_time_seconds: loadTimeSec,
       duration_seconds: 5,
       created_at: new Date().toISOString()
     };
@@ -187,7 +217,9 @@
             os: os,
             browser: browser,
             screen_resolution: screenRes,
-            language: lang,
+            language: rawLang,
+            browser_lang: normalizedLang,
+            load_time_seconds: loadTimeSec,
             duration_seconds: 5
           }])
           .select('id')
@@ -210,6 +242,7 @@
 
     async function flushAnalyticsUpdate(dur) {
       calculateScrollDepth();
+      if (loadTimeSec === 0) measureLoadTime();
 
       // Local update
       try {
@@ -221,6 +254,7 @@
           if (visitorId) localLogs[0].visitor_id = visitorId;
           localLogs[0].is_returning = isReturning;
           localLogs[0].visit_count = visitCount;
+          if (loadTimeSec > 0) localLogs[0].load_time_seconds = loadTimeSec;
           localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
         }
       } catch (e) {}
@@ -237,12 +271,45 @@
               visitor_id: visitorId,
               is_returning: isReturning,
               visit_count: visitCount,
+              load_time_seconds: loadTimeSec,
               updated_at: new Date().toISOString()
             }).eq('id', cloudRecordId);
           } catch (e) {}
         }
       }
     }
+
+    // Global Event Tracking Helper for Villages and Navigation Clicks
+    window.gmaTrackEvent = function(eventType, details) {
+      try {
+        const events = JSON.parse(localStorage.getItem('gardabani_analytics_events') || '[]');
+        const targetName = (details && (details.village_name || details.name || details.target)) || '';
+        const evtRecord = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          session_id: sessionId,
+          event_type: eventType,
+          target_name: targetName,
+          page_path: pagePath,
+          created_at: new Date().toISOString()
+        };
+        events.unshift(evtRecord);
+        if (events.length > 300) events.length = 300;
+        localStorage.setItem('gardabani_analytics_events', JSON.stringify(events));
+
+        // Sync with Supabase events table if configured
+        if (typeof initSupabase === 'function') {
+          const client = initSupabase();
+          if (client) {
+            client.from('site_analytics_events').insert([{
+              session_id: sessionId,
+              event_type: eventType,
+              target_name: targetName,
+              page_path: pagePath
+            }]).then(() => {}).catch(() => {});
+          }
+        }
+      } catch (e) {}
+    };
 
     // Listen for cookie consent changes in real-time
     window.addEventListener('cookie_consent_changed', (e) => {
