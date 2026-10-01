@@ -155,6 +155,9 @@
       } catch (e) {}
     }
 
+    // 10. Active Session Duration (declared here so it's available in the load event below)
+    let duration = 5;
+
     window.addEventListener('load', () => {
       setTimeout(() => {
         measureLoadTime();
@@ -189,9 +192,18 @@
     try {
       let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
       localLogs.unshift(visitRecord);
-      if (localLogs.length > 250) localLogs = localLogs.slice(0, 250);
+      if (localLogs.length > 500) localLogs = localLogs.slice(0, 500);
       localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
     } catch (e) {}
+
+    // Daily visit count summary (accumulates permanently)
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const dailyLog = JSON.parse(localStorage.getItem('gardabani_daily_log') || '{}');
+      if (!dailyLog[today]) dailyLog[today] = 0;
+      dailyLog[today] += 1;
+      localStorage.setItem('gardabani_daily_log', JSON.stringify(dailyLog));
+    } catch(e) {}
 
     // 9. Cloud Sync with Supabase (if configured)
     let cloudRecordId = null;
@@ -233,8 +245,7 @@
       }
     }
 
-    // 10. Active Session Duration & Scroll Heartbeat
-    let duration = 5;
+    // Active Session Duration & Scroll Heartbeat
     const heartbeatTimer = setInterval(() => {
       duration += 10;
       flushAnalyticsUpdate(duration);

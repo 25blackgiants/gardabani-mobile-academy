@@ -773,6 +773,12 @@ const STEALTH_ADMIN_JS = `
       setupSecretLogoDoor();
       setupStealthModalDOM();
       startInactivityWatcher();
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('stealth-admin-modal');
+          if (modal && modal.style.display !== 'none') closeStealthAdminModal();
+        }
+      });
     });
 `;
 
@@ -7238,6 +7244,14 @@ ${COOKIE_CONSENT_CSS}
           <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">ვიზიტების მონაცემები იტვირთება...</div>
         </div>
       </div>
+
+      <!-- Daily Visits Log -->
+      <div class="chart-section-card" style="margin-top:16px;">
+        <div class="chart-section-header">
+          <span class="chart-section-title">📅 დღიური ვიზიტები (ბოლო 14 დღე)</span>
+        </div>
+        <div id="analytics-daily-log" style="padding:8px 0; font-size:12px;"></div>
+      </div>
     </section>
 
   </div>
@@ -7364,12 +7378,10 @@ ${STEALTH_ADMIN_JS}
           themeIcon.textContent = '☀️';
           themeText.textContent = 'დღე';
           themeBtn.title = 'დღის რეჟიმზე გადართვა';
-          settingDarkmode.checked = true;
         } else {
           themeIcon.textContent = '🌙';
           themeText.textContent = 'ღამე';
           themeBtn.title = 'ღამის რეჟიმზე გადართვა';
-          settingDarkmode.checked = false;
         }
       }
 
@@ -7386,12 +7398,6 @@ ${STEALTH_ADMIN_JS}
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         applyTheme(isDark ? 'light' : 'dark');
         showToast(isDark ? 'დღის რეჟიმი გააქტიურდა ☀️' : 'ღამის რეჟიმი გააქტიურდა 🌙');
-      });
-
-      rowDarkmode.addEventListener('click', () => {
-        const targetChecked = !settingDarkmode.checked;
-        applyTheme(targetChecked ? 'dark' : 'light');
-        showToast(targetChecked ? 'ღამის რეჟიმი გააქტიურდა 🌙' : 'დღის რეჟიმი გააქტიურდა ☀️');
       });
 
       // 4. Reset All Settings & Dates
@@ -8187,6 +8193,41 @@ ${STEALTH_ADMIN_JS}
 
               feedContainer.appendChild(item);
             });
+          }
+        }
+
+        // Daily Log Render
+        const dailyLogEl = document.getElementById('analytics-daily-log');
+        if (dailyLogEl) {
+          try {
+            const dailyData = JSON.parse(localStorage.getItem('gardabani_daily_log') || '{}');
+            const sortedDays = Object.keys(dailyData).sort().reverse().slice(0, 14);
+            if (sortedDays.length === 0) {
+              dailyLogEl.innerHTML = '<div style="color:var(--text-muted); padding:8px;">მონაცემები ჯერ არ არის შეგროვებული</div>';
+            } else {
+              const maxVal = Math.max(...sortedDays.map(d => dailyData[d]), 1);
+              let html = '<table style="width:100%; border-collapse:collapse;">';
+              sortedDays.forEach(day => {
+                const count = dailyData[day];
+                const pct = Math.round((count / maxVal) * 100);
+                const barColor = count >= 5 ? '#10b981' : (count >= 2 ? '#3b82f6' : '#94a3b8');
+                html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+                  '<td style="padding:4px 8px 4px 0; width:90px; color:var(--text-muted); font-size:11px;">' + day + '</td>' +
+                  '<td style="padding:4px 0;">' +
+                    '<div style="display:flex; align-items:center; gap:8px;">' +
+                      '<div style="flex:1; background:var(--bg-card-subtle); border-radius:4px; height:10px; overflow:hidden;">' +
+                        '<div style="width:' + pct + '%; height:100%; background:' + barColor + '; border-radius:4px;"></div>' +
+                      '</div>' +
+                      '<span style="width:30px; text-align:right; font-weight:700; color:var(--text-main);">' + count + '</span>' +
+                    '</div>' +
+                  '</td>' +
+                '</tr>';
+              });
+              html += '</table>';
+              dailyLogEl.innerHTML = html;
+            }
+          } catch(e) {
+            dailyLogEl.innerHTML = '';
           }
         }
       }
