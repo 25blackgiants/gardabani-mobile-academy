@@ -48,13 +48,16 @@ const STEALTH_ADMIN_CSS = `
       backdrop-filter: blur(8px) !important;
       -webkit-backdrop-filter: blur(8px) !important;
       z-index: 9999999 !important;
-      display: flex !important;
+      display: none;
       align-items: center !important;
       justify-content: center !important;
       padding: 16px !important;
       margin: 0 !important;
       box-sizing: border-box !important;
       animation: stealthFadeIn 0.2s ease-out;
+    }
+    .stealth-modal-backdrop.show {
+      display: flex !important;
     }
     @keyframes stealthFadeIn {
       from { opacity: 0; }
@@ -427,6 +430,7 @@ const STEALTH_ADMIN_JS = `
       const modal = document.getElementById('stealth-admin-modal');
       if (!modal) return;
       document.body.style.overflow = 'hidden';
+      modal.classList.add('show');
       modal.style.display = 'flex';
       const errorAlert = document.getElementById('stealth-error-alert');
       if (errorAlert) errorAlert.style.display = 'none';
@@ -469,7 +473,10 @@ const STEALTH_ADMIN_JS = `
 
     function closeStealthAdminModal() {
       const modal = document.getElementById('stealth-admin-modal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
       document.body.style.overflow = '';
       if (lockoutTimerInterval) {
         clearInterval(lockoutTimerInterval);

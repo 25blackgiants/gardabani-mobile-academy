@@ -18,13 +18,16 @@ const COOKIE_CONSENT_CSS = `
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     z-index: 9999998 !important;
-    display: flex !important;
+    display: none;
     align-items: center !important;
     justify-content: center !important;
     padding: 16px !important;
     margin: 0 !important;
     box-sizing: border-box !important;
     animation: cookieFadeIn 0.2s ease-out;
+  }
+  .cookie-consent-backdrop.show {
+    display: flex !important;
   }
   @keyframes cookieFadeIn {
     from { opacity: 0; }
@@ -248,6 +251,7 @@ const COOKIE_CONSENT_JS = `
     function openCookieModal() {
       const backdrop = document.getElementById('cookie-consent-backdrop');
       if (backdrop) {
+        backdrop.classList.add('show');
         backdrop.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       }
@@ -256,6 +260,7 @@ const COOKIE_CONSENT_JS = `
     function closeCookieModal() {
       const backdrop = document.getElementById('cookie-consent-backdrop');
       if (backdrop) {
+        backdrop.classList.remove('show');
         backdrop.style.display = 'none';
         document.body.style.overflow = '';
       }
