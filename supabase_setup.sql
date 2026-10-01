@@ -79,3 +79,64 @@ ON CONFLICT (id) DO UPDATE SET
   longitude = EXCLUDED.longitude,
   activity_title = EXCLUDED.activity_title,
   activity_description = EXCLUDED.activity_description;
+
+-- ============================================================================
+-- 6. მენტორების ცხრილის შექმნა (MENTORS TABLE)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS mentors (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'მენტორი',
+  description TEXT NOT NULL,
+  tags TEXT[] NOT NULL DEFAULT '{}',
+  avatar_color TEXT DEFAULT '#8b5cf6',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Row-Level Security მენტორების ცხრილისთვის
+ALTER TABLE mentors ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public Read Mentors" ON mentors;
+CREATE POLICY "Public Read Mentors"
+ON mentors
+FOR SELECT
+TO public
+USING (true);
+
+DROP POLICY IF EXISTS "Admin Insert Mentors" ON mentors;
+CREATE POLICY "Admin Insert Mentors"
+ON mentors
+FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin Update Mentors" ON mentors;
+CREATE POLICY "Admin Update Mentors"
+ON mentors
+FOR UPDATE
+TO authenticated
+USING (true)
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin Delete Mentors" ON mentors;
+CREATE POLICY "Admin Delete Mentors"
+ON mentors
+FOR DELETE
+TO authenticated
+USING (true);
+
+-- 8. საწყისი 5 მენტორის შეყვანა
+INSERT INTO mentors (id, name, role, description, tags, avatar_color)
+VALUES
+(1, 'დაკო კეჟერაშვილი', 'მენტორი', 'არაფორმალური განათლება, კულტურათაშორისი დიალოგი და შემოქმედებითი უნარების განვითარება ახალგაზრდებში.', ARRAY['არაფორმალური განათლება', 'კულტურათაშორისი დიალოგი'], '#8b5cf6'),
+(2, 'ნია ჩინტლაძე', 'მენტორი', 'ახალგაზრდული ინიციატივები, სამოქალაქო აქტივიზმი და სათემო პროექტების დაგეგმვა.', ARRAY['ახალგაზრდული პროექტები', 'სამოქალაქო აქტივიზმი'], '#ec4899'),
+(3, 'მიშო გოგიაშვილი', 'მენტორი', 'კომუნიკაცია, გუნდური ლიდერობა და ახალგაზრდების ჩართულობის პროგრამების კოორდინაცია.', ARRAY['გუნდური ლიდერობა', 'კომუნიკაცია'], '#3b82f6'),
+(4, 'დავით მაკარიანი', 'მენტორი', 'ტექნოლოგიები, ციფრული წიგნიერება და რეგიონული ახალგაზრდების ინოვაციური პროექტები.', ARRAY['ციფრული უნარები', 'ინოვაციები'], '#10b981'),
+(5, 'ანდრია საჯაია', 'მენტორი', 'სოციალური მეწარმეობა, კვლევა და საგანმანათლებლო მოდულების განვითარება.', ARRAY['სოციალური მეწარმეობა', 'საგანმანათლებლო მოდულები'], '#0d9488')
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  role = EXCLUDED.role,
+  description = EXCLUDED.description,
+  tags = EXCLUDED.tags,
+  avatar_color = EXCLUDED.avatar_color;
+

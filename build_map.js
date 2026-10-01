@@ -4,86 +4,11 @@ const path = require('path');
 // 1. Read Gardabani boundary compact GeoJSON
 const boundaryGeoJson = fs.readFileSync(path.join(__dirname, 'gardabani_boundary_compact.json'), 'utf8');
 
-// Shared initial locations with October 2026 test dates
-const INITIAL_LOCATIONS_JS = `[
-      {
-        id: 1,
-        name: "მთავარი ჰაბი — ქ. გარდაბანი",
-        shortName: "ქ. გარდაბანი",
-        type: "hub",
-        date: "2026-10-03",
-        latitude: 41.4589,
-        longitude: 45.0928,
-        activityTitle: "ცენტრალური საგანმანათლებლო პროგრამა და კოორდინაცია",
-        activityDescription: "პროგრამის ძირითადი შტაბი და ცენტრალური შეხვედრების სივრცე. ქართველ და აზერბაიჯანელ ახალგაზრდებს შორის კულტურული დიალოგი, ენობრივი გაცვლა და ტექნოლოგიური ვორქშოფები."
-      },
-      {
-        id: 2,
-        name: "ლოკაცია 1: სოფ. კესალო",
-        shortName: "კესალო",
-        type: "village",
-        date: "2026-10-07",
-        latitude: 41.4360,
-        longitude: 45.0315,
-        activityTitle: "მობილური ვორქშოფი: შემოქმედებითი უნარები და გუნდურობა",
-        activityDescription: "ახალგაზრდული გუნდური პროექტები, ხელოვნების თერაპია, დებატები და ერთობლივი ინიციატივების დაგეგმვა ადგილობრივი თემის მონაწილეობით."
-      },
-      {
-        id: 3,
-        name: "ლოკაცია 2: სოფ. ნაზარლო",
-        shortName: "ნაზარლო",
-        type: "village",
-        date: "2026-10-12",
-        latitude: 41.4085,
-        longitude: 45.0740,
-        activityTitle: "მობილური ვორქშოფი: სამოქალაქო ჩართულობა და მედიაწიგნიერება",
-        activityDescription: "ტრენინგები კრიტიკულ აზროვნებაში, ციფრული უსაფრთხოება, ადგილობრივი საჭიროებების ადვოკატირება და სამოქალაქო აქტივიზმი."
-      },
-      {
-        id: 4,
-        name: "ლოკაცია 3: სოფ. სართიჭალა",
-        shortName: "სართიჭალა",
-        type: "village",
-        date: "2026-10-16",
-        latitude: 41.7145,
-        longitude: 45.1820,
-        activityTitle: "მობილური ვორქშოფი: ტექნოლოგიები და კარიერული ორიენტაცია",
-        activityDescription: "ციფრული უნარების განვითარება, თანამედროვე პროფესიების გაცნობა, CV-ის შედგენა და პროფესიული განათლების შესაძლებლობები."
-      },
-      {
-        id: 5,
-        name: "ლოკაცია 4: სოფ. კუმისი",
-        shortName: "კუმისი",
-        type: "village",
-        date: "2026-10-21",
-        latitude: 41.5860,
-        longitude: 44.8380,
-        activityTitle: "მობილური ვორქშოფი: ეკოლოგია და გარემოსდაცვითი ინიციატივები",
-        activityDescription: "ერთობლივი ეკო-აქტივობები, კუმისის ტბის მიმდებარე ტერიტორიის დასუფთავების აქცია და გარემოსდაცვითი ცნობიერების ამაღლება."
-      },
-      {
-        id: 6,
-        name: "ლოკაცია 5: სოფ. ყარაჯალარი",
-        shortName: "ყარაჯალარი",
-        type: "village",
-        date: "2026-10-25",
-        latitude: 41.5650,
-        longitude: 45.0220,
-        activityTitle: "მობილური ვორქშოფი: ქართულ-აზერბაიჯანული ენობრივი კლუბი",
-        activityDescription: "ინტერაქტიული ენობრივი თამაშები, ორმხრივი ენის პრაქტიკა, კულტურათაშორისი დიალოგი და ახალგაზრდების დამეგობრების კლუბი."
-      },
-      {
-        id: 7,
-        name: "ლოკაცია 6: სოფ. ვახტანგისი",
-        shortName: "ვახტანგისი",
-        type: "village",
-        date: "2026-10-29",
-        latitude: 41.3480,
-        longitude: 45.1050,
-        activityTitle: "მობილური ვორქშოფი: სოციალური მეწარმეობა და იდეების ბანკი",
-        activityDescription: "სასაზღვრო რეგიონის ახალგაზრდებისთვის მცირე სოციალური ბიზნეს-იდეების გენერირება და სათემო პროექტების დაფინანსების შესაძლებლობები."
-      }
-    ]`;
+// Modular Data Sources from src/data/
+const { INITIAL_LOCATIONS } = require('./src/data/locations');
+const { INITIAL_MENTORS } = require('./src/data/mentors');
+const INITIAL_LOCATIONS_JS = JSON.stringify(INITIAL_LOCATIONS, null, 2);
+const INITIAL_MENTORS_JS = JSON.stringify(INITIAL_MENTORS, null, 2);
 
 // ============================================================================
 // STEALTH ADMIN ACCESS CONFIG & COMPONENT (SHA-256, RATE LIMIT, INACTIVITY)
@@ -2731,9 +2656,10 @@ ${STEALTH_ADMIN_JS}
             </div>
             <div class="popup-footer">
               <span style="font-size:0.70rem; color:var(--text-subtle);">📍 \${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
-              <div style="display:flex; gap:4px;">
+              <div style="display:flex; gap:4px; align-items:center;">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-gardabani" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">🚗 როგორ მივიდე</a>
                 <a href="calendar.html" class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;">📅 კალენდარი</a>
-                \${isAdmin ? \`<button class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem;" onclick="openEditLocation(\${loc.id})">✏️ რედაქტირება</button>\` : ''}
+                \${isAdmin ? \`<button class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem;" onclick="openEditLocation(\${loc.id})">✏️</button>\` : ''}
               </div>
             </div>
           </div>
@@ -2893,6 +2819,7 @@ ${STEALTH_ADMIN_JS}
           <div class="loc-item-footer">
             <span class="loc-item-coords">\${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
             <div class="loc-item-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="loc-action-btn" title="როგორ მივიდე (Google Maps)" onclick="event.stopPropagation();" style="text-decoration:none;">🚗 მიმართულება</a>
               <button class="loc-action-btn" title="რუკაზე ჩვენება" onclick="event.stopPropagation(); zoomToLocation(\${loc.id})">🔍 ჩვენება</button>
               \${isAdmin ? \`<button class="loc-action-btn" title="რედაქტირება" onclick="event.stopPropagation(); openEditLocation(\${loc.id})">✏️</button>\` : ''}
             </div>
@@ -4548,9 +4475,14 @@ ${STEALTH_ADMIN_JS}
             <span style="font-size:0.74rem; font-weight:700; color:var(--text-muted);">
               სტატუსი: დაგეგმილია
             </span>
-            <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
-              <span>🗺️</span> რუკაზე ნახვა
-            </a>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">
+                <span>🚗</span> როგორ მივიდე
+              </a>
+              <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
+                <span>🗺️</span> რუკაზე ნახვა
+              </a>
+            </div>
           </div>
         \`;
         container.appendChild(item);
@@ -4582,7 +4514,10 @@ ${STEALTH_ADMIN_JS}
             <div style="font-size:0.80rem; font-weight:700; color:var(--text-muted);">🎯 \${loc.activityTitle}</div>
           </div>
           <p style="font-size:0.75rem; color:var(--text-subtle); line-height:1.4;">\${loc.activityDescription}</p>
-          <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+          <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:4px; flex-wrap:wrap; align-items:center;">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში">
+              <span>🚗</span> როგორ მივიდე
+            </a>
             <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
               <span>🗺️</span> რუკაზე ნახვა
             </a>
@@ -5194,6 +5129,172 @@ const mentorsHtmlContent = `<!DOCTYPE html>
         font-size: 0.70rem;
       }
     }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-window {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-popup);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-textarea {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      background: var(--bg-input);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-card-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Admin Indicator */
+    .admin-indicator {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    [data-theme="dark"] .admin-indicator {
+      background: #064e3b;
+      color: #a7f3d0;
+      border-color: #047857;
+    }
+
+    .btn-indicator-logout {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 0.70rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .btn-indicator-logout:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.80rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 3000;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .toast-msg {
+      background: #141414;
+      color: #ffffff;
+      border: 1px solid #262626;
+    }
+
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
 ${STEALTH_ADMIN_CSS}
   </style>
 </head>
@@ -5217,6 +5318,16 @@ ${STEALTH_ADMIN_CSS}
       </div>
 
       <div class="header-actions">
+        <!-- Admin Indicator (shown when admin mode is on) -->
+        <div class="admin-indicator" id="admin-indicator" style="display:none;" title="ადმინისტრატორის სესია აქტიურია">
+          <span>🛡️ ადმინი</span>
+          <button type="button" class="btn-indicator-logout" id="btn-header-logout" title="სესიის დასრულება">✕ გამოსვლა</button>
+        </div>
+
+        <button class="btn btn-primary" id="btn-add-mentor" style="display:none;" title="ახალი მენტორის დამატება">
+          <span>➕</span> ახალი მენტორი
+        </button>
+
         <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
           <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
         </button>
@@ -5235,122 +5346,70 @@ ${STEALTH_ADMIN_CSS}
       </p>
     </section>
 
-    <!-- MENTORS GRID (5 MENTORS) -->
-    <section class="mentors-grid">
-      
-      <!-- Mentor 1: დაკო კეჟერაშვილი -->
-      <article class="mentor-card">
-        <div class="avatar-wrapper">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="58" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="2"/>
-            <path d="M60 26c-11 0-19 8-19 19 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h62c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-11-8-19-19-19z" fill="#8b5cf6" opacity="0.85"/>
-            <circle cx="60" cy="45" r="13" fill="#c4b5fd"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="mentor-name">დაკო კეჟერაშვილი</h3>
-          <span class="mentor-role">მენტორი</span>
-          <p class="mentor-desc">
-            არაფორმალური განათლება, კულტურათაშორისი დიალოგი და შემოქმედებითი უნარების განვითარება ახალგაზრდებში.
-          </p>
-          <div class="tags-row">
-            <span class="tag-badge">არაფორმალური განათლება</span>
-            <span class="tag-badge">კულტურათაშორისი დიალოგი</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Mentor 2: ნია ჩინტლაძე -->
-      <article class="mentor-card">
-        <div class="avatar-wrapper">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="58" fill="#fdf2f8" stroke="#fbcfe8" stroke-width="2"/>
-            <path d="M60 26c-11 0-19 8-19 19 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h62c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-11-8-19-19-19z" fill="#ec4899" opacity="0.85"/>
-            <circle cx="60" cy="45" r="13" fill="#f472b6"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="mentor-name">ნია ჩინტლაძე</h3>
-          <span class="mentor-role">მენტორი</span>
-          <p class="mentor-desc">
-            ახალგაზრდული ინიციატივები, სამოქალაქო აქტივიზმი და სათემო პროექტების დაგეგმვა.
-          </p>
-          <div class="tags-row">
-            <span class="tag-badge">ახალგაზრდული პროექტები</span>
-            <span class="tag-badge">სამოქალაქო აქტივიზმი</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Mentor 3: მიშო გოგიაშვილი -->
-      <article class="mentor-card">
-        <div class="avatar-wrapper">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="58" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
-            <path d="M60 26c-10 0-18 8-18 18 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h60c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-10-8-18-18-18z" fill="#3b82f6" opacity="0.85"/>
-            <circle cx="60" cy="44" r="12" fill="#93c5fd"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="mentor-name">მიშო გოგიაშვილი</h3>
-          <span class="mentor-role">მენტორი</span>
-          <p class="mentor-desc">
-            კომუნიკაცია, გუნდური ლიდერობა და ახალგაზრდების ჩართულობის პროგრამების კოორდინაცია.
-          </p>
-          <div class="tags-row">
-            <span class="tag-badge">გუნდური ლიდერობა</span>
-            <span class="tag-badge">კომუნიკაცია</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Mentor 4: დავით მაკარიანი -->
-      <article class="mentor-card">
-        <div class="avatar-wrapper">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="58" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="2"/>
-            <path d="M60 26c-10 0-18 8-18 18 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h60c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-10-8-18-18-18z" fill="#10b981" opacity="0.85"/>
-            <circle cx="60" cy="44" r="12" fill="#6ee7b7"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="mentor-name">დავით მაკარიანი</h3>
-          <span class="mentor-role">მენტორი</span>
-          <p class="mentor-desc">
-            ტექნოლოგიები, ციფრული წიგნიერება და რეგიონული ახალგაზრდების ინოვაციური პროექტები.
-          </p>
-          <div class="tags-row">
-            <span class="tag-badge">ციფრული უნარები</span>
-            <span class="tag-badge">ინოვაციები</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Mentor 5: ანდრია საჯაია -->
-      <article class="mentor-card">
-        <div class="avatar-wrapper">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="58" fill="#f0fdfa" stroke="#99f6e4" stroke-width="2"/>
-            <path d="M60 26c-10 0-18 8-18 18 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h60c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-10-8-18-18-18z" fill="#0d9488" opacity="0.85"/>
-            <circle cx="60" cy="44" r="12" fill="#5eead4"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="mentor-name">ანდრია საჯაია</h3>
-          <span class="mentor-role">მენტორი</span>
-          <p class="mentor-desc">
-            სოციალური მეწარმეობა, კვლევა და საგანმანათლებლო მოდულების განვითარება.
-          </p>
-          <div class="tags-row">
-            <span class="tag-badge">სოციალური მეწარმეობა</span>
-            <span class="tag-badge">საგანმანათლებლო მოდულები</span>
-          </div>
-        </div>
-      </article>
-
+    <!-- DYNAMIC MENTORS GRID (CONNECTED TO SUPABASE) -->
+    <section class="mentors-grid" id="mentors-grid">
+      <!-- Mentors rendered dynamically by JS from Supabase / Fallback -->
     </section>
 
   </div>
+
+  <!-- MENTOR MODAL (Add / Edit) -->
+  <div class="modal-backdrop" id="mentor-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="mentor-modal-title">
+          <span>👤</span> მენტორის დამატება
+        </h3>
+        <button type="button" class="stealth-close-btn" id="btn-close-mentor-modal">✕</button>
+      </div>
+      <form id="mentor-form">
+        <div class="modal-body">
+          <input type="hidden" id="mentor-form-id">
+          
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="mentor-name">სახელი და გვარი</label>
+              <input type="text" id="mentor-name" class="form-input" required placeholder="მაგ. დაკო კეჟერაშვილი">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mentor-role">როლი / პოზიცია</label>
+              <input type="text" id="mentor-role" class="form-input" required placeholder="მაგ. მენტორი">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mentor-desc">აღწერა / მიმართულება</label>
+            <textarea id="mentor-desc" class="form-textarea" rows="3" required placeholder="მიმართულება და საქმიანობის სფერო..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="mentor-tags">თეგები (მძიმით გამოყოფილი)</label>
+              <input type="text" id="mentor-tags" class="form-input" placeholder="მაგ. არაფორმალური განათლება, დიალოგი">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mentor-color">ავატარის ფერი</label>
+              <select id="mentor-color" class="form-input">
+                <option value="#8b5cf6">იისფერი (#8b5cf6)</option>
+                <option value="#ec4899">ვარდისფერი (#ec4899)</option>
+                <option value="#3b82f6">ლურჯი (#3b82f6)</option>
+                <option value="#10b981">მწვანე (#10b981)</option>
+                <option value="#0d9488">ფირუზისფერი (#0d9488)</option>
+                <option value="#f59e0b">ნარინჯისფერი (#f59e0b)</option>
+                <option value="#dc2626">წითელი (#dc2626)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-mentor-modal">გაუქმება</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-mentor">შენახვა</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toast-msg"></div>
 
 ${STEALTH_ADMIN_HTML}
 
@@ -5360,8 +5419,189 @@ ${STEALTH_ADMIN_HTML}
 
   <script>
 ${STEALTH_ADMIN_JS}
+
+    const INITIAL_MENTORS = ${INITIAL_MENTORS_JS};
+
+    let mentors = [...INITIAL_MENTORS];
+
+    function showToast(msg) {
+      let toast = document.getElementById('toast-msg');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-msg';
+        toast.className = 'toast-msg';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function getAvatarSvg(color) {
+      return \`
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="58" fill="\${color}15" stroke="\${color}40" stroke-width="2"/>
+          <path d="M60 26c-11 0-19 8-19 19 0 7 4 13 9 16-14 4-23 15-23 29v6c0 1.1.9 2 2 2h62c1.1 0 2-.9 2-2v-6c0-14-9-25-23-29 5-3 9-9 9-16 0-11-8-19-19-19z" fill="\${color}" opacity="0.85"/>
+          <circle cx="60" cy="45" r="13" fill="\${color}80"/>
+        </svg>
+      \`;
+    }
+
+    function renderMentorsList(mentorsData) {
+      const grid = document.getElementById('mentors-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const isAdmin = isAdminMode();
+
+      mentorsData.forEach(m => {
+        const card = document.createElement('article');
+        card.className = 'mentor-card';
+        card.id = 'mentor-card-' + m.id;
+
+        const tagsList = Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []);
+        const tagsHtml = tagsList.filter(t => t.trim()).map(t => \`<span class="tag-badge">\${t.trim()}</span>\`).join('');
+        const color = m.avatar_color || '#8b5cf6';
+
+        card.innerHTML = \`
+          <div class="avatar-wrapper">
+            \${getAvatarSvg(color)}
+          </div>
+          <div style="width:100%;">
+            <h3 class="mentor-name">\${m.name}</h3>
+            <span class="mentor-role">\${m.role || 'მენტორი'}</span>
+            <p class="mentor-desc">\${m.description}</p>
+            <div class="tags-row">\${tagsHtml}</div>
+          </div>
+          \${isAdmin ? \`
+            <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="openEditMentor(\${m.id})">✏️ ჩასწორება</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="deleteMentor(\${m.id})">🗑️ წაშლა</button>
+            </div>
+          \` : ''}
+        \`;
+        grid.appendChild(card);
+      });
+    }
+
+    async function syncMentorsFromSupabase() {
+      const client = initSupabase();
+      if (!client) return;
+      try {
+        const { data, error } = await client
+          .from('mentors')
+          .select('*')
+          .order('id', { ascending: true });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          mentors = data.map(m => ({
+            id: Number(m.id),
+            name: m.name,
+            role: m.role || 'მენტორი',
+            description: m.description,
+            tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []),
+            avatar_color: m.avatar_color || '#8b5cf6'
+          }));
+          renderMentorsList(mentors);
+        }
+      } catch (err) {
+        console.warn('Mentors Supabase sync fallback:', err);
+      }
+    }
+
+    function syncAdminUI() {
+      const isAdmin = isAdminMode();
+      const adminIndicator = document.getElementById('admin-indicator');
+      const btnAddMentor = document.getElementById('btn-add-mentor');
+      if (adminIndicator) adminIndicator.style.display = isAdmin ? 'inline-flex' : 'none';
+      if (btnAddMentor) btnAddMentor.style.display = isAdmin ? 'inline-flex' : 'none';
+      renderMentorsList(mentors);
+    }
+
+    // Modal Handlers
+    function openAddMentor() {
+      document.getElementById('mentor-modal-title').innerHTML = '<span>➕</span> ახალი მენტორის დამატება';
+      document.getElementById('mentor-form-id').value = '';
+      document.getElementById('mentor-name').value = '';
+      document.getElementById('mentor-role').value = 'მენტორი';
+      document.getElementById('mentor-desc').value = '';
+      document.getElementById('mentor-tags').value = '';
+      document.getElementById('mentor-color').value = '#8b5cf6';
+      document.getElementById('mentor-modal').classList.add('open');
+    }
+
+    function openEditMentor(id) {
+      const mentor = mentors.find(m => m.id === id);
+      if (!mentor) return;
+      document.getElementById('mentor-modal-title').innerHTML = '<span>✏️</span> მენტორის რედაქტირება';
+      document.getElementById('mentor-form-id').value = mentor.id;
+      document.getElementById('mentor-name').value = mentor.name;
+      document.getElementById('mentor-role').value = mentor.role || 'მენტორი';
+      document.getElementById('mentor-desc').value = mentor.description;
+      document.getElementById('mentor-tags').value = Array.isArray(mentor.tags) ? mentor.tags.join(', ') : mentor.tags;
+      document.getElementById('mentor-color').value = mentor.avatar_color || '#8b5cf6';
+      document.getElementById('mentor-modal').classList.add('open');
+    }
+
+    function closeMentorModal() {
+      document.getElementById('mentor-modal').classList.remove('open');
+    }
+
+    async function saveMentor(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('mentor-form-id').value;
+      const isNew = !idVal;
+      const id = isNew ? (mentors.length ? Math.max(...mentors.map(m => m.id)) + 1 : 1) : Number(idVal);
+      const name = document.getElementById('mentor-name').value.trim();
+      const role = document.getElementById('mentor-role').value.trim();
+      const description = document.getElementById('mentor-desc').value.trim();
+      const tagsStr = document.getElementById('mentor-tags').value.trim();
+      const tags = tagsStr ? tagsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const avatar_color = document.getElementById('mentor-color').value;
+
+      const record = { id, name, role, description, tags, avatar_color };
+
+      if (isNew) {
+        mentors.push(record);
+      } else {
+        const idx = mentors.findIndex(m => m.id === id);
+        if (idx !== -1) mentors[idx] = record;
+      }
+      renderMentorsList(mentors);
+      closeMentorModal();
+      showToast('მენტორი წარმატებით შეინახა ✅');
+
+      const client = initSupabase();
+      if (client) {
+        try {
+          await client.from('mentors').upsert(record);
+        } catch (err) {
+          console.warn('Mentors Supabase save error:', err);
+        }
+      }
+    }
+
+    async function deleteMentor(id) {
+      if (!confirm('ნამდვილად გსურთ მენტორის წაშლა?')) return;
+      mentors = mentors.filter(m => m.id !== id);
+      renderMentorsList(mentors);
+      showToast('მენტორი წაიშალა 🗑️');
+
+      const client = initSupabase();
+      if (client) {
+        try {
+          await client.from('mentors').delete().eq('id', id);
+        } catch (err) {
+          console.warn('Mentors Supabase delete error:', err);
+        }
+      }
+    }
+
     // Theme toggle handling for mentors page
     document.addEventListener('DOMContentLoaded', () => {
+      renderMentorsList(mentors);
+      syncMentorsFromSupabase();
+      syncAdminUI();
+
+      // Theme UI
       const themeBtn = document.getElementById('theme-toggle');
       const themeIcon = document.getElementById('theme-icon');
       const themeText = document.getElementById('theme-text');
@@ -5388,6 +5628,30 @@ ${STEALTH_ADMIN_JS}
         localStorage.setItem('theme', newTheme);
         syncUI(newTheme);
       });
+
+      // Admin Logout
+      const btnLogout = document.getElementById('btn-header-logout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+          logoutAdmin();
+          syncAdminUI();
+          showToast('ადმინისტრატორის სესია დასრულდა');
+        });
+      }
+
+      // Add Mentor Button
+      const btnAddMentor = document.getElementById('btn-add-mentor');
+      if (btnAddMentor) btnAddMentor.addEventListener('click', openAddMentor);
+
+      // Close Modal Buttons
+      const btnCloseModal = document.getElementById('btn-close-mentor-modal');
+      if (btnCloseModal) btnCloseModal.addEventListener('click', closeMentorModal);
+      const btnCancelModal = document.getElementById('btn-cancel-mentor-modal');
+      if (btnCancelModal) btnCancelModal.addEventListener('click', closeMentorModal);
+
+      // Mentor Form Submit
+      const mentorForm = document.getElementById('mentor-form');
+      if (mentorForm) mentorForm.addEventListener('submit', saveMentor);
     });
   </script>
 

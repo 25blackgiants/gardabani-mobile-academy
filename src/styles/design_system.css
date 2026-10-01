@@ -1,0 +1,79 @@
+/* ==========================================================================
+   DESIGN SYSTEM: COMMON VARIABLES & THEME
+   ========================================================================== */
+:root {
+  --primary-hub: #dc2626;         /* Hub Red / Crimson */
+  --primary-hub-glow: rgba(220, 38, 38, 0.35);
+  --primary-village: #2563eb;     /* Village Royal Blue */
+  --primary-village-glow: rgba(37, 99, 235, 0.25);
+  --accent-gardabani: #4f46e5;    /* Gardabani Boundary Indigo */
+  --accent-cyan: #0284c7;
+  
+  /* Light Mode (default) */
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
+  --bg-hover: #f1f5f9;
+  --bg-input: #f8fafc;
+  --bg-nav: #f1f5f9;
+  
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+  
+  --border-light: #e2e8f0;
+  --border-focus: #94a3b8;
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  --shadow-popup: 0 20px 25px -5px rgba(0, 0, 0, 0.22), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+  
+  --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+/* Night Mode Theme Variables (TRUE PURE BLACK - NO BLUE TINT) */
+[data-theme="dark"] {
+  --bg-page: #000000;         /* True Pure Black */
+  --bg-card: #0a0a0a;         /* Deep neutral black card */
+  --bg-card-subtle: #141414;  /* Slightly lighter card element */
+  --bg-hover: #1c1c1c;        /* Neutral dark hover */
+  --bg-input: #121212;        /* Dark input field */
+  --bg-nav: #0e0e0e;          /* Navigation pill background */
+  
+  --text-main: #f5f5f5;       /* Crisp clean white text */
+  --text-muted: #a3a3a3;      /* Clean neutral gray text */
+  --text-subtle: #737373;     /* Muted neutral gray */
+  
+  --border-light: #262626;    /* Dark neutral border, no blue tint */
+  --border-focus: #3b82f6;    /* Focus outline */
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
+  --shadow-popup: 0 20px 30px rgba(0, 0, 0, 0.95);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-stack);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+}
