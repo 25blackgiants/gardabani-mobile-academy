@@ -1,23 +1,69 @@
 // ============================================================================
-// LIGHTWEIGHT PRIVACY-FIRST ANALYTICS TRACKER
+// LIGHTWEIGHT PRIVACY-FIRST ANALYTICS TRACKER (WITH COOKIE CONSENT AWARENESS)
 // Anonymous, Non-invasive, Client-side session and visit logger
 // Works with Supabase and has automatic LocalStorage offline resilience
 // ============================================================================
 
 (function() {
   try {
-    // 1. Ephemeral & Anonymous Session Token (SessionStorage)
+    // 1. Consent State
+    function getConsentStatus() {
+      return localStorage.getItem('gardabani_cookie_consent') || 'pending';
+    }
+
+    let consentStatus = getConsentStatus();
+
+    // 2. Ephemeral & Anonymous Session Token (SessionStorage - strictly necessary for page transitions)
     let sessionId = sessionStorage.getItem('gma_session_id');
     if (!sessionId) {
       sessionId = 'sess_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
       sessionStorage.setItem('gma_session_id', sessionId);
     }
 
-    // 2. Identify Page
+    // 3. Persistent Visitor ID & Retention (Enabled only if consent is accepted)
+    let visitorId = '';
+    let visitCount = 1;
+    let isReturning = false;
+
+    function evaluateVisitorIdentity() {
+      consentStatus = getConsentStatus();
+      if (consentStatus === 'accepted') {
+        visitorId = localStorage.getItem('gma_visitor_id');
+        if (!visitorId) {
+          visitorId = 'usr_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
+          localStorage.setItem('gma_visitor_id', visitorId);
+          document.cookie = 'gma_vid=' + visitorId + '; path=/; max-age=31536000; SameSite=Lax';
+        }
+
+        // Increment visit count once per unique session
+        const sessionCounted = sessionStorage.getItem('gma_session_counted');
+        visitCount = parseInt(localStorage.getItem('gma_visit_count') || '0', 10);
+        if (!sessionCounted) {
+          visitCount += 1;
+          localStorage.setItem('gma_visit_count', visitCount.toString());
+          sessionStorage.setItem('gma_session_counted', 'true');
+        }
+        isReturning = visitCount > 1;
+      } else {
+        // If rejected, remove any persistent ID
+        visitorId = '';
+        visitCount = 1;
+        isReturning = false;
+        if (consentStatus === 'rejected') {
+          localStorage.removeItem('gma_visitor_id');
+          localStorage.removeItem('gma_visit_count');
+          document.cookie = 'gma_vid=; path=/; max-age=0; SameSite=Lax';
+        }
+      }
+    }
+
+    evaluateVisitorIdentity();
+
+    // 4. Page Metadata
     const pagePath = window.location.pathname.split('/').pop() || 'index.html';
     const pageTitle = document.title || 'გარდაბნის მობილური აკადემია';
 
-    // 3. User Agent & Device Type
+    // 5. Device, OS, Browser
     const ua = navigator.userAgent || '';
     let deviceType = 'Desktop';
     if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
@@ -26,7 +72,6 @@
       deviceType = 'Mobile';
     }
 
-    // OS Detection
     let os = 'Desktop OS';
     if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
     else if (/Android/i.test(ua)) os = 'Android';
@@ -34,7 +79,6 @@
     else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
     else if (/Linux/i.test(ua)) os = 'Linux';
 
-    // Browser Detection
     let browser = 'ბრაუზერი';
     if (/Edg\//i.test(ua)) browser = 'Edge';
     else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua) && !/OPR\//i.test(ua)) browser = 'Chrome';
@@ -59,12 +103,46 @@
       }
     }
 
+    // 6. Network Quality (Only if consent is accepted or for technical diagnosis)
+    let networkType = 'wifi/broadband';
+    try {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (conn && conn.effectiveType) {
+        networkType = conn.effectiveType.toUpperCase();
+      }
+    } catch (e) {}
+
+    // 7. Scroll Depth Tracking
+    let maxScrollDepth = 0;
+    function calculateScrollDepth() {
+      try {
+        const docElem = document.documentElement;
+        const totalHeight = (docElem.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+        if (totalHeight > 0) {
+          const currentScroll = window.scrollY || window.pageYOffset;
+          const pct = Math.min(100, Math.max(0, Math.round((currentScroll / totalHeight) * 100)));
+          if (pct > maxScrollDepth) maxScrollDepth = pct;
+        } else {
+          maxScrollDepth = 100;
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('scroll', calculateScrollDepth, { passive: true });
+    setTimeout(calculateScrollDepth, 1500);
+
     const screenRes = (window.screen.width || 0) + 'x' + (window.screen.height || 0);
     const lang = navigator.language || 'ka';
 
     const visitRecord = {
       id: Date.now() + Math.floor(Math.random() * 1000),
       session_id: sessionId,
+      visitor_id: visitorId,
+      consent_status: consentStatus,
+      is_returning: isReturning,
+      visit_count: visitCount,
+      network_type: networkType,
+      scroll_depth: maxScrollDepth,
       page_path: pagePath,
       page_title: pageTitle,
       referrer: referrer,
@@ -77,15 +155,15 @@
       created_at: new Date().toISOString()
     };
 
-    // 4. Save to Local Storage Log (Offline Fallback & Instant Access)
+    // 8. Save to Local Storage Log (Offline Fallback & Instant Access)
     try {
       let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
       localLogs.unshift(visitRecord);
-      if (localLogs.length > 200) localLogs = localLogs.slice(0, 200);
+      if (localLogs.length > 250) localLogs = localLogs.slice(0, 250);
       localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
     } catch (e) {}
 
-    // 5. Cloud Sync with Supabase (if client is initialized)
+    // 9. Cloud Sync with Supabase (if configured)
     let cloudRecordId = null;
     async function syncVisitToSupabase() {
       if (typeof initSupabase !== 'function') return;
@@ -96,6 +174,12 @@
           .from('site_analytics')
           .insert([{
             session_id: sessionId,
+            visitor_id: visitorId,
+            consent_status: consentStatus,
+            is_returning: isReturning,
+            visit_count: visitCount,
+            network_type: networkType,
+            scroll_depth: maxScrollDepth,
             page_path: pagePath,
             page_title: pageTitle,
             referrer: referrer,
@@ -113,23 +197,30 @@
           cloudRecordId = data.id;
         }
       } catch (err) {
-        // Silent catch: Analytics must never break main UX
+        // Total silence for analytics errors
       }
     }
 
-    // 6. Active Session Duration Heartbeat
+    // 10. Active Session Duration & Scroll Heartbeat
     let duration = 5;
     const heartbeatTimer = setInterval(() => {
       duration += 10;
-      flushDuration(duration);
+      flushAnalyticsUpdate(duration);
     }, 10000);
 
-    async function flushDuration(dur) {
+    async function flushAnalyticsUpdate(dur) {
+      calculateScrollDepth();
+
       // Local update
       try {
         let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
         if (localLogs.length > 0 && localLogs[0].session_id === sessionId && localLogs[0].page_path === pagePath) {
           localLogs[0].duration_seconds = dur;
+          localLogs[0].scroll_depth = maxScrollDepth;
+          localLogs[0].consent_status = getConsentStatus();
+          if (visitorId) localLogs[0].visitor_id = visitorId;
+          localLogs[0].is_returning = isReturning;
+          localLogs[0].visit_count = visitCount;
           localStorage.setItem('gardabani_analytics_log', JSON.stringify(localLogs));
         }
       } catch (e) {}
@@ -141,6 +232,11 @@
           try {
             await client.from('site_analytics').update({
               duration_seconds: dur,
+              scroll_depth: maxScrollDepth,
+              consent_status: getConsentStatus(),
+              visitor_id: visitorId,
+              is_returning: isReturning,
+              visit_count: visitCount,
               updated_at: new Date().toISOString()
             }).eq('id', cloudRecordId);
           } catch (e) {}
@@ -148,16 +244,22 @@
       }
     }
 
+    // Listen for cookie consent changes in real-time
+    window.addEventListener('cookie_consent_changed', (e) => {
+      evaluateVisitorIdentity();
+      flushAnalyticsUpdate(duration);
+    });
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') flushDuration(duration);
+      if (document.visibilityState === 'hidden') flushAnalyticsUpdate(duration);
     });
 
     window.addEventListener('beforeunload', () => {
       clearInterval(heartbeatTimer);
-      flushDuration(duration);
+      flushAnalyticsUpdate(duration);
     });
 
-    // Send after brief delay to prioritize rendering of main components
+    // Send after brief delay
     setTimeout(syncVisitToSupabase, 800);
 
   } catch (err) {

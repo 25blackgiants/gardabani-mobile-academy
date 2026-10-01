@@ -10,12 +10,22 @@ const { INITIAL_MENTORS } = require('./src/data/mentors');
 const INITIAL_LOCATIONS_JS = JSON.stringify(INITIAL_LOCATIONS, null, 2);
 const INITIAL_MENTORS_JS = JSON.stringify(INITIAL_MENTORS, null, 2);
 
+// Modular Cookie Consent Component
+const { COOKIE_CONSENT_CSS, COOKIE_CONSENT_HTML, COOKIE_CONSENT_JS } = require('./src/components/cookie_consent');
+
 // Modular Analytics Tracker from src/analytics/
 const analyticsTrackerJs = fs.readFileSync(path.join(__dirname, 'src', 'analytics', 'tracker.js'), 'utf8');
 const SITE_ANALYTICS_TRACKER_HTML = `
   <!-- Privacy-First Analytics Tracker -->
   <script>
 ${analyticsTrackerJs}
+  </script>
+`;
+
+const COOKIE_CONSENT_FULL_BLOCK = `
+${COOKIE_CONSENT_HTML}
+  <script>
+${COOKIE_CONSENT_JS}
   </script>
 `;
 
@@ -2141,6 +2151,7 @@ const mapHtmlContent = `<!DOCTYPE html>
       }
     }
 ${STEALTH_ADMIN_CSS}
+${COOKIE_CONSENT_CSS}
   </style>
 </head>
 <body>
@@ -3245,6 +3256,7 @@ ${STEALTH_ADMIN_JS}
       syncLocationsFromSupabase();
     });
   </script>
+${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
 </body>
 </html>`;
@@ -4188,6 +4200,7 @@ const calendarHtmlContent = `<!DOCTYPE html>
       }
     }
 ${STEALTH_ADMIN_CSS}
+${COOKIE_CONSENT_CSS}
   </style>
 </head>
 <body>
@@ -4621,6 +4634,7 @@ ${STEALTH_ADMIN_JS}
       });
     });
   </script>
+${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
 </body>
 </html>`;
@@ -5306,6 +5320,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       opacity: 1;
     }
 ${STEALTH_ADMIN_CSS}
+${COOKIE_CONSENT_CSS}
   </style>
 </head>
 <body>
@@ -5664,6 +5679,7 @@ ${STEALTH_ADMIN_JS}
       if (mentorForm) mentorForm.addEventListener('submit', saveMentor);
     });
   </script>
+${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
 </body>
 </html>`;
@@ -6499,6 +6515,7 @@ const settingsHtmlContent = `<!DOCTYPE html>
       background: var(--bg-hover);
     }
 ${STEALTH_ADMIN_CSS}
+${COOKIE_CONSENT_CSS}
   </style>
 </head>
 <body>
@@ -6640,7 +6657,7 @@ ${STEALTH_ADMIN_CSS}
         </div>
       </div>
 
-      <!-- KPI SUMMARY METRICS -->
+      <!-- KPI SUMMARY METRICS (6 CARDS) -->
       <div class="analytics-kpi-grid">
         <div class="analytics-kpi-card">
           <div class="kpi-icon">👁️</div>
@@ -6657,6 +6674,13 @@ ${STEALTH_ADMIN_CSS}
           </div>
         </div>
         <div class="analytics-kpi-card">
+          <div class="kpi-icon">🔄</div>
+          <div class="kpi-info">
+            <span class="kpi-label">დაბრუნებულები</span>
+            <span class="kpi-value" id="kpi-retention-rate">0%</span>
+          </div>
+        </div>
+        <div class="analytics-kpi-card">
           <div class="kpi-icon">⏱️</div>
           <div class="kpi-info">
             <span class="kpi-label">საშ. ხანგრძლივობა</span>
@@ -6670,22 +6694,31 @@ ${STEALTH_ADMIN_CSS}
             <span class="kpi-value" id="kpi-mobile-pct">0%</span>
           </div>
         </div>
+        <div class="analytics-kpi-card">
+          <div class="kpi-icon">🍪</div>
+          <div class="kpi-info">
+            <span class="kpi-label">ქუქი-თანხმობა</span>
+            <span class="kpi-value" id="kpi-consent-rate">0%</span>
+          </div>
+        </div>
       </div>
 
       <!-- BREAKDOWN CHARTS & PROGRESS BARS -->
       <div class="analytics-details-grid">
-        <!-- Devices & Browsers -->
+        <!-- Devices, Browsers & Network Quality -->
         <div class="analytics-panel">
-          <h3 class="panel-title">📱 მოწყობილობები და ბრაუზერები</h3>
+          <h3 class="panel-title">📱 მოწყობილობები & ქსელი</h3>
           <div id="stats-devices"></div>
           <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-browsers"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-networks"></div>
         </div>
 
-        <!-- Traffic Sources & Top Pages -->
+        <!-- Traffic Sources, Top Pages & Engagement -->
         <div class="analytics-panel">
-          <h3 class="panel-title">🌐 საიდან შემოვიდნენ & გვერდები</h3>
+          <h3 class="panel-title">🌐 ტრაფიკი & ინტერაქცია</h3>
           <div id="stats-referrers"></div>
           <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-pages"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-scroll"></div>
         </div>
       </div>
 
@@ -6705,12 +6738,14 @@ ${STEALTH_ADMIN_CSS}
                 <th>გვერდი</th>
                 <th>მოწყობილობა & OS</th>
                 <th>ბრაუზერი</th>
+                <th>ქსელი</th>
                 <th>საიდან (წყარო)</th>
+                <th>სქროლი</th>
                 <th>ხანგრძლივობა</th>
               </tr>
             </thead>
             <tbody id="analytics-log-tbody">
-              <tr><td colspan="6" style="text-align:center; padding:16px; color:var(--text-muted);">ვიზიტების მონაცემები იტვირთება...</td></tr>
+              <tr><td colspan="8" style="text-align:center; padding:16px; color:var(--text-muted);">ვიზიტების მონაცემები იტვირთება...</td></tr>
             </tbody>
           </table>
         </div>
@@ -6722,7 +6757,7 @@ ${STEALTH_ADMIN_CSS}
       <div class="card-header-group">
         <h2 class="card-main-title">🎨 ვიზუალური თემა და სისტემა</h2>
         <p class="card-subtitle">
-          სისტემური ფერების პალიტრა და მონაცემების საწყის მდგომარეობაში დაბრუნება.
+          სისტემური ფერების პალიტრა, კონფიდენციალურობის მართვა და მონაცემების საწყის მდგომარეობაში დაბრუნება.
         </p>
       </div>
 
@@ -6740,6 +6775,21 @@ ${STEALTH_ADMIN_CSS}
           <input type="checkbox" id="setting-darkmode">
           <span class="lever-slider"></span>
         </label>
+      </div>
+
+      <!-- Cookie Consent Management Row -->
+      <div class="switch-row" id="row-cookie-settings" style="cursor:default;">
+        <div class="switch-label-group">
+          <span class="switch-title">
+            <span>🍪</span> ქუქი-ფაილები და კონფიდენციალურობა
+          </span>
+          <span class="switch-desc" id="cookie-status-desc">
+            სტატუსი: მოწმდება...
+          </span>
+        </div>
+        <button type="button" class="btn btn-outline" id="btn-reopen-cookie-banner" style="padding:6px 12px; font-size:12px; white-space:nowrap;">
+          <span>↺</span> არჩევანის შეცვლა
+        </button>
       </div>
 
       <div style="display:flex; justify-content:flex-end; margin-top:4px;">
@@ -6949,12 +6999,17 @@ ${STEALTH_ADMIN_JS}
       function renderAnalyticsUI(records) {
         const totalViewsEl = document.getElementById('kpi-total-views');
         const uniqueSessionsEl = document.getElementById('kpi-unique-sessions');
+        const retentionRateEl = document.getElementById('kpi-retention-rate');
         const avgDurationEl = document.getElementById('kpi-avg-duration');
         const mobilePctEl = document.getElementById('kpi-mobile-pct');
+        const consentRateEl = document.getElementById('kpi-consent-rate');
+
         const devicesContainer = document.getElementById('stats-devices');
         const browsersContainer = document.getElementById('stats-browsers');
+        const networksContainer = document.getElementById('stats-networks');
         const referrersContainer = document.getElementById('stats-referrers');
         const pagesContainer = document.getElementById('stats-pages');
+        const scrollContainer = document.getElementById('stats-scroll');
         const tbody = document.getElementById('analytics-log-tbody');
 
         if (!totalViewsEl) return;
@@ -6962,13 +7017,17 @@ ${STEALTH_ADMIN_JS}
         if (!records || records.length === 0) {
           totalViewsEl.textContent = '0';
           uniqueSessionsEl.textContent = '0';
+          if (retentionRateEl) retentionRateEl.textContent = '0%';
           avgDurationEl.textContent = '0 წმ';
           mobilePctEl.textContent = '0%';
+          if (consentRateEl) consentRateEl.textContent = '0%';
           devicesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები არ არის</div>';
           browsersContainer.innerHTML = '';
+          if (networksContainer) networksContainer.innerHTML = '';
           referrersContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები არ არის</div>';
           pagesContainer.innerHTML = '';
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:18px; color:var(--text-muted);">ვიზიტები ჯერ არ არის დაფიქსირებული. დააწკაპუნეთ "🧪 დემო მონაცემები"-ს.</td></tr>';
+          if (scrollContainer) scrollContainer.innerHTML = '';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--text-muted);">ვიზიტები ჯერ არ არის დაფიქსირებული. დააწკაპუნეთ "🧪 დემო მონაცემები"-ს.</td></tr>';
           return;
         }
 
@@ -6980,13 +7039,21 @@ ${STEALTH_ADMIN_JS}
         const mobileCount = records.filter(r => r.device_type === 'Mobile' || r.device_type === 'Tablet').length;
         const mobilePct = Math.round((mobileCount / totalViews) * 100);
 
+        // Retention & Cookie Consent Rate
+        const returningCount = records.filter(r => r.is_returning === true || (Number(r.visit_count) > 1)).length;
+        const retentionRate = Math.round((returningCount / totalViews) * 100);
+        const acceptedCount = records.filter(r => r.consent_status === 'accepted').length;
+        const consentRate = Math.round((acceptedCount / totalViews) * 100);
+
         totalViewsEl.textContent = totalViews.toLocaleString('ka-GE');
         uniqueSessionsEl.textContent = uniqueSessions.toLocaleString('ka-GE');
+        if (retentionRateEl) retentionRateEl.textContent = retentionRate + '%';
         avgDurationEl.textContent = formatDuration(avgDuration);
         mobilePctEl.textContent = mobilePct + '%';
+        if (consentRateEl) consentRateEl.textContent = consentRate + '%';
 
         // 2. Devices breakdown
-        devicesContainer.innerHTML = '';
+        devicesContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📱 მოწყობილობები:</div>';
         const devCounts = { '📱 მობილური (Mobile)': 0, '💻 კომპიუტერი (Desktop)': 0, '📟 პლანშეტი (Tablet)': 0 };
         records.forEach(r => {
           if (r.device_type === 'Mobile') devCounts['📱 მობილური (Mobile)']++;
@@ -7008,8 +7075,21 @@ ${STEALTH_ADMIN_JS}
           renderProgressBar(browsersContainer, k, v, totalViews);
         });
 
-        // 4. Traffic sources / Referrers
-        referrersContainer.innerHTML = '';
+        // 4. Network Quality breakdown
+        if (networksContainer) {
+          networksContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📶 ქსელის კავშირი:</div>';
+          const netCounts = {};
+          records.forEach(r => {
+            const net = (r.network_type || 'WIFI/LAN').toUpperCase();
+            netCounts[net] = (netCounts[net] || 0) + 1;
+          });
+          Object.entries(netCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
+            renderProgressBar(networksContainer, k, v, totalViews);
+          });
+        }
+
+        // 5. Traffic sources / Referrers
+        referrersContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🌐 საიდან შემოვიდნენ:</div>';
         const refCounts = {};
         records.forEach(r => {
           const ref = r.referrer || 'პირდაპირი (Direct)';
@@ -7019,7 +7099,7 @@ ${STEALTH_ADMIN_JS}
           renderProgressBar(referrersContainer, k, v, totalViews);
         });
 
-        // 5. Popular Pages
+        // 6. Popular Pages
         pagesContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📄 პოპულარული გვერდები:</div>';
         const pageCounts = {};
         records.forEach(r => {
@@ -7030,16 +7110,28 @@ ${STEALTH_ADMIN_JS}
           renderProgressBar(pagesContainer, k, v, totalViews);
         });
 
-        // 6. Table rows
+        // 7. Scroll Depth / Engagement
+        if (scrollContainer) {
+          const totalScroll = records.reduce((acc, r) => acc + (Number(r.scroll_depth) || 0), 0);
+          const avgScroll = Math.round(totalScroll / totalViews);
+          scrollContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📜 საშუალო სქროლის სიღრმე:</div>';
+          renderProgressBar(scrollContainer, 'ეკრანის გადახვევა', avgScroll, 100, avgScroll + '%');
+        }
+
+        // 8. Table rows
         tbody.innerHTML = '';
         records.slice(0, 15).forEach(r => {
           const tr = document.createElement('tr');
           const devIcon = r.device_type === 'Mobile' ? '📱' : (r.device_type === 'Tablet' ? '📟' : '💻');
+          const netBadge = r.network_type ? '<span style="display:inline-block; padding:2px 5px; border-radius:4px; background:rgba(37,99,235,0.12); color:var(--primary); font-size:10.5px; font-weight:600;">' + r.network_type + '</span>' : '-';
+          const scrollPct = (r.scroll_depth !== undefined && r.scroll_depth !== null) ? r.scroll_depth + '%' : '-';
           tr.innerHTML = '<td>' + formatTimeAgo(r.created_at) + '</td>' +
             '<td><strong style="color:var(--primary);">' + getPageBadge(r.page_path) + '</strong></td>' +
             '<td>' + devIcon + ' ' + (r.device_type || 'Desktop') + ' (' + (r.os || 'OS') + ')</td>' +
             '<td>' + (r.browser || 'Unknown') + '</td>' +
+            '<td>' + netBadge + '</td>' +
             '<td><span style="display:inline-block; padding:2px 6px; border-radius:4px; background:var(--border-light); font-size:11px;">' + (r.referrer || 'Direct') + '</span></td>' +
+            '<td>' + scrollPct + '</td>' +
             '<td>' + formatDuration(r.duration_seconds) + '</td>';
           tbody.appendChild(tr);
         });
@@ -7089,13 +7181,13 @@ ${STEALTH_ADMIN_JS}
       if (btnSeedAnalytics) {
         btnSeedAnalytics.addEventListener('click', () => {
           const sampleLogs = [
-            { id: 101, session_id: 'sess_1', page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 145, created_at: new Date(Date.now() - 15 * 60000).toISOString() },
-            { id: 102, session_id: 'sess_2', page_path: 'calendar.html', referrer: 'პირდაპირი (Direct)', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 230, created_at: new Date(Date.now() - 40 * 60000).toISOString() },
-            { id: 103, session_id: 'sess_3', page_path: 'mentors.html', referrer: 'Google', device_type: 'Desktop', os: 'Windows', browser: 'Chrome', duration_seconds: 180, created_at: new Date(Date.now() - 65 * 60000).toISOString() },
-            { id: 104, session_id: 'sess_4', page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'Android', browser: 'Samsung Internet', duration_seconds: 95, created_at: new Date(Date.now() - 120 * 60000).toISOString() },
-            { id: 105, session_id: 'sess_5', page_path: 'settings.html', referrer: 'პირდაპირი (Direct)', device_type: 'Desktop', os: 'macOS', browser: 'Safari', duration_seconds: 310, created_at: new Date(Date.now() - 180 * 60000).toISOString() },
-            { id: 106, session_id: 'sess_6', page_path: 'index.html', referrer: 'Instagram', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 75, created_at: new Date(Date.now() - 240 * 60000).toISOString() },
-            { id: 107, session_id: 'sess_7', page_path: 'calendar.html', referrer: 'Google', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 160, created_at: new Date(Date.now() - 300 * 60000).toISOString() }
+            { id: 101, session_id: 'sess_1', visitor_id: 'usr_1', consent_status: 'accepted', is_returning: true, visit_count: 3, network_type: '4G', scroll_depth: 92, page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 145, created_at: new Date(Date.now() - 15 * 60000).toISOString() },
+            { id: 102, session_id: 'sess_2', visitor_id: 'usr_2', consent_status: 'accepted', is_returning: false, visit_count: 1, network_type: '4G', scroll_depth: 100, page_path: 'calendar.html', referrer: 'პირდაპირი (Direct)', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 230, created_at: new Date(Date.now() - 40 * 60000).toISOString() },
+            { id: 103, session_id: 'sess_3', visitor_id: 'usr_3', consent_status: 'accepted', is_returning: true, visit_count: 2, network_type: 'WIFI', scroll_depth: 65, page_path: 'mentors.html', referrer: 'Google', device_type: 'Desktop', os: 'Windows', browser: 'Chrome', duration_seconds: 180, created_at: new Date(Date.now() - 65 * 60000).toISOString() },
+            { id: 104, session_id: 'sess_4', visitor_id: '', consent_status: 'rejected', is_returning: false, visit_count: 1, network_type: '3G', scroll_depth: 45, page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'Android', browser: 'Samsung Internet', duration_seconds: 95, created_at: new Date(Date.now() - 120 * 60000).toISOString() },
+            { id: 105, session_id: 'sess_5', visitor_id: 'usr_5', consent_status: 'accepted', is_returning: true, visit_count: 5, network_type: 'WIFI', scroll_depth: 88, page_path: 'settings.html', referrer: 'პირდაპირი (Direct)', device_type: 'Desktop', os: 'macOS', browser: 'Safari', duration_seconds: 310, created_at: new Date(Date.now() - 180 * 60000).toISOString() },
+            { id: 106, session_id: 'sess_6', visitor_id: 'usr_6', consent_status: 'accepted', is_returning: false, visit_count: 1, network_type: '4G', scroll_depth: 70, page_path: 'index.html', referrer: 'Instagram', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 75, created_at: new Date(Date.now() - 240 * 60000).toISOString() },
+            { id: 107, session_id: 'sess_7', visitor_id: 'usr_7', consent_status: 'accepted', is_returning: true, visit_count: 2, network_type: '4G', scroll_depth: 95, page_path: 'calendar.html', referrer: 'Google', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 160, created_at: new Date(Date.now() - 300 * 60000).toISOString() }
           ];
           localStorage.setItem('gardabani_analytics_log', JSON.stringify(sampleLogs));
           loadAndRenderAnalytics();
@@ -7114,11 +7206,38 @@ ${STEALTH_ADMIN_JS}
         });
       }
 
+      // Cookie Consent settings sync
+      function syncCookieSettingsUI() {
+        const desc = document.getElementById('cookie-status-desc');
+        const c = localStorage.getItem('gardabani_cookie_consent');
+        if (desc) {
+          if (c === 'accepted') {
+            desc.innerHTML = '<span style="color:#16a34a; font-weight:600;">მიღებულია ✅</span> (სრული ანალიტიკა და ქსელის ხარისხი აქტიურია)';
+          } else if (c === 'rejected') {
+            desc.innerHTML = '<span style="color:#dc2626; font-weight:600;">შეზღუდულია ❌</span> (მხოლოდ აუცილებელი ტექნიკური ფუნქციონალი)';
+          } else {
+            desc.innerHTML = '<span style="color:#ca8a04; font-weight:600;">ჯერ არ არის არჩეული ⏳</span> (გადაწყვეტილება მოსალოდნელია)';
+          }
+        }
+      }
+
+      const btnReopenCookie = document.getElementById('btn-reopen-cookie-banner');
+      if (btnReopenCookie) {
+        btnReopenCookie.addEventListener('click', () => {
+          if (typeof window.openCookieConsentSettings === 'function') {
+            window.openCookieConsentSettings();
+          }
+        });
+      }
+      window.addEventListener('cookie_consent_changed', syncCookieSettingsUI);
+      syncCookieSettingsUI();
+
       if (isAdminMode()) {
         loadAndRenderAnalytics();
       }
     });
   </script>
+${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
 </body>
 </html>`;
