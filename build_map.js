@@ -6951,7 +6951,7 @@ ${COOKIE_CONSENT_CSS}
     </section>
 
     <!-- ACTIVE ADMIN ANALYTICS CARD -->
-    <section class="settings-card fade-in-anim" id="admin-analytics-card">
+    <section class="settings-card fade-in-anim" id="admin-analytics-card" style="display:none;">
       <div class="card-header-group" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 class="card-main-title" style="display:flex; align-items:center; gap:8px;">
@@ -7216,6 +7216,9 @@ ${STEALTH_ADMIN_JS}
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // State Variables for Analytics (declared first to prevent TDZ)
+// (Analytics state variables hoisted to DOMContentLoaded top)
+
       // 1. Layers Setup with localStorage
       const boundaryInput = document.getElementById('setting-boundary');
       const radiusInput = document.getElementById('setting-radius');
@@ -7257,16 +7260,20 @@ ${STEALTH_ADMIN_JS}
           activeCard.style.display = isAdmin ? 'block' : 'none';
         }
         if (analyticsCard) {
-          analyticsCard.style.display = 'block';
-          if (typeof loadAndRenderAnalytics === 'function') {
-            loadAndRenderAnalytics();
-          }
-          if (typeof initLiveModeTicker === 'function') {
-            initLiveModeTicker();
+          analyticsCard.style.display = isAdmin ? 'block' : 'none';
+          if (isAdmin) {
+            if (typeof loadAndRenderAnalytics === 'function') {
+              loadAndRenderAnalytics();
+            }
+            if (typeof initLiveModeTicker === 'function') {
+              initLiveModeTicker();
+            }
+          } else if (liveSyncIntervalId) {
+            clearInterval(liveSyncIntervalId);
+            liveSyncIntervalId = null;
           }
         }
       }
-      syncAdminView();
 
       // Supabase connection & RLS status check
       const statusBadge = document.getElementById('supabase-status-badge');
@@ -8121,16 +8128,18 @@ async function loadAndRenderAnalytics() {
       // Buttons setup
       const btnRefreshAnalytics = document.getElementById('btn-refresh-analytics');
       if (btnRefreshAnalytics) {
-        btnRefreshAnalytics.addEventListener('click', () => {
+        btnRefreshAnalytics.onclick = function(e) {
+          e.preventDefault();
           loadAndRenderAnalytics();
           showToast('ვიზიტების მონაცემები განახლდა 🔄');
-        });
+        };
       }
 
       
       const btnExportCSV = document.getElementById('btn-export-csv');
       if (btnExportCSV) {
-        btnExportCSV.addEventListener('click', () => {
+        btnExportCSV.onclick = function(e) {
+          e.preventDefault();
           let recs = [];
           try {
             recs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
@@ -8154,7 +8163,7 @@ async function loadAndRenderAnalytics() {
           link.click();
           document.body.removeChild(link);
           showToast('CSV ექსპორტი დასრულდა 📥');
-        });
+        };
       }
       function generateSimulatedVisits() {
         const now = Date.now();
@@ -8364,18 +8373,21 @@ async function loadAndRenderAnalytics() {
         localStorage.removeItem('gardabani_cleared_by_user');
       }
 
+      // Action Buttons Binding
       const btnSimulateAnalytics = document.getElementById('btn-simulate-analytics');
       if (btnSimulateAnalytics) {
-        btnSimulateAnalytics.addEventListener('click', () => {
+        btnSimulateAnalytics.onclick = function(e) {
+          e.preventDefault();
           generateSimulatedVisits();
           loadAndRenderAnalytics();
           showToast('სატესტო მონაცემები წარმატებით დაგენერირდა! 📊');
-        });
+        };
       }
 
       const btnClearLocalAnalytics = document.getElementById('btn-clear-local-analytics');
       if (btnClearLocalAnalytics) {
-        btnClearLocalAnalytics.addEventListener('click', () => {
+        btnClearLocalAnalytics.onclick = function(e) {
+          e.preventDefault();
           if (confirm('ნამდვილად გსურთ ლოკალური ჟურნალის გასუფთავება?')) {
             localStorage.removeItem('gardabani_analytics_log');
             localStorage.removeItem('gardabani_analytics_events');
@@ -8384,7 +8396,7 @@ async function loadAndRenderAnalytics() {
             loadAndRenderAnalytics();
             showToast('ლოკალური ჟურნალი გასუფთავდა 🗑️');
           }
-        });
+        };
       }
 
       function initLiveModeTicker() {
@@ -8394,6 +8406,11 @@ async function loadAndRenderAnalytics() {
         if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
 
         liveSyncIntervalId = setInterval(() => {
+          if (!isAdminMode()) {
+            clearInterval(liveSyncIntervalId);
+            liveSyncIntervalId = null;
+            return;
+          }
           liveCountdownSeconds--;
           if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
           if (liveCountdownSeconds <= 0) {
@@ -8463,8 +8480,8 @@ async function loadAndRenderAnalytics() {
       window.addEventListener('cookie_consent_changed', syncCookieSettingsUI);
       syncCookieSettingsUI();
 
-      loadAndRenderAnalytics();
-      initLiveModeTicker();
+      // Synchronize Admin View and render if logged in
+      syncAdminView();
     });
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
