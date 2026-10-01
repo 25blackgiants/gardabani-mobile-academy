@@ -1605,14 +1605,14 @@
       </div>
     </section>
 
-    <!-- ACTIVE ADMIN ANALYTICS CARD (VISIBLE ONLY WHEN LOGGED IN AS ADMIN) -->
-    <section class="settings-card fade-in-anim" id="admin-analytics-card" style="display:none;">
+    <!-- ACTIVE ADMIN ANALYTICS CARD -->
+    <section class="settings-card fade-in-anim" id="admin-analytics-card">
       <div class="card-header-group" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 class="card-main-title" style="display:flex; align-items:center; gap:8px;">
             <span>📊</span> ვიზიტორთა ანალიტიკა და მონაცემები
             <span class="live-pulse-badge"><span class="pulse-dot"></span> ლაივ რეჟიმი</span>
-            <span style="font-size:11px; font-weight:700; background:rgba(37,99,235,0.15); color:var(--primary); padding:3px 8px; border-radius:9999px;">Admin Only</span>
+            <span style="font-size:11px; font-weight:700; background:rgba(37,99,235,0.15); color:var(--primary); padding:3px 8px; border-radius:9999px;">ანალიტიკა</span>
           </h2>
           <p class="card-subtitle">
             საიტის რეალური ვიზიტორების, მოწყობილობების, წყაროებისა და აქტივობის მონაცემთა ვიზუალიზაცია.
@@ -2457,17 +2457,12 @@
           activeCard.style.display = isAdmin ? 'block' : 'none';
         }
         if (analyticsCard) {
-          analyticsCard.style.display = isAdmin ? 'block' : 'none';
-          if (isAdmin) {
-            if (typeof loadAndRenderAnalytics === 'function') {
-              loadAndRenderAnalytics();
-            }
-            if (typeof initLiveModeTicker === 'function') {
-              initLiveModeTicker();
-            }
-          } else if (typeof liveSyncIntervalId !== 'undefined' && liveSyncIntervalId) {
-            clearInterval(liveSyncIntervalId);
-            liveSyncIntervalId = null;
+          analyticsCard.style.display = 'block';
+          if (typeof loadAndRenderAnalytics === 'function') {
+            loadAndRenderAnalytics();
+          }
+          if (typeof initLiveModeTicker === 'function') {
+            initLiveModeTicker();
           }
         }
       }
@@ -3275,7 +3270,7 @@
 async function loadAndRenderAnalytics() {
         let records = [];
         let events = [];
-        if (isSupabaseConfigured() && isAdminMode()) {
+        if (isSupabaseConfigured()) {
           const client = initSupabase();
           if (client) {
             try {
@@ -3330,32 +3325,29 @@ async function loadAndRenderAnalytics() {
       const btnExportCSV = document.getElementById('btn-export-csv');
       if (btnExportCSV) {
         btnExportCSV.addEventListener('click', () => {
-           let records = [];
-           try {
-              records = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
-           } catch(e){}
-           
-           if(records.length === 0) {
-             showToast('საექსპორტო მონაცემები ცარიელია');
-             return;
-           }
-           
-           let csv = 'Date,Page,Device,Language,Duration(sec),Speed(sec),Referrer
-';
-           records.forEach(r => {
-              const pT = (r.page_title || r.page_path || '').replace(/,/g, '');
-              csv += '"' + r.created_at + '","' + pT + '","' + r.device_type + '","' + r.browser_lang + '","' + r.duration_seconds + '","' + r.load_time_seconds + '","' + r.referrer + '"
-';
-           });
-           
-           const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-           const url = URL.createObjectURL(blob);
-           const link = document.createElement('a');
-           link.setAttribute('href', url);
-           link.setAttribute('download', 'analytics_export.csv');
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
+          let recs = [];
+          try {
+            recs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
+          } catch(e) {}
+          if (!recs || recs.length === 0) {
+            showToast('საექსპორტო მონაცემები ცარიელია');
+            return;
+          }
+          const rows = ['Date,Page,Device,Language,Duration(sec),Speed(sec),Referrer'];
+          recs.forEach(r => {
+            const pT = (r.page_title || r.page_path || '').replace(/[,"]/g, ' ');
+            rows.push([r.created_at || '', pT, r.device_type || '', r.browser_lang || '', r.duration_seconds || 0, r.load_time_seconds || 0, (r.referrer || '').replace(/[,"]/g, ' ')].join(','));
+          });
+          const csvContent = rows.join(String.fromCharCode(10));
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'analytics_export.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('CSV ექსპორტი დასრულდა 📥');
         });
       }
       const btnClearLocalAnalytics = document.getElementById('btn-clear-local-analytics');
@@ -3377,11 +3369,6 @@ async function loadAndRenderAnalytics() {
         if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
 
         liveSyncIntervalId = setInterval(() => {
-          if (!isAdminMode()) {
-            clearInterval(liveSyncIntervalId);
-            liveSyncIntervalId = null;
-            return;
-          }
           liveCountdownSeconds--;
           if (countdownEl) countdownEl.textContent = '⏱️ ' + liveCountdownSeconds + 's';
           if (liveCountdownSeconds <= 0) {
@@ -3451,9 +3438,8 @@ async function loadAndRenderAnalytics() {
       window.addEventListener('cookie_consent_changed', syncCookieSettingsUI);
       syncCookieSettingsUI();
 
-      if (isAdminMode()) {
-        loadAndRenderAnalytics();
-      }
+      loadAndRenderAnalytics();
+      initLiveModeTicker();
     });
   </script>
 
