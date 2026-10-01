@@ -6394,46 +6394,178 @@ const settingsHtmlContent = `<!DOCTYPE html>
       }
 
     /* ==========================================================================
-       ADMIN ANALYTICS DASHBOARD STYLES
+       MODERN ADMIN ANALYTICS DASHBOARD STYLES (EXECUTIVE LEVEL)
        ========================================================================== */
+    .analytics-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .live-pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #16a34a;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    
     .analytics-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 12px;
-      margin-top: 14px;
+      margin-top: 16px;
     }
     .analytics-kpi-card {
       background: var(--bg-card-subtle);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .kpi-icon {
-      font-size: 28px;
-      line-height: 1;
-    }
-    .kpi-info {
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .analytics-kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .analytics-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--primary));
+    }
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
     .kpi-label {
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
+    }
+    .kpi-icon-pill {
+      font-size: 16px;
+      background: var(--border-light);
+      padding: 4px 7px;
+      border-radius: 8px;
+      line-height: 1;
     }
     .kpi-value {
-      font-size: 20px;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+    .kpi-subtext {
+      font-size: 11.5px;
+      color: var(--text-subtle);
+      margin-top: 6px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Modern Visual Timeline Chart */
+    .analytics-chart-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      margin-top: 16px;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chart-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+    }
+    .chart-bars-container {
+      display: flex;
+      align-items: flex-end;
+      height: 110px;
+      gap: 6px;
+      padding-top: 10px;
+      border-bottom: 1px solid var(--border-light);
+      overflow-x: auto;
+    }
+    .chart-bar-col {
+      flex: 1;
+      min-width: 24px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+    .chart-bar-fill {
+      width: 100%;
+      max-width: 18px;
+      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+      border-radius: 4px 4px 1px 1px;
+      transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .chart-bar-col:hover .chart-bar-fill {
+      background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+    .chart-bar-label {
+      font-size: 10px;
+      color: var(--text-subtle);
+      margin-top: 6px;
+      white-space: nowrap;
+    }
+    .chart-bar-count {
+      font-size: 10px;
       font-weight: 700;
       color: var(--text-main);
-      line-height: 1.2;
-      margin-top: 2px;
+      margin-bottom: 4px;
     }
+
+    /* Breakdown Details Grid */
     .analytics-details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
       gap: 16px;
       margin-top: 16px;
     }
@@ -6441,78 +6573,183 @@ const settingsHtmlContent = `<!DOCTYPE html>
       background: var(--bg-card-subtle);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      padding: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
     .panel-title {
       font-size: 13.5px;
       font-weight: 600;
       color: var(--text-main);
-      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
+      margin: 0;
     }
-    .progress-stat-row {
+
+    /* Segmented Multi-Bar for Devices & Networks */
+    .multi-segment-bar {
+      display: flex;
+      height: 10px;
+      border-radius: 9999px;
+      overflow: hidden;
+      background: var(--border-light);
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+    .bar-segment {
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+    .seg-mobile { background: #3b82f6; }
+    .seg-desktop { background: #8b5cf6; }
+    .seg-tablet { background: #06b6d4; }
+    .seg-4g { background: #10b981; }
+    .seg-wifi { background: #3b82f6; }
+    .seg-3g { background: #f59e0b; }
+
+    /* Ranked Progress Rows */
+    .rank-row {
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      margin-bottom: 11px;
+      gap: 4px;
+      margin-bottom: 10px;
     }
-    .progress-stat-header {
+    .rank-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 12px;
       font-weight: 500;
       color: var(--text-main);
     }
-    .progress-stat-header span:last-child {
-      color: var(--text-muted);
-    }
-    .progress-stat-track {
+    .rank-track {
       height: 7px;
       background: var(--border-light);
       border-radius: 9999px;
       overflow: hidden;
     }
-    .progress-stat-fill {
+    .rank-fill {
       height: 100%;
-      background: var(--primary);
       border-radius: 9999px;
-      transition: width 0.3s ease;
+      transition: width 0.4s ease;
     }
-    .analytics-table-container {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+
+    /* Modern Activity Feed List */
+    .activity-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      max-height: 280px;
-      overflow-y: auto;
+      padding: 12px 14px;
+      transition: background 0.15s ease, transform 0.15s ease;
     }
-    .analytics-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      text-align: left;
+    .activity-item:hover {
+      background: var(--bg-hover);
+      transform: translateX(2px);
     }
-    .analytics-table th {
-      position: sticky;
-      top: 0;
-      background: var(--bg-card);
-      padding: 10px 12px;
+    .activity-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .activity-avatar {
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .activity-title-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .activity-page-title {
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-light);
+      color: var(--text-main);
       white-space: nowrap;
-      z-index: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .analytics-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border-light);
+    .activity-time-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .activity-badges-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .badge-pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 500;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-device {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
       color: var(--text-main);
     }
-    .analytics-table tr:hover td {
-      background: var(--bg-hover);
+    .badge-network {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      font-weight: 600;
+    }
+    .badge-source {
+      background: rgba(37, 99, 235, 0.10);
+      color: #2563eb;
+    }
+    .badge-duration {
+      background: rgba(139, 92, 246, 0.12);
+      color: #8b5cf6;
+      font-weight: 600;
+    }
+    .badge-scroll {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+    [data-theme="dark"] .badge-network { color: #34d399; }
+    [data-theme="dark"] .badge-source { color: #60a5fa; }
+    [data-theme="dark"] .badge-duration { color: #a78bfa; }
+    [data-theme="dark"] .badge-scroll { color: #fbbf24; }
+
+    @media (max-width: 600px) {
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .activity-badges-group {
+        justify-content: flex-start;
+      }
     }
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
@@ -6640,114 +6877,111 @@ ${COOKIE_CONSENT_CSS}
       <div class="card-header-group" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 class="card-main-title" style="display:flex; align-items:center; gap:8px;">
-            <span>📊</span> ვიზიტორთა ანალიტიკა და სტატისტიკა
+            <span>📊</span> ვიზიტორთა ანალიტიკა და მონაცემები
+            <span class="live-pulse-badge"><span class="pulse-dot"></span> ლაივ რეჟიმი</span>
             <span style="font-size:11px; font-weight:700; background:rgba(37,99,235,0.15); color:var(--primary); padding:3px 8px; border-radius:9999px;">Admin Only</span>
           </h2>
           <p class="card-subtitle">
-            საიტის ვიზიტების, მოწყობილობების, წყაროებისა და აქტივობის ხანგრძლივობის რეალური დროის ანალიტიკა.
+            საიტის რეალური ვიზიტორების, მოწყობილობების, წყაროებისა და აქტივობის მონაცემთა ვიზუალიზაცია.
           </p>
         </div>
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <div class="analytics-header-actions">
           <button class="btn btn-outline" id="btn-refresh-analytics" style="padding:6px 12px; font-size:12.5px;" title="მონაცემების განახლება">
             <span>🔄</span> განახლება
           </button>
-          <button class="btn btn-outline" id="btn-seed-analytics" style="padding:6px 12px; font-size:12.5px;" title="სატესტო დემო მონაცემები">
-            <span>🧪</span> დემო მონაცემები
+          <button class="btn btn-outline" id="btn-clear-local-analytics" style="padding:6px 12px; font-size:12.5px; color:var(--text-subtle);" title="ლოკალური ჟურნალის გასუფთავება">
+            <span>🗑️</span> ლოგის გასუფთავება
           </button>
         </div>
       </div>
 
-      <!-- KPI SUMMARY METRICS (6 CARDS) -->
+      <!-- EXECUTIVE KPI SUMMARY METRICS (4 ADVANCED CARDS) -->
       <div class="analytics-kpi-grid">
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">👁️</div>
-          <div class="kpi-info">
-            <span class="kpi-label">სულ ნახვები</span>
-            <span class="kpi-value" id="kpi-total-views">0</span>
+        <div class="analytics-kpi-card" style="--card-accent: #3b82f6;">
+          <div class="kpi-header">
+            <span class="kpi-label">უნიკალური ვიზიტორები</span>
+            <span class="kpi-icon-pill">👥</span>
+          </div>
+          <div class="kpi-value" id="kpi-unique-sessions">0</div>
+          <div class="kpi-subtext" id="kpi-retention-sub">
+            <span>🔄</span> დაბრუნების წილი: <strong id="kpi-retention-rate">0%</strong>
           </div>
         </div>
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">👥</div>
-          <div class="kpi-info">
-            <span class="kpi-label">უნიკალური სესიები</span>
-            <span class="kpi-value" id="kpi-unique-sessions">0</span>
+
+        <div class="analytics-kpi-card" style="--card-accent: #8b5cf6;">
+          <div class="kpi-header">
+            <span class="kpi-label">სულ ნახვები (Views)</span>
+            <span class="kpi-icon-pill">👁️</span>
+          </div>
+          <div class="kpi-value" id="kpi-total-views">0</div>
+          <div class="kpi-subtext" id="kpi-pages-sub">
+            <span>📄</span> სესიაზე: <strong id="kpi-pages-per-session">1.0</strong> გვერდი
           </div>
         </div>
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">🔄</div>
-          <div class="kpi-info">
-            <span class="kpi-label">დაბრუნებულები</span>
-            <span class="kpi-value" id="kpi-retention-rate">0%</span>
-          </div>
-        </div>
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">⏱️</div>
-          <div class="kpi-info">
+
+        <div class="analytics-kpi-card" style="--card-accent: #10b981;">
+          <div class="kpi-header">
             <span class="kpi-label">საშ. ხანგრძლივობა</span>
-            <span class="kpi-value" id="kpi-avg-duration">0 წმ</span>
+            <span class="kpi-icon-pill">⏱️</span>
+          </div>
+          <div class="kpi-value" id="kpi-avg-duration">0 წმ</div>
+          <div class="kpi-subtext" id="kpi-scroll-sub">
+            <span>📜</span> საშუალო სქროლი: <strong id="kpi-avg-scroll">0%</strong>
           </div>
         </div>
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">📱</div>
-          <div class="kpi-info">
-            <span class="kpi-label">მობილურების წილი</span>
-            <span class="kpi-value" id="kpi-mobile-pct">0%</span>
+
+        <div class="analytics-kpi-card" style="--card-accent: #f59e0b;">
+          <div class="kpi-header">
+            <span class="kpi-label">მობილური ტრაფიკი</span>
+            <span class="kpi-icon-pill">📱</span>
           </div>
-        </div>
-        <div class="analytics-kpi-card">
-          <div class="kpi-icon">🍪</div>
-          <div class="kpi-info">
-            <span class="kpi-label">ქუქი-თანხმობა</span>
-            <span class="kpi-value" id="kpi-consent-rate">0%</span>
+          <div class="kpi-value" id="kpi-mobile-pct">0%</div>
+          <div class="kpi-subtext" id="kpi-network-sub">
+            <span>📶</span> 4G/LTE კავშირი: <strong id="kpi-fast-net-pct">0%</strong>
           </div>
         </div>
       </div>
 
-      <!-- BREAKDOWN CHARTS & PROGRESS BARS -->
+      <!-- VISUAL TIMELINE CHART -->
+      <div class="analytics-chart-box">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <span>📈</span> ვიზიტების დინამიკა (საათობრივი აქტივობა)
+          </h3>
+          <span style="font-size:11.5px; color:var(--text-subtle);" id="chart-timeframe-label">ბოლო 24 საათი</span>
+        </div>
+        <div class="chart-bars-container" id="chart-bars-container">
+          <div style="width:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; height:100%;">მონაცემები იტვირთება...</div>
+        </div>
+      </div>
+
+      <!-- BREAKDOWN DETAILS GRID -->
       <div class="analytics-details-grid">
-        <!-- Devices, Browsers & Network Quality -->
+        <!-- Panel 1: Devices, Platforms & Network Quality -->
         <div class="analytics-panel">
-          <h3 class="panel-title">📱 მოწყობილობები & ქსელი</h3>
+          <h3 class="panel-title"><span>📱</span> მოწყობილობები და ქსელის ხარისხი</h3>
           <div id="stats-devices"></div>
           <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-browsers"></div>
           <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-networks"></div>
         </div>
 
-        <!-- Traffic Sources, Top Pages & Engagement -->
+        <!-- Panel 2: Popular Pages & Traffic Sources -->
         <div class="analytics-panel">
-          <h3 class="panel-title">🌐 ტრაფიკი & ინტერაქცია</h3>
-          <div id="stats-referrers"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-pages"></div>
-          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-scroll"></div>
+          <h3 class="panel-title"><span>🌐</span> გვერდები, წყაროები და ქუქი-სტატუსი</h3>
+          <div id="stats-pages"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-referrers"></div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-light);" id="stats-consent"></div>
         </div>
       </div>
 
-      <!-- RECENT VISITS LOG TABLE -->
+      <!-- RECENT ACTIVITY FEED (MODERN RESPONSIVE STREAM) -->
       <div style="margin-top:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <h3 class="panel-title" style="margin:0;">🕒 ბოლო ვიზიტების რეალური ჟურნალი</h3>
-          <button class="btn btn-outline" id="btn-clear-local-analytics" style="padding:4px 8px; font-size:11px; color:var(--text-subtle);">
-            <span>🗑️</span> ლოგის გასუფთავება
-          </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 class="panel-title" style="margin:0;"><span>⚡</span> ბოლო ვიზიტორთა რეალური ნაკადი (Live Feed)</h3>
+          <span style="font-size:11.5px; color:var(--text-subtle);" id="activity-feed-count">0 ჩანაწერი</span>
         </div>
-        <div class="analytics-table-container">
-          <table class="analytics-table">
-            <thead>
-              <tr>
-                <th>დრო</th>
-                <th>გვერდი</th>
-                <th>მოწყობილობა & OS</th>
-                <th>ბრაუზერი</th>
-                <th>ქსელი</th>
-                <th>საიდან (წყარო)</th>
-                <th>სქროლი</th>
-                <th>ხანგრძლივობა</th>
-              </tr>
-            </thead>
-            <tbody id="analytics-log-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:16px; color:var(--text-muted);">ვიზიტების მონაცემები იტვირთება...</td></tr>
-            </tbody>
-          </table>
+        <div class="activity-feed" id="analytics-activity-feed">
+          <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">ვიზიტების მონაცემები იტვირთება...</div>
         </div>
       </div>
     </section>
@@ -6960,7 +7194,7 @@ ${STEALTH_ADMIN_JS}
         }
       });
 
-      // 5. Admin Analytics Dashboard Logic
+      // 5. Executive Admin Analytics Dashboard Logic
       function formatDuration(sec) {
         sec = Math.round(Number(sec) || 0);
         if (sec < 60) return sec + ' წმ';
@@ -6973,44 +7207,118 @@ ${STEALTH_ADMIN_JS}
         try {
           const d = new Date(isoString);
           if (isNaN(d.getTime())) return 'ახლახან';
+          const diffSec = Math.floor((Date.now() - d.getTime()) / 1000);
+          if (diffSec < 60) return 'ახლახან';
+          if (diffSec < 3600) return Math.floor(diffSec / 60) + ' წთ წინ';
+          if (diffSec < 86400) return Math.floor(diffSec / 3600) + ' სთ წინ';
           const pad = function(n) { return String(n).padStart(2, '0'); };
-          return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ' (' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ')';
+          return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
         } catch (e) {
           return 'ახლახან';
         }
       }
 
-      function getPageBadge(path) {
-        if (!path) return '🗺️ რუკა';
-        if (path.includes('calendar')) return '📅 კალენდარი';
-        if (path.includes('mentors')) return '👥 მენტორები';
-        if (path.includes('settings')) return '⚙️ პარამეტრები';
-        return '🗺️ მთავარი';
+      function getPageInfo(path) {
+        if (!path) return { title: 'მთავარი გვერდი (რუკა)', icon: '🗺️' };
+        if (path.includes('calendar')) return { title: 'აქტივობების კალენდარი', icon: '📅' };
+        if (path.includes('mentors')) return { title: 'მენტორების კატალოგი', icon: '👥' };
+        if (path.includes('settings')) return { title: 'პარამეტრები & მართვა', icon: '⚙️' };
+        return { title: 'მთავარი გვერდი (რუკა)', icon: '🗺️' };
       }
 
-      function renderProgressBar(container, label, count, total, percentText) {
+      function renderRankRow(container, label, count, total, percentText, barColor) {
         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
         const row = document.createElement('div');
-        row.className = 'progress-stat-row';
-        row.innerHTML = '<div class="progress-stat-header"><span>' + label + '</span><span>' + count + ' (' + (percentText || (pct + '%')) + ')</span></div><div class="progress-stat-track"><div class="progress-stat-fill" style="width:' + pct + '%;"></div></div>';
+        row.className = 'rank-row';
+        const fillBg = barColor || 'var(--primary)';
+        row.innerHTML = 
+          '<div class="rank-header">' +
+            '<span>' + label + '</span>' +
+            '<span style="color:var(--text-subtle);">' + count + ' (' + (percentText || (pct + '%')) + ')</span>' +
+          '</div>' +
+          '<div class="rank-track">' +
+            '<div class="rank-fill" style="width:' + pct + '%; background:' + fillBg + ';"></div>' +
+          '</div>';
         container.appendChild(row);
+      }
+
+      function renderTimelineChart(records) {
+        const container = document.getElementById('chart-bars-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!records || records.length === 0) {
+          container.innerHTML = '<div style="width:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; height:100%;">მონაცემები ჯერ არ არის დაფიქსირებული</div>';
+          return;
+        }
+
+        // 8 time buckets of 3 hours covering the past 24 hours
+        const now = new Date();
+        const buckets = [];
+        for (let i = 7; i >= 0; i--) {
+          const slotEnd = new Date(now.getTime() - i * 3 * 3600 * 1000);
+          const slotStart = new Date(slotEnd.getTime() - 3 * 3600 * 1000);
+          const label = String(slotEnd.getHours()).padStart(2, '0') + ':00';
+          buckets.push({
+            start: slotStart.getTime(),
+            end: slotEnd.getTime(),
+            label: label,
+            count: 0
+          });
+        }
+
+        let matched = 0;
+        records.forEach(r => {
+          const t = new Date(r.created_at).getTime();
+          if (!isNaN(t)) {
+            for (const b of buckets) {
+              if (t >= b.start && t <= b.end) {
+                b.count++;
+                matched++;
+                break;
+              }
+            }
+          }
+        });
+
+        // If historical records outside 24h, distribute to latest bucket so chart reflects presence
+        if (matched === 0 && records.length > 0) {
+          buckets[buckets.length - 1].count = records.length;
+        }
+
+        const maxVal = Math.max(...buckets.map(b => b.count), 1);
+
+        buckets.forEach(b => {
+          const col = document.createElement('div');
+          col.className = 'chart-bar-col';
+          const heightPct = b.count > 0 ? Math.max(Math.round((b.count / maxVal) * 85), 14) : 4;
+          col.title = b.label + ' - ' + b.count + ' ვიზიტი';
+          col.innerHTML = 
+            (b.count > 0 ? '<span class="chart-bar-count">' + b.count + '</span>' : '') +
+            '<div class="chart-bar-fill" style="height:' + heightPct + '%; opacity:' + (b.count > 0 ? '1' : '0.22') + ';"></div>' +
+            '<span class="chart-bar-label">' + b.label + '</span>';
+          container.appendChild(col);
+        });
       }
 
       function renderAnalyticsUI(records) {
         const totalViewsEl = document.getElementById('kpi-total-views');
         const uniqueSessionsEl = document.getElementById('kpi-unique-sessions');
         const retentionRateEl = document.getElementById('kpi-retention-rate');
+        const pagesPerSessionEl = document.getElementById('kpi-pages-per-session');
         const avgDurationEl = document.getElementById('kpi-avg-duration');
+        const avgScrollEl = document.getElementById('kpi-avg-scroll');
         const mobilePctEl = document.getElementById('kpi-mobile-pct');
-        const consentRateEl = document.getElementById('kpi-consent-rate');
+        const fastNetPctEl = document.getElementById('kpi-fast-net-pct');
 
         const devicesContainer = document.getElementById('stats-devices');
         const browsersContainer = document.getElementById('stats-browsers');
         const networksContainer = document.getElementById('stats-networks');
-        const referrersContainer = document.getElementById('stats-referrers');
         const pagesContainer = document.getElementById('stats-pages');
-        const scrollContainer = document.getElementById('stats-scroll');
-        const tbody = document.getElementById('analytics-log-tbody');
+        const referrersContainer = document.getElementById('stats-referrers');
+        const consentContainer = document.getElementById('stats-consent');
+        const feedContainer = document.getElementById('analytics-activity-feed');
+        const feedCountEl = document.getElementById('activity-feed-count');
 
         if (!totalViewsEl) return;
 
@@ -7018,122 +7326,193 @@ ${STEALTH_ADMIN_JS}
           totalViewsEl.textContent = '0';
           uniqueSessionsEl.textContent = '0';
           if (retentionRateEl) retentionRateEl.textContent = '0%';
+          if (pagesPerSessionEl) pagesPerSessionEl.textContent = '0';
           avgDurationEl.textContent = '0 წმ';
+          if (avgScrollEl) avgScrollEl.textContent = '0%';
           mobilePctEl.textContent = '0%';
-          if (consentRateEl) consentRateEl.textContent = '0%';
-          devicesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები არ არის</div>';
+          if (fastNetPctEl) fastNetPctEl.textContent = '0%';
+          
+          renderTimelineChart([]);
+          devicesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები ჯერ არ არის</div>';
           browsersContainer.innerHTML = '';
           if (networksContainer) networksContainer.innerHTML = '';
-          referrersContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები არ არის</div>';
-          pagesContainer.innerHTML = '';
-          if (scrollContainer) scrollContainer.innerHTML = '';
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--text-muted);">ვიზიტები ჯერ არ არის დაფიქსირებული. დააწკაპუნეთ "🧪 დემო მონაცემები"-ს.</td></tr>';
+          pagesContainer.innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">მონაცემები ჯერ არ არის</div>';
+          referrersContainer.innerHTML = '';
+          if (consentContainer) consentContainer.innerHTML = '';
+          feedContainer.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">ვიზიტები ჯერ არ არის დაფიქსირებული. საიტზე ვიზიტისთანავე მონაცემები ავტომატურად აისახება აქ.</div>';
+          if (feedCountEl) feedCountEl.textContent = '0 ჩანაწერი';
           return;
         }
 
-        // 1. KPIs
+        // 1. KPI Calculations
         const totalViews = records.length;
-        const uniqueSessions = new Set(records.map(r => r.session_id)).size;
+        const uniqueSet = new Set(records.map(r => r.visitor_id || r.session_id));
+        const uniqueSessions = uniqueSet.size;
+        const pagesPerSession = uniqueSessions > 0 ? (totalViews / uniqueSessions).toFixed(1) : '1.0';
+
         const totalDuration = records.reduce((acc, r) => acc + (Number(r.duration_seconds) || 0), 0);
         const avgDuration = Math.round(totalDuration / totalViews);
+
+        const totalScroll = records.reduce((acc, r) => acc + (Number(r.scroll_depth) || 0), 0);
+        const avgScroll = Math.round(totalScroll / totalViews);
+
         const mobileCount = records.filter(r => r.device_type === 'Mobile' || r.device_type === 'Tablet').length;
         const mobilePct = Math.round((mobileCount / totalViews) * 100);
 
-        // Retention & Cookie Consent Rate
         const returningCount = records.filter(r => r.is_returning === true || (Number(r.visit_count) > 1)).length;
         const retentionRate = Math.round((returningCount / totalViews) * 100);
-        const acceptedCount = records.filter(r => r.consent_status === 'accepted').length;
-        const consentRate = Math.round((acceptedCount / totalViews) * 100);
 
+        const fastNetCount = records.filter(r => {
+          const net = String(r.network_type || '').toUpperCase();
+          return net.includes('4G') || net.includes('WIFI') || net.includes('5G');
+        }).length;
+        const fastNetPct = Math.round((fastNetCount / totalViews) * 100);
+
+        // Update KPI card elements
         totalViewsEl.textContent = totalViews.toLocaleString('ka-GE');
         uniqueSessionsEl.textContent = uniqueSessions.toLocaleString('ka-GE');
         if (retentionRateEl) retentionRateEl.textContent = retentionRate + '%';
+        if (pagesPerSessionEl) pagesPerSessionEl.textContent = pagesPerSession;
         avgDurationEl.textContent = formatDuration(avgDuration);
+        if (avgScrollEl) avgScrollEl.textContent = avgScroll + '%';
         mobilePctEl.textContent = mobilePct + '%';
-        if (consentRateEl) consentRateEl.textContent = consentRate + '%';
+        if (fastNetPctEl) fastNetPctEl.textContent = fastNetPct + '%';
 
-        // 2. Devices breakdown
-        devicesContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📱 მოწყობილობები:</div>';
-        const devCounts = { '📱 მობილური (Mobile)': 0, '💻 კომპიუტერი (Desktop)': 0, '📟 პლანშეტი (Tablet)': 0 };
+        // 2. Timeline chart
+        renderTimelineChart(records);
+
+        // 3. Devices Breakdown (Multi-segment bar + ranked rows)
+        let mobNum = 0, deskNum = 0, tabNum = 0;
         records.forEach(r => {
-          if (r.device_type === 'Mobile') devCounts['📱 მობილური (Mobile)']++;
-          else if (r.device_type === 'Tablet') devCounts['📟 პლანშეტი (Tablet)']++;
-          else devCounts['💻 კომპიუტერი (Desktop)']++;
+          if (r.device_type === 'Mobile') mobNum++;
+          else if (r.device_type === 'Tablet') tabNum++;
+          else deskNum++;
         });
-        Object.entries(devCounts).forEach(([k, v]) => {
-          if (v > 0) renderProgressBar(devicesContainer, k, v, totalViews);
-        });
+        const mobPct = Math.round((mobNum / totalViews) * 100);
+        const deskPct = Math.round((deskNum / totalViews) * 100);
+        const tabPct = Math.max(0, 100 - mobPct - deskPct);
 
-        // 3. Browsers breakdown
-        browsersContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🌐 ბრაუზერები:</div>';
+        let devMultiBarHtml = '<div class="multi-segment-bar">' +
+          (mobPct > 0 ? '<div class="bar-segment seg-mobile" style="width:' + mobPct + '%;" title="მობილური: ' + mobPct + '%"></div>' : '') +
+          (deskPct > 0 ? '<div class="bar-segment seg-desktop" style="width:' + deskPct + '%;" title="დესკტოპი: ' + deskPct + '%"></div>' : '') +
+          (tabPct > 0 ? '<div class="bar-segment seg-tablet" style="width:' + tabPct + '%;" title="პლანშეტი: ' + tabPct + '%"></div>' : '') +
+          '</div>';
+
+        devicesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">მოწყობილობის ტიპი:</div>' + devMultiBarHtml;
+        if (mobNum > 0) renderRankRow(devicesContainer, '📱 მობილური (Mobile)', mobNum, totalViews, null, '#3b82f6');
+        if (deskNum > 0) renderRankRow(devicesContainer, '💻 კომპიუტერი (Desktop)', deskNum, totalViews, null, '#8b5cf6');
+        if (tabNum > 0) renderRankRow(devicesContainer, '📟 პლანშეტი (Tablet)', tabNum, totalViews, null, '#06b6d4');
+
+        // 4. Browsers Breakdown
+        browsersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 ბრაუზერები:</div>';
         const browserCounts = {};
         records.forEach(r => {
           const b = r.browser || 'სხვა';
           browserCounts[b] = (browserCounts[b] || 0) + 1;
         });
         Object.entries(browserCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
-          renderProgressBar(browsersContainer, k, v, totalViews);
+          renderRankRow(browsersContainer, k, v, totalViews);
         });
 
-        // 4. Network Quality breakdown
+        // 5. Network Quality Breakdown
         if (networksContainer) {
-          networksContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📶 ქსელის კავშირი:</div>';
           const netCounts = {};
           records.forEach(r => {
             const net = (r.network_type || 'WIFI/LAN').toUpperCase();
             netCounts[net] = (netCounts[net] || 0) + 1;
           });
+          const g4Num = netCounts['4G'] || 0;
+          const wifiNum = (netCounts['WIFI'] || 0) + (netCounts['WIFI/LAN'] || 0);
+          const g3Num = (netCounts['3G'] || 0) + (netCounts['2G'] || 0);
+
+          const g4Pct = Math.round((g4Num / totalViews) * 100);
+          const wifiPct = Math.round((wifiNum / totalViews) * 100);
+          const g3Pct = Math.max(0, 100 - g4Pct - wifiPct);
+
+          let netMultiBarHtml = '<div class="multi-segment-bar">' +
+            (g4Pct > 0 ? '<div class="bar-segment seg-4g" style="width:' + g4Pct + '%;" title="4G: ' + g4Pct + '%"></div>' : '') +
+            (wifiPct > 0 ? '<div class="bar-segment seg-wifi" style="width:' + wifiPct + '%;" title="WIFI: ' + wifiPct + '%"></div>' : '') +
+            (g3Pct > 0 ? '<div class="bar-segment seg-3g" style="width:' + g3Pct + '%;" title="3G/ნელი: ' + g3Pct + '%"></div>' : '') +
+            '</div>';
+
+          networksContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📶 ქსელის კავშირი & სიჩქარე:</div>' + netMultiBarHtml;
           Object.entries(netCounts).sort((a,b) => b[1] - a[1]).slice(0, 3).forEach(([k, v]) => {
-            renderProgressBar(networksContainer, k, v, totalViews);
+            const color = k.includes('4G') ? '#10b981' : (k.includes('3G') ? '#f59e0b' : '#3b82f6');
+            renderRankRow(networksContainer, k, v, totalViews, null, color);
           });
         }
 
-        // 5. Traffic sources / Referrers
-        referrersContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">🌐 საიდან შემოვიდნენ:</div>';
+        // 6. Popular Pages Breakdown
+        pagesContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">📄 პოპულარული გვერდები:</div>';
+        const pageCounts = {};
+        records.forEach(r => {
+          const info = getPageInfo(r.page_path);
+          const key = info.icon + ' ' + info.title;
+          pageCounts[key] = (pageCounts[key] || 0) + 1;
+        });
+        Object.entries(pageCounts).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => {
+          renderRankRow(pagesContainer, k, v, totalViews);
+        });
+
+        // 7. Traffic Sources / Referrers Breakdown
+        referrersContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🌐 საიდან შემოვიდნენ (წყაროები):</div>';
         const refCounts = {};
         records.forEach(r => {
           const ref = r.referrer || 'პირდაპირი (Direct)';
           refCounts[ref] = (refCounts[ref] || 0) + 1;
         });
         Object.entries(refCounts).sort((a,b) => b[1] - a[1]).slice(0, 4).forEach(([k, v]) => {
-          renderProgressBar(referrersContainer, k, v, totalViews);
+          renderRankRow(referrersContainer, k, v, totalViews);
         });
 
-        // 6. Popular Pages
-        pagesContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📄 პოპულარული გვერდები:</div>';
-        const pageCounts = {};
-        records.forEach(r => {
-          const p = getPageBadge(r.page_path);
-          pageCounts[p] = (pageCounts[p] || 0) + 1;
-        });
-        Object.entries(pageCounts).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => {
-          renderProgressBar(pagesContainer, k, v, totalViews);
-        });
-
-        // 7. Scroll Depth / Engagement
-        if (scrollContainer) {
-          const totalScroll = records.reduce((acc, r) => acc + (Number(r.scroll_depth) || 0), 0);
-          const avgScroll = Math.round(totalScroll / totalViews);
-          scrollContainer.innerHTML = '<div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">📜 საშუალო სქროლის სიღრმე:</div>';
-          renderProgressBar(scrollContainer, 'ეკრანის გადახვევა', avgScroll, 100, avgScroll + '%');
+        // 8. Cookie Consent Breakdown
+        if (consentContainer) {
+          consentContainer.innerHTML = '<div style="font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--text-main);">🍪 ქუქი-თანხმობის სტატუსი:</div>';
+          const accCount = records.filter(r => r.consent_status === 'accepted').length;
+          const rejCount = records.filter(r => r.consent_status === 'rejected').length;
+          const undCount = totalViews - accCount - rejCount;
+          if (accCount > 0) renderRankRow(consentContainer, '✅ მიღებული (Accepted)', accCount, totalViews, null, '#10b981');
+          if (rejCount > 0) renderRankRow(consentContainer, '❌ შეზღუდული (Rejected)', rejCount, totalViews, null, '#ef4444');
+          if (undCount > 0) renderRankRow(consentContainer, '⏳ გადაწყვეტილების გარეშე', undCount, totalViews, null, '#f59e0b');
         }
 
-        // 8. Table rows
-        tbody.innerHTML = '';
-        records.slice(0, 15).forEach(r => {
-          const tr = document.createElement('tr');
+        // 9. Modern Activity Feed / Stream
+        feedContainer.innerHTML = '';
+        if (feedCountEl) feedCountEl.textContent = records.length + ' ჩანაწერი';
+
+        records.slice(0, 25).forEach(r => {
+          const pInfo = getPageInfo(r.page_path);
           const devIcon = r.device_type === 'Mobile' ? '📱' : (r.device_type === 'Tablet' ? '📟' : '💻');
-          const netBadge = r.network_type ? '<span style="display:inline-block; padding:2px 5px; border-radius:4px; background:rgba(37,99,235,0.12); color:var(--primary); font-size:10.5px; font-weight:600;">' + r.network_type + '</span>' : '-';
-          const scrollPct = (r.scroll_depth !== undefined && r.scroll_depth !== null) ? r.scroll_depth + '%' : '-';
-          tr.innerHTML = '<td>' + formatTimeAgo(r.created_at) + '</td>' +
-            '<td><strong style="color:var(--primary);">' + getPageBadge(r.page_path) + '</strong></td>' +
-            '<td>' + devIcon + ' ' + (r.device_type || 'Desktop') + ' (' + (r.os || 'OS') + ')</td>' +
-            '<td>' + (r.browser || 'Unknown') + '</td>' +
-            '<td>' + netBadge + '</td>' +
-            '<td><span style="display:inline-block; padding:2px 6px; border-radius:4px; background:var(--border-light); font-size:11px;">' + (r.referrer || 'Direct') + '</span></td>' +
-            '<td>' + scrollPct + '</td>' +
-            '<td>' + formatDuration(r.duration_seconds) + '</td>';
-          tbody.appendChild(tr);
+          const isReturningVisitor = r.is_returning === true || (Number(r.visit_count) > 1);
+          const visitorTag = isReturningVisitor ? '🔄 დაბრუნებული' : '✨ ახალი';
+
+          const item = document.createElement('div');
+          item.className = 'activity-item';
+
+          const netBadge = r.network_type 
+            ? '<span class="badge-pill badge-network">📶 ' + r.network_type + '</span>' 
+            : '';
+          const scrollBadge = (r.scroll_depth !== undefined && r.scroll_depth !== null)
+            ? '<span class="badge-pill badge-scroll">📜 ' + r.scroll_depth + '%</span>'
+            : '';
+
+          item.innerHTML = 
+            '<div class="activity-item-left">' +
+              '<div class="activity-avatar">' + pInfo.icon + '</div>' +
+              '<div class="activity-title-group">' +
+                '<div class="activity-page-title">' + pInfo.title + '</div>' +
+                '<div class="activity-time-meta">' + formatTimeAgo(r.created_at) + ' • ' + visitorTag + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="activity-badges-group">' +
+              '<span class="badge-pill badge-device">' + devIcon + ' ' + (r.device_type || 'Desktop') + ' (' + (r.os || 'OS') + ')</span>' +
+              netBadge +
+              '<span class="badge-pill badge-source">🌐 ' + (r.referrer || 'პირდაპირი') + '</span>' +
+              '<span class="badge-pill badge-duration">⏱️ ' + formatDuration(r.duration_seconds) + '</span>' +
+              scrollBadge +
+            '</div>';
+
+          feedContainer.appendChild(item);
         });
       }
 
@@ -7174,24 +7553,6 @@ ${STEALTH_ADMIN_JS}
         btnRefreshAnalytics.addEventListener('click', () => {
           loadAndRenderAnalytics();
           showToast('ვიზიტების მონაცემები განახლდა 🔄');
-        });
-      }
-
-      const btnSeedAnalytics = document.getElementById('btn-seed-analytics');
-      if (btnSeedAnalytics) {
-        btnSeedAnalytics.addEventListener('click', () => {
-          const sampleLogs = [
-            { id: 101, session_id: 'sess_1', visitor_id: 'usr_1', consent_status: 'accepted', is_returning: true, visit_count: 3, network_type: '4G', scroll_depth: 92, page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 145, created_at: new Date(Date.now() - 15 * 60000).toISOString() },
-            { id: 102, session_id: 'sess_2', visitor_id: 'usr_2', consent_status: 'accepted', is_returning: false, visit_count: 1, network_type: '4G', scroll_depth: 100, page_path: 'calendar.html', referrer: 'პირდაპირი (Direct)', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 230, created_at: new Date(Date.now() - 40 * 60000).toISOString() },
-            { id: 103, session_id: 'sess_3', visitor_id: 'usr_3', consent_status: 'accepted', is_returning: true, visit_count: 2, network_type: 'WIFI', scroll_depth: 65, page_path: 'mentors.html', referrer: 'Google', device_type: 'Desktop', os: 'Windows', browser: 'Chrome', duration_seconds: 180, created_at: new Date(Date.now() - 65 * 60000).toISOString() },
-            { id: 104, session_id: 'sess_4', visitor_id: '', consent_status: 'rejected', is_returning: false, visit_count: 1, network_type: '3G', scroll_depth: 45, page_path: 'index.html', referrer: 'Facebook', device_type: 'Mobile', os: 'Android', browser: 'Samsung Internet', duration_seconds: 95, created_at: new Date(Date.now() - 120 * 60000).toISOString() },
-            { id: 105, session_id: 'sess_5', visitor_id: 'usr_5', consent_status: 'accepted', is_returning: true, visit_count: 5, network_type: 'WIFI', scroll_depth: 88, page_path: 'settings.html', referrer: 'პირდაპირი (Direct)', device_type: 'Desktop', os: 'macOS', browser: 'Safari', duration_seconds: 310, created_at: new Date(Date.now() - 180 * 60000).toISOString() },
-            { id: 106, session_id: 'sess_6', visitor_id: 'usr_6', consent_status: 'accepted', is_returning: false, visit_count: 1, network_type: '4G', scroll_depth: 70, page_path: 'index.html', referrer: 'Instagram', device_type: 'Mobile', os: 'iOS', browser: 'Safari', duration_seconds: 75, created_at: new Date(Date.now() - 240 * 60000).toISOString() },
-            { id: 107, session_id: 'sess_7', visitor_id: 'usr_7', consent_status: 'accepted', is_returning: true, visit_count: 2, network_type: '4G', scroll_depth: 95, page_path: 'calendar.html', referrer: 'Google', device_type: 'Mobile', os: 'Android', browser: 'Chrome', duration_seconds: 160, created_at: new Date(Date.now() - 300 * 60000).toISOString() }
-          ];
-          localStorage.setItem('gardabani_analytics_log', JSON.stringify(sampleLogs));
-          loadAndRenderAnalytics();
-          showToast('სატესტო დემო მონაცემები ჩაიტვირთა 🧪');
         });
       }
 
