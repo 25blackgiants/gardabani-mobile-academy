@@ -140,3 +140,61 @@ ON CONFLICT (id) DO UPDATE SET
   tags = EXCLUDED.tags,
   avatar_color = EXCLUDED.avatar_color;
 
+-- ============================================================================
+-- 9. ვიზიტების ანალიტიკის ცხრილი (SITE ANALYTICS TABLE)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS site_analytics (
+  id BIGSERIAL PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  page_path TEXT NOT NULL,
+  page_title TEXT DEFAULT '',
+  referrer TEXT DEFAULT '',
+  device_type TEXT DEFAULT 'Desktop',
+  os TEXT DEFAULT '',
+  browser TEXT DEFAULT 'Unknown',
+  screen_resolution TEXT DEFAULT '',
+  language TEXT DEFAULT '',
+  duration_seconds INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 10. Row-Level Security ანალიტიკისთვის
+ALTER TABLE site_analytics ENABLE ROW LEVEL SECURITY;
+
+-- საჯარო ჩაწერა (ანონიმური ვიზიტორებისთვის)
+DROP POLICY IF EXISTS "Public Insert Analytics" ON site_analytics;
+CREATE POLICY "Public Insert Analytics"
+ON site_analytics
+FOR INSERT
+TO public
+WITH CHECK (true);
+
+-- საჯარო განახლება (სესიის ხანგრძლივობის გასაზრდელად)
+DROP POLICY IF EXISTS "Public Update Analytics" ON site_analytics;
+CREATE POLICY "Public Update Analytics"
+ON site_analytics
+FOR UPDATE
+TO public
+USING (true)
+WITH CHECK (true);
+
+-- წაკითხვა მხოლოდ ავტორიზებული ადმინისტრატორისთვის
+DROP POLICY IF EXISTS "Admin Read Analytics" ON site_analytics;
+CREATE POLICY "Admin Read Analytics"
+ON site_analytics
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- საწყისი სადემონსტრაციო ვიზიტები
+INSERT INTO site_analytics (session_id, page_path, page_title, referrer, device_type, os, browser, screen_resolution, language, duration_seconds, created_at)
+VALUES
+('sess_demo_1', 'index.html', 'გარდაბნის მობილური აკადემია', 'Facebook', 'Mobile', 'iOS', 'Safari', '390x844', 'ka-GE', 145, NOW() - INTERVAL '15 minutes'),
+('sess_demo_2', 'calendar.html', 'კალენდარი — გარდაბნის მობილური აკადემია', 'პირდაპირი (Direct)', 'Mobile', 'Android', 'Chrome', '412x915', 'ka-GE', 230, NOW() - INTERVAL '40 minutes'),
+('sess_demo_3', 'mentors.html', 'მენტორები — გარდაბნის მობილური აკადემია', 'Google', 'Desktop', 'Windows', 'Chrome', '1920x1080', 'ka-GE', 180, NOW() - INTERVAL '1 hour'),
+('sess_demo_4', 'index.html', 'გარდაბნის მობილური აკადემია', 'Facebook', 'Mobile', 'Android', 'Samsung Internet', '384x854', 'ka-GE', 95, NOW() - INTERVAL '2 hours'),
+('sess_demo_5', 'settings.html', 'პარამეტრები — გარდაბნის მობილური აკადემია', 'პირდაპირი (Direct)', 'Desktop', 'macOS', 'Safari', '1440x900', 'ka-GE', 310, NOW() - INTERVAL '3 hours')
+ON CONFLICT DO NOTHING;
+
+
