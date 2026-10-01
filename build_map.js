@@ -824,12 +824,11 @@ const mapHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია</title>
   
-  <!-- Immediate Theme Initializer to prevent white flash -->
+  <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -1944,6 +1943,268 @@ const mapHtmlContent = `<!DOCTYPE html>
     .toast-msg.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
+    }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE ADAPTATIONS (768px & 480px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 8px 10px 16px;
+        gap: 8px;
+      }
+
+      /* Header Layout on Mobile: Clean 2-Row Native App Header */
+      header.header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: var(--radius-md);
+      }
+
+      .header-content {
+        display: contents;
+      }
+
+      .header-title {
+        order: 1;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-logo {
+        font-size: 1.25rem;
+      }
+
+      .header-actions {
+        order: 2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      /* Native-like horizontal touch-scrollable navigation bar */
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        border-radius: var(--radius-full);
+        gap: 4px;
+        background: var(--bg-nav);
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      .theme-toggle-btn {
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+
+      /* Top Map Controls Bar */
+      .controls-stats-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .map-type-bar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 10px;
+      }
+
+      .options-group-title {
+        font-size: 0.74rem;
+      }
+
+      .layer-pills {
+        display: flex;
+        flex: 1;
+        max-width: 220px;
+      }
+
+      .layer-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 4px 6px;
+        font-size: 0.70rem;
+      }
+
+      .btn-gardabani {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+      }
+
+      /* Map Container Viewport Height */
+      .map-panel {
+        height: calc(100vh - 195px);
+        min-height: 420px;
+        border-radius: var(--radius-md);
+      }
+
+      /* Floating Controls over Map */
+      .map-floating-left {
+        top: 10px;
+        left: 10px;
+      }
+
+      .drawer-trigger-btn {
+        padding: 7px 12px;
+        font-size: 0.78rem;
+        gap: 6px;
+      }
+
+      .trigger-icon {
+        font-size: 1rem;
+      }
+
+      .map-floating-right {
+        top: 10px;
+        right: 10px;
+        gap: 4px;
+      }
+
+      .map-ctrl-btn {
+        padding: 5px 8px;
+        font-size: 0.70rem;
+      }
+
+      /* Off-Canvas Slide-Out Drawer on Mobile */
+      .sidebar-drawer {
+        width: 88vw;
+        max-width: 340px;
+      }
+
+      .drawer-header {
+        padding: 10px 14px;
+      }
+
+      .drawer-title {
+        font-size: 0.88rem;
+      }
+
+      .locations-list {
+        padding: 8px 10px;
+        gap: 6px;
+      }
+
+      .loc-card-item {
+        padding: 8px 10px;
+      }
+
+      /* Popup adjustments */
+      .leaflet-popup-content {
+        width: 260px !important;
+      }
+
+      .popup-card {
+        padding: 10px 12px;
+        gap: 6px;
+      }
+
+      .popup-title {
+        font-size: 0.84rem;
+      }
+
+      .popup-act-title {
+        font-size: 0.76rem;
+      }
+
+      .popup-act-desc {
+        font-size: 0.72rem;
+      }
+
+      /* Modal adjustments */
+      .modal-window {
+        max-width: 95vw;
+        max-height: 92vh;
+        border-radius: var(--radius-md);
+      }
+
+      .modal-body {
+        padding: 12px 14px;
+      }
+
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-footer {
+        padding: 10px 14px;
+        flex-direction: column-reverse;
+      }
+
+      .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 6px 8px 14px;
+      }
+
+      header.header {
+        padding: 8px 10px;
+      }
+
+      .header-title {
+        font-size: 0.92rem;
+      }
+
+      .nav-tab {
+        padding: 6px 7px;
+        font-size: 0.69rem;
+      }
+
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
+
+      .drawer-trigger-btn span:nth-child(2) {
+        display: inline;
+      }
+
+      .trigger-badge {
+        display: none;
+      }
+
+      .leaflet-popup-content {
+        width: 230px !important;
+      }
     }
 ${STEALTH_ADMIN_CSS}
   </style>
@@ -3061,12 +3322,11 @@ const calendarHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — კალენდარი</title>
   
-  <!-- Immediate Theme Initializer to prevent white flash -->
+  <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -3767,6 +4027,229 @@ const calendarHtmlContent = `<!DOCTYPE html>
       color: #93c5fd;
       border-color: #1e40af;
     }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE ADAPTATIONS (768px & 480px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 8px 10px 16px;
+        gap: 10px;
+      }
+
+      /* Header Layout on Mobile: Clean 2-Row Native App Header */
+      header.header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: var(--radius-md);
+      }
+
+      .header-content {
+        display: contents;
+      }
+
+      .header-title {
+        order: 1;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-logo {
+        font-size: 1.25rem;
+      }
+
+      .header-actions {
+        order: 2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        border-radius: var(--radius-full);
+        gap: 4px;
+        background: var(--bg-nav);
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      .theme-toggle-btn {
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+
+      .btn-return-map {
+        display: none;
+      }
+
+      /* Calendar Hero */
+      .calendar-hero {
+        padding: 14px 16px;
+        gap: 6px;
+      }
+
+      .hero-title {
+        font-size: 1.15rem;
+      }
+
+      .hero-desc {
+        font-size: 0.80rem;
+      }
+
+      /* Main Calendar Layout */
+      .calendar-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .card {
+        padding: 12px 10px;
+        border-radius: var(--radius-md);
+      }
+
+      /* Month Nav */
+      .month-nav-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-bottom: 8px;
+      }
+
+      .month-heading {
+        font-size: 0.95rem;
+      }
+
+      .month-btn {
+        padding: 4px 8px;
+        font-size: 0.74rem;
+      }
+
+      .calendar-weekdays {
+        gap: 3px;
+      }
+
+      .weekday-label {
+        font-size: 0.65rem;
+        padding: 4px 1px;
+      }
+
+      .calendar-grid {
+        gap: 3px;
+      }
+
+      .calendar-day-cell {
+        min-height: 42px;
+        padding: 3px 2px;
+        border-radius: 6px;
+      }
+
+      .day-number {
+        font-size: 0.74rem;
+      }
+
+      .calendar-day-cell.today .day-number {
+        width: 20px;
+        height: 20px;
+        font-size: 0.68rem;
+      }
+
+      .event-dot {
+        width: 5px;
+        height: 5px;
+      }
+
+      .details-header {
+        padding-bottom: 8px;
+      }
+
+      .details-date-title {
+        font-size: 0.95rem;
+      }
+
+      .event-card {
+        padding: 10px 12px;
+      }
+
+      /* Timeline Card */
+      .timeline-card {
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+      }
+
+      .timeline-title {
+        font-size: 1rem;
+      }
+
+      .timeline-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .timeline-item-card {
+        padding: 12px 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 6px 8px 14px;
+      }
+
+      header.header {
+        padding: 8px 10px;
+      }
+
+      .header-title {
+        font-size: 0.92rem;
+      }
+
+      .nav-tab {
+        padding: 6px 7px;
+        font-size: 0.69rem;
+      }
+
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
+
+      .calendar-day-cell {
+        min-height: 38px;
+      }
+
+      .day-number {
+        font-size: 0.70rem;
+      }
+    }
 ${STEALTH_ADMIN_CSS}
   </style>
 </head>
@@ -4207,12 +4690,11 @@ const mentorsHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
   
-  <!-- Immediate Theme Initializer to prevent white flash -->
+  <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -4561,6 +5043,157 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       padding: 2px 6px;
       border-radius: var(--radius-sm);
     }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE ADAPTATIONS (768px & 480px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 8px 10px 16px;
+        gap: 10px;
+      }
+
+      /* Header Layout on Mobile: Clean 2-Row Native App Header */
+      header.header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: var(--radius-md);
+      }
+
+      .header-content {
+        display: contents;
+      }
+
+      .header-title {
+        order: 1;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-logo {
+        font-size: 1.25rem;
+      }
+
+      .header-actions {
+        order: 2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        border-radius: var(--radius-full);
+        gap: 4px;
+        background: var(--bg-nav);
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      .theme-toggle-btn {
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+
+      .btn-return-map {
+        display: none;
+      }
+
+      /* Mentors Hero */
+      .mentors-hero {
+        padding: 14px 16px;
+        gap: 6px;
+      }
+
+      .hero-title {
+        font-size: 1.15rem;
+      }
+
+      .hero-desc {
+        font-size: 0.80rem;
+      }
+
+      /* Mentors Grid */
+      .mentors-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .mentor-card {
+        padding: 16px 14px;
+        gap: 10px;
+      }
+
+      .avatar-wrapper {
+        width: 80px;
+        height: 80px;
+      }
+
+      .mentor-name {
+        font-size: 0.98rem;
+      }
+
+      .mentor-role {
+        font-size: 0.76rem;
+      }
+
+      .mentor-desc {
+        font-size: 0.78rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 6px 8px 14px;
+      }
+
+      header.header {
+        padding: 8px 10px;
+      }
+
+      .header-title {
+        font-size: 0.92rem;
+      }
+
+      .nav-tab {
+        padding: 6px 7px;
+        font-size: 0.69rem;
+      }
+
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
+    }
 ${STEALTH_ADMIN_CSS}
   </style>
 </head>
@@ -4771,12 +5404,11 @@ const settingsHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — პარამეტრები</title>
   
-  <!-- Immediate Theme Initializer to prevent white flash -->
+  <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -5327,6 +5959,154 @@ const settingsHtmlContent = `<!DOCTYPE html>
     .toast-msg.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
+    }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE ADAPTATIONS (768px & 480px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 8px 10px 16px;
+        gap: 10px;
+      }
+
+      /* Header Layout on Mobile: Clean 2-Row Native App Header */
+      header.header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: var(--radius-md);
+      }
+
+      .header-content {
+        display: contents;
+      }
+
+      .header-title {
+        order: 1;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-logo {
+        font-size: 1.25rem;
+      }
+
+      .header-actions {
+        order: 2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        border-radius: var(--radius-full);
+        gap: 4px;
+        background: var(--bg-nav);
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      .theme-toggle-btn {
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+
+      .btn-return-map {
+        display: none;
+      }
+
+      /* Settings Cards */
+      .settings-card {
+        padding: 14px 16px;
+        gap: 12px;
+        border-radius: var(--radius-md);
+      }
+
+      .card-main-title {
+        font-size: 0.98rem;
+      }
+
+      .card-subtitle {
+        font-size: 0.76rem;
+      }
+
+      .switch-row {
+        padding: 10px 12px;
+        gap: 10px;
+      }
+
+      .switch-title {
+        font-size: 0.82rem;
+      }
+
+      .switch-desc {
+        font-size: 0.72rem;
+      }
+
+      .action-btn-row {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .action-btn-row .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 6px 8px 14px;
+      }
+
+      header.header {
+        padding: 8px 10px;
+      }
+
+      .header-title {
+        font-size: 0.92rem;
+      }
+
+      .nav-tab {
+        padding: 6px 7px;
+        font-size: 0.69rem;
+      }
+
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
     }
 ${STEALTH_ADMIN_CSS}
   </style>

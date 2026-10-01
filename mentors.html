@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
   
-  <!-- Immediate Theme Initializer to prevent white flash -->
+  <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -358,6 +357,157 @@
       color: var(--text-subtle);
       padding: 2px 6px;
       border-radius: var(--radius-sm);
+    }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE ADAPTATIONS (768px & 480px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 8px 10px 16px;
+        gap: 10px;
+      }
+
+      /* Header Layout on Mobile: Clean 2-Row Native App Header */
+      header.header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: var(--radius-md);
+      }
+
+      .header-content {
+        display: contents;
+      }
+
+      .header-title {
+        order: 1;
+        font-size: 1.05rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-logo {
+        font-size: 1.25rem;
+      }
+
+      .header-actions {
+        order: 2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        border-radius: var(--radius-full);
+        gap: 4px;
+        background: var(--bg-nav);
+      }
+
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      .theme-toggle-btn {
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+
+      .btn-return-map {
+        display: none;
+      }
+
+      /* Mentors Hero */
+      .mentors-hero {
+        padding: 14px 16px;
+        gap: 6px;
+      }
+
+      .hero-title {
+        font-size: 1.15rem;
+      }
+
+      .hero-desc {
+        font-size: 0.80rem;
+      }
+
+      /* Mentors Grid */
+      .mentors-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .mentor-card {
+        padding: 16px 14px;
+        gap: 10px;
+      }
+
+      .avatar-wrapper {
+        width: 80px;
+        height: 80px;
+      }
+
+      .mentor-name {
+        font-size: 0.98rem;
+      }
+
+      .mentor-role {
+        font-size: 0.76rem;
+      }
+
+      .mentor-desc {
+        font-size: 0.78rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 6px 8px 14px;
+      }
+
+      header.header {
+        padding: 8px 10px;
+      }
+
+      .header-title {
+        font-size: 0.92rem;
+      }
+
+      .nav-tab {
+        padding: 6px 7px;
+        font-size: 0.69rem;
+      }
+
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
     }
 
     /* Stealth Admin Modal */
