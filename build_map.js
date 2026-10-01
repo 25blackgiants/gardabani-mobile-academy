@@ -35,18 +35,25 @@ ${COOKIE_CONSENT_JS}
 const ADMIN_SHA256_HASH = 'c0d1410b08f5c820b8fbc180ba01a7916c210de74ac518a3d38d1a52ba4e7672';
 
 const STEALTH_ADMIN_CSS = `
-    /* Stealth Admin Modal */
+    /* Stealth Admin Modal - Perfectly Centered in Viewport */
     .stealth-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.82);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 999999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(0, 0, 0, 0.85) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      z-index: 9999999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
       animation: stealthFadeIn 0.2s ease-out;
     }
     @keyframes stealthFadeIn {
@@ -59,9 +66,11 @@ const STEALTH_ADMIN_CSS = `
       border-radius: 16px;
       width: 100%;
       max-width: 440px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(37, 99, 235, 0.3);
+      margin: auto !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(37, 99, 235, 0.3);
       overflow: hidden;
       animation: stealthSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
     [data-theme="dark"] .stealth-modal-window {
       background: #0a0a0a;
@@ -417,6 +426,7 @@ const STEALTH_ADMIN_JS = `
     function openStealthAdminModal() {
       const modal = document.getElementById('stealth-admin-modal');
       if (!modal) return;
+      document.body.style.overflow = 'hidden';
       modal.style.display = 'flex';
       const errorAlert = document.getElementById('stealth-error-alert');
       if (errorAlert) errorAlert.style.display = 'none';
@@ -460,6 +470,7 @@ const STEALTH_ADMIN_JS = `
     function closeStealthAdminModal() {
       const modal = document.getElementById('stealth-admin-modal');
       if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
       if (lockoutTimerInterval) {
         clearInterval(lockoutTimerInterval);
         lockoutTimerInterval = null;
@@ -6964,6 +6975,27 @@ ${COOKIE_CONSENT_CSS}
           <span class="lever-slider"></span>
         </label>
       </div>
+
+      <!-- Cookie Consent Management Row -->
+      <div class="switch-row" id="row-cookie-settings" style="cursor:default;">
+        <div class="switch-label-group">
+          <span class="switch-title">
+            <span>🍪</span> ქუქი-ფაილები და კონფიდენციალურობა
+          </span>
+          <span class="switch-desc" id="cookie-status-desc">
+            სტატუსი: მოწმდება...
+          </span>
+        </div>
+        <button type="button" class="btn btn-outline" id="btn-reopen-cookie-banner" style="padding:6px 12px; font-size:12px; white-space:nowrap;">
+          <span>↺</span> არჩევანის შეცვლა
+        </button>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:10px; padding-top:10px; border-top:1px solid var(--border-light);">
+        <button class="btn btn-danger" id="btn-reset-all-settings" style="font-size:12px; padding:6px 14px;">
+          <span>↺</span> ყველა პარამეტრის საწყისზე დაბრუნება
+        </button>
+      </div>
     </section>
 
     <!-- SECTION 2: SERVER SECURITY STATUS -->
@@ -7201,53 +7233,6 @@ ${COOKIE_CONSENT_CSS}
       </div>
     </section>
 
-    <!-- SECTION 3: SYSTEM & THEME DEFAULTS -->
-    <section class="settings-card">
-      <div class="card-header-group">
-        <h2 class="card-main-title">🎨 ვიზუალური თემა და სისტემა</h2>
-        <p class="card-subtitle">
-          სისტემური ფერების პალიტრა, კონფიდენციალურობის მართვა და მონაცემების საწყის მდგომარეობაში დაბრუნება.
-        </p>
-      </div>
-
-      <!-- Theme Lever Switch -->
-      <div class="switch-row" id="row-darkmode">
-        <div class="switch-label-group">
-          <span class="switch-title">
-            <span>🌙</span> ღამის რეჟიმი (True Pitch Black)
-          </span>
-          <span class="switch-desc">
-            სუფთა შავი ფონი (#000000) და მაღალი კონტრასტი.
-          </span>
-        </div>
-        <label class="lever-switch">
-          <input type="checkbox" id="setting-darkmode">
-          <span class="lever-slider"></span>
-        </label>
-      </div>
-
-      <!-- Cookie Consent Management Row -->
-      <div class="switch-row" id="row-cookie-settings" style="cursor:default;">
-        <div class="switch-label-group">
-          <span class="switch-title">
-            <span>🍪</span> ქუქი-ფაილები და კონფიდენციალურობა
-          </span>
-          <span class="switch-desc" id="cookie-status-desc">
-            სტატუსი: მოწმდება...
-          </span>
-        </div>
-        <button type="button" class="btn btn-outline" id="btn-reopen-cookie-banner" style="padding:6px 12px; font-size:12px; white-space:nowrap;">
-          <span>↺</span> არჩევანის შეცვლა
-        </button>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; margin-top:4px;">
-        <button class="btn btn-danger" id="btn-reset-all-settings">
-          <span>↺</span> ყველა პარამეტრის საწყისზე დაბრუნება
-        </button>
-      </div>
-    </section>
-
   </div>
 
 ${STEALTH_ADMIN_HTML}
@@ -7279,8 +7264,6 @@ ${STEALTH_ADMIN_JS}
       const radiusInput = document.getElementById('setting-radius');
       const rowBoundary = document.getElementById('row-boundary');
       const rowRadius = document.getElementById('row-radius');
-      const rowDarkmode = document.getElementById('row-darkmode');
-      const settingDarkmode = document.getElementById('setting-darkmode');
 
       const savedBoundary = localStorage.getItem('gardabani_setting_boundary');
       const savedRadius = localStorage.getItem('gardabani_setting_radius');
