@@ -114,6 +114,7 @@
 
     // 7. Scroll Depth Tracking
     let maxScrollDepth = 0;
+    const scrollMilestones = new Set();
     function calculateScrollDepth() {
       try {
         const docElem = document.documentElement;
@@ -122,8 +123,12 @@
           const currentScroll = window.scrollY || window.pageYOffset;
           const pct = Math.min(100, Math.max(0, Math.round((currentScroll / totalHeight) * 100)));
           if (pct > maxScrollDepth) maxScrollDepth = pct;
+          [25, 50, 75, 100].forEach(ms => {
+            if (pct >= ms) scrollMilestones.add(ms);
+          });
         } else {
           maxScrollDepth = 100;
+          [25, 50, 75, 100].forEach(ms => scrollMilestones.add(ms));
         }
       } catch (e) {}
     }
@@ -131,7 +136,9 @@
     window.addEventListener('scroll', calculateScrollDepth, { passive: true });
     setTimeout(calculateScrollDepth, 1500);
 
-    const screenRes = (window.screen.width || 0) + 'x' + (window.screen.height || 0);
+    const screenWidth = window.screen.width || 0;
+    const screenSizeCategory = screenWidth < 768 ? 'small' : screenWidth < 1024 ? 'medium' : 'large';
+    const screenRes = screenWidth + 'x' + (window.screen.height || 0);
     const rawLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'ka').toLowerCase();
     let normalizedLang = 'other';
     if (rawLang.startsWith('ka')) normalizedLang = 'ka';
@@ -155,16 +162,46 @@
       } catch (e) {}
     }
 
-    // 10. Active Session Duration (declared here so it's available in the load event below)
+    // 10. Active Session Duration
     let duration = 5;
+    let activeSeconds = 5;
+    let isActive = !document.hidden;
+    let lastTime = Date.now();
+
+    function updateTime() {
+      const now = Date.now();
+      const delta = Math.round((now - lastTime) / 1000);
+      lastTime = now;
+      if (delta > 0) {
+        duration += delta;
+        if (isActive) activeSeconds += delta;
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      updateTime();
+      isActive = !document.hidden;
+      if (document.visibilityState === 'hidden') flushAnalyticsUpdate();
+    });
+    
+    window.addEventListener('focus', () => {
+      updateTime();
+      isActive = true;
+    });
+    
+    window.addEventListener('blur', () => {
+      updateTime();
+      isActive = false;
+    });
 
     window.addEventListener('load', () => {
       setTimeout(() => {
         measureLoadTime();
-        if (loadTimeSec > 0) flushAnalyticsUpdate(duration);
+        if (loadTimeSec > 0) flushAnalyticsUpdate();
       }, 250);
     });
 
+    const now = new Date();
     const visitRecord = {
       id: Date.now() + Math.floor(Math.random() * 1000),
       session_id: sessionId,
@@ -174,6 +211,7 @@
       visit_count: visitCount,
       network_type: networkType,
       scroll_depth: maxScrollDepth,
+      scroll_milestones: Array.from(scrollMilestones),
       page_path: pagePath,
       page_title: pageTitle,
       referrer: referrer,
@@ -181,11 +219,15 @@
       os: os,
       browser: browser,
       screen_resolution: screenRes,
+      screen_size: screenSizeCategory,
       language: rawLang,
       browser_lang: normalizedLang,
       load_time_seconds: loadTimeSec,
-      duration_seconds: 5,
-      created_at: new Date().toISOString()
+      duration_seconds: duration,
+      active_seconds: activeSeconds,
+      hour_of_day: now.getHours(),
+      day_of_week: now.getDay(),
+      created_at: now.toISOString()
     };
 
     // 8. Save to Local Storage Log (Offline Fallback & Instant Access)
@@ -222,6 +264,7 @@
             visit_count: visitCount,
             network_type: networkType,
             scroll_depth: maxScrollDepth,
+            scroll_milestones: Array.from(scrollMilestones),
             page_path: pagePath,
             page_title: pageTitle,
             referrer: referrer,
@@ -229,10 +272,14 @@
             os: os,
             browser: browser,
             screen_resolution: screenRes,
+            screen_size: screenSizeCategory,
             language: rawLang,
             browser_lang: normalizedLang,
             load_time_seconds: loadTimeSec,
-            duration_seconds: 5
+            duration_seconds: duration,
+            active_seconds: activeSeconds,
+            hour_of_day: visitRecord.hour_of_day,
+            day_of_week: visitRecord.day_of_week
           }])
           .select('id')
           .single();
@@ -247,20 +294,23 @@
 
     // Active Session Duration & Scroll Heartbeat
     const heartbeatTimer = setInterval(() => {
-      duration += 10;
-      flushAnalyticsUpdate(duration);
+      updateTime();
+      flushAnalyticsUpdate();
     }, 10000);
 
-    async function flushAnalyticsUpdate(dur) {
+    async function flushAnalyticsUpdate() {
       calculateScrollDepth();
       if (loadTimeSec === 0) measureLoadTime();
+      updateTime();
 
       // Local update
       try {
         let localLogs = JSON.parse(localStorage.getItem('gardabani_analytics_log') || '[]');
         if (localLogs.length > 0 && localLogs[0].session_id === sessionId && localLogs[0].page_path === pagePath) {
-          localLogs[0].duration_seconds = dur;
+          localLogs[0].duration_seconds = duration;
+          localLogs[0].active_seconds = activeSeconds;
           localLogs[0].scroll_depth = maxScrollDepth;
+          localLogs[0].scroll_milestones = Array.from(scrollMilestones);
           localLogs[0].consent_status = getConsentStatus();
           if (visitorId) localLogs[0].visitor_id = visitorId;
           localLogs[0].is_returning = isReturning;
@@ -276,8 +326,10 @@
         if (client) {
           try {
             await client.from('site_analytics').update({
-              duration_seconds: dur,
+              duration_seconds: duration,
+              active_seconds: activeSeconds,
               scroll_depth: maxScrollDepth,
+              scroll_milestones: Array.from(scrollMilestones),
               consent_status: getConsentStatus(),
               visitor_id: visitorId,
               is_returning: isReturning,
@@ -325,16 +377,12 @@
     // Listen for cookie consent changes in real-time
     window.addEventListener('cookie_consent_changed', (e) => {
       evaluateVisitorIdentity();
-      flushAnalyticsUpdate(duration);
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') flushAnalyticsUpdate(duration);
+      flushAnalyticsUpdate();
     });
 
     window.addEventListener('beforeunload', () => {
       clearInterval(heartbeatTimer);
-      flushAnalyticsUpdate(duration);
+      flushAnalyticsUpdate();
     });
 
     // Send after brief delay
