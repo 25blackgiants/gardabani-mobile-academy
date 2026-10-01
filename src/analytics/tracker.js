@@ -194,6 +194,32 @@
       isActive = false;
     });
 
+    // 8. Hardware, Data Saver, Orientation & Localization Metrics
+    const deviceMemory = (typeof navigator.deviceMemory === 'number') ? (navigator.deviceMemory + 'GB') : 'უცნობი';
+    const cpuCores = (typeof navigator.hardwareConcurrency === 'number') ? navigator.hardwareConcurrency : 0;
+
+    let dataSaver = false;
+    try {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (conn && typeof conn.saveData === 'boolean') {
+        dataSaver = conn.saveData;
+      }
+    } catch(e) {}
+
+    const screenOrientation = (window.innerHeight > window.innerWidth) ? 'Portrait (ვერტიკალური)' : 'Landscape (ჰორიზონტალური)';
+
+    let systemThemePref = 'Light';
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        systemThemePref = 'Dark';
+      }
+    } catch(e) {}
+
+    let timeZone = 'Asia/Tbilisi';
+    try {
+      timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Tbilisi';
+    } catch(e) {}
+
     window.addEventListener('load', () => {
       setTimeout(() => {
         measureLoadTime();
@@ -220,6 +246,12 @@
       browser: browser,
       screen_resolution: screenRes,
       screen_size: screenSizeCategory,
+      device_memory: deviceMemory,
+      cpu_cores: cpuCores,
+      data_saver: dataSaver,
+      screen_orientation: screenOrientation,
+      system_theme_pref: systemThemePref,
+      timezone: timeZone,
       language: rawLang,
       browser_lang: normalizedLang,
       load_time_seconds: loadTimeSec,

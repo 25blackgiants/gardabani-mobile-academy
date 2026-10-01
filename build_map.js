@@ -6800,9 +6800,25 @@ const settingsHtmlContent = `<!DOCTYPE html>
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .analytics-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .analytics-panel {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     @media (max-width: 640px) {
       .analytics-kpi-grid { grid-template-columns: 1fr 1fr; }
       .analytics-charts-grid { grid-template-columns: 1fr; }
+      .analytics-details-grid { grid-template-columns: 1fr; }
       .activity-item { flex-direction: column; align-items: flex-start; gap: 8px; }
       .activity-badges-group { justify-content: flex-start; }
       .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(12, 1fr); }
@@ -7166,6 +7182,37 @@ ${COOKIE_CONSENT_CSS}
         </div>
         <div class="heatmap-grid" id="analytics-heatmap"></div>
         <div class="heatmap-labels" id="analytics-heatmap-labels"></div>
+      </div>
+
+      <!-- Device Capabilities, Hardware & Localization (4 Advanced Panels) -->
+      <div class="analytics-details-grid" style="margin-top:16px;">
+        <!-- Panel 1: Device Memory & CPU Power -->
+        <div class="analytics-panel">
+          <h3 class="panel-title" style="margin:0; font-size:13.5px;"><span>💾</span> ტელეფონის მეხსიერება & CPU სიმძლავრე</h3>
+          <div style="font-size:11.5px; color:var(--text-subtle);">აპარატურული რესურსების განაწილება (RAM & პროცესორის ბირთვები)</div>
+          <div id="stats-device-hardware" style="margin-top:4px;"></div>
+        </div>
+
+        <!-- Panel 2: Data Saver & Network Efficiency -->
+        <div class="analytics-panel">
+          <h3 class="panel-title" style="margin:0; font-size:13.5px;"><span>📉</span> მონაცემთა დაზოგვის რეჟიმი (Data Saver)</h3>
+          <div style="font-size:11.5px; color:var(--text-subtle);">მობილური მეგაბაიტების დაზოგვის სტატუსი სოფლის ქსელებში</div>
+          <div id="stats-data-saver" style="margin-top:4px;"></div>
+        </div>
+
+        <!-- Panel 3: Screen Orientation & OS Theme -->
+        <div class="analytics-panel">
+          <h3 class="panel-title" style="margin:0; font-size:13.5px;"><span>🔄</span> ეკრანის ორიენტაცია & სისტემური თემა</h3>
+          <div style="font-size:11.5px; color:var(--text-subtle);">ვერტიკალური/ჰორიზონტალური რეჟიმი და მოწყობილობის Dark/Light თემა</div>
+          <div id="stats-orientation-theme" style="margin-top:4px;"></div>
+        </div>
+
+        <!-- Panel 4: Timezone & Geolocation -->
+        <div class="analytics-panel">
+          <h3 class="panel-title" style="margin:0; font-size:13.5px;"><span>🌐</span> დროის სარტყელი (Timezone)</h3>
+          <div style="font-size:11.5px; color:var(--text-subtle);">ვიზიტორთა გეოგრაფიული არეალი და დროის ზონები</div>
+          <div id="stats-timezones" style="margin-top:4px;"></div>
+        </div>
       </div>
 
       <!-- RECENT ACTIVITY FEED (MODERN RESPONSIVE STREAM) -->
@@ -7983,6 +8030,9 @@ ${STEALTH_ADMIN_JS}
                 '<div class="activity-badges-group">' +
                   '<span class="badge-pill badge-device">' + devIcon + ' ' + (r.device_type || 'Desktop') + '</span>' +
                   '<span class="badge-pill badge-lang">' + langLabel + '</span>' +
+                  (r.device_memory ? ('<span class="badge-pill" style="color:var(--text-main);">💾 ' + r.device_memory + '</span>') : '') +
+                  (r.timezone ? ('<span class="badge-pill" style="color:#0ea5e9;">🌐 ' + (r.timezone.replace('Asia/', '').replace('Europe/', '')) + '</span>') : '') +
+                  (r.data_saver ? ('<span class="badge-pill" style="color:#f59e0b;">📉 Data Saver</span>') : '') +
                   '<span class="badge-pill badge-duration">⏱️ ' + formatDuration(r.duration_seconds) + '</span>' +
                 '</div>';
               feedContainer.appendChild(item);
@@ -8028,6 +8078,93 @@ ${STEALTH_ADMIN_JS}
                lbl.textContent = i;
                labelsEl.appendChild(lbl);
            }
+        }
+
+        // --- Hardware, Data Saver, Orientation & Timezone Panels ---
+        const totRecs = records.length;
+
+        // 1. Hardware (RAM & CPU Cores)
+        const hwEl = document.getElementById('stats-device-hardware');
+        if (hwEl) {
+          hwEl.innerHTML = '';
+          if (totRecs === 0) {
+            hwEl.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">მონაცემები არ არის</div>';
+          } else {
+            const ramMap = {};
+            const cpuMap = {};
+            records.forEach(r => {
+              const ram = r.device_memory || '4GB';
+              ramMap[ram] = (ramMap[ram] || 0) + 1;
+              const cores = r.cpu_cores ? (r.cpu_cores + ' ბირთვი') : '4 ბირთვი';
+              cpuMap[cores] = (cpuMap[cores] || 0) + 1;
+            });
+            Object.keys(ramMap).sort((a,b) => ramMap[b] - ramMap[a]).slice(0, 3).forEach(k => {
+              renderRankRow(hwEl, 'RAM: ' + k, ramMap[k], totRecs, null, '#8b5cf6');
+            });
+            Object.keys(cpuMap).sort((a,b) => cpuMap[b] - cpuMap[a]).slice(0, 2).forEach(k => {
+              renderRankRow(hwEl, 'CPU: ' + k, cpuMap[k], totRecs, null, '#3b82f6');
+            });
+          }
+        }
+
+        // 2. Data Saver
+        const dsEl = document.getElementById('stats-data-saver');
+        if (dsEl) {
+          dsEl.innerHTML = '';
+          if (totRecs === 0) {
+            dsEl.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">მონაცემები არ არის</div>';
+          } else {
+            let dsOn = 0, dsOff = 0;
+            records.forEach(r => {
+              if (r.data_saver === true || r.data_saver === 'true') dsOn++;
+              else dsOff++;
+            });
+            renderRankRow(dsEl, '📉 ჩართულია (მეგაბაიტების დაზოგვა)', dsOn, totRecs, null, '#f59e0b');
+            renderRankRow(dsEl, '⚡ გამორთულია (სტანდარტული რეჟიმი)', dsOff, totRecs, null, '#10b981');
+          }
+        }
+
+        // 3. Orientation & System Theme
+        const otEl = document.getElementById('stats-orientation-theme');
+        if (otEl) {
+          otEl.innerHTML = '';
+          if (totRecs === 0) {
+            otEl.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">მონაცემები არ არის</div>';
+          } else {
+            let portrait = 0, landscape = 0, darkTheme = 0, lightTheme = 0;
+            records.forEach(r => {
+              const o = (r.screen_orientation || '').toLowerCase();
+              if (o.includes('portrait') || o.includes('ვერტიკალური')) portrait++;
+              else landscape++;
+
+              const st = (r.system_theme_pref || '').toLowerCase();
+              if (st.includes('dark')) darkTheme++;
+              else lightTheme++;
+            });
+            renderRankRow(otEl, '📱 Portrait (ვერტიკალური ეკრანი)', portrait, totRecs, null, '#06b6d4');
+            renderRankRow(otEl, '💻 Landscape (ჰორიზონტალური)', landscape, totRecs, null, '#6366f1');
+            renderRankRow(otEl, '🌙 სისტემური Dark Mode', darkTheme, totRecs, null, '#a855f7');
+            renderRankRow(otEl, '☀️ სისტემური Light Mode', lightTheme, totRecs, null, '#eab308');
+          }
+        }
+
+        // 4. Timezones
+        const tzEl = document.getElementById('stats-timezones');
+        if (tzEl) {
+          tzEl.innerHTML = '';
+          if (totRecs === 0) {
+            tzEl.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">მონაცემები არ არის</div>';
+          } else {
+            const tzMap = {};
+            records.forEach(r => {
+              const tz = r.timezone || 'Asia/Tbilisi';
+              tzMap[tz] = (tzMap[tz] || 0) + 1;
+            });
+            Object.keys(tzMap).sort((a,b) => tzMap[b] - tzMap[a]).slice(0, 4).forEach(k => {
+              const flag = k.includes('Tbilisi') ? '🇬🇪 ' : (k.includes('Europe') ? '🇪🇺 ' : (k.includes('America') ? '🇺🇸 ' : '🌐 '));
+              renderRankRow(tzEl, flag + k, tzMap[k], totRecs, null, '#0ea5e9');
+            });
+          }
         }
 
         // Daily Bar Chart mini
@@ -8148,10 +8285,16 @@ async function loadAndRenderAnalytics() {
             showToast('საექსპორტო მონაცემები ცარიელია');
             return;
           }
-          const rows = ['Date,Page,Device,Language,Duration(sec),Speed(sec),Referrer'];
+          const rows = ['Date,Page,Device,Language,Duration(sec),Speed(sec),RAM,CPU_Cores,Data_Saver,Orientation,OS_Theme,Timezone,Referrer'];
           recs.forEach(r => {
             const pT = (r.page_title || r.page_path || '').replace(/[,"]/g, ' ');
-            rows.push([r.created_at || '', pT, r.device_type || '', r.browser_lang || '', r.duration_seconds || 0, r.load_time_seconds || 0, (r.referrer || '').replace(/[,"]/g, ' ')].join(','));
+            const ram = (r.device_memory || 'უცნობი').replace(/[,"]/g, ' ');
+            const cores = r.cpu_cores || 0;
+            const ds = r.data_saver ? 'True' : 'False';
+            const orient = (r.screen_orientation || 'Portrait').replace(/[,"]/g, ' ');
+            const st = (r.system_theme_pref || 'Light').replace(/[,"]/g, ' ');
+            const tz = (r.timezone || 'Asia/Tbilisi').replace(/[,"]/g, ' ');
+            rows.push([r.created_at || '', pT, r.device_type || '', r.browser_lang || '', r.duration_seconds || 0, r.load_time_seconds || 0, ram, cores, ds, orient, st, tz, (r.referrer || '').replace(/[,"]/g, ' ')].join(','));
           });
           const csvContent = rows.join(String.fromCharCode(10));
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -8185,6 +8328,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Safari',
             screen_resolution: '390x844',
             browser_lang: 'ka',
+            device_memory: '4GB',
+            cpu_cores: 6,
+            data_saver: false,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Dark',
+            timezone: 'Asia/Tbilisi',
             load_time_seconds: 0.9,
             duration_seconds: 145,
             hour_of_day: 14,
@@ -8207,6 +8356,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Chrome',
             screen_resolution: '412x915',
             browser_lang: 'az',
+            device_memory: '4GB',
+            cpu_cores: 8,
+            data_saver: true,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Light',
+            timezone: 'Asia/Tbilisi',
             load_time_seconds: 1.2,
             duration_seconds: 220,
             hour_of_day: 13,
@@ -8229,6 +8384,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Chrome',
             screen_resolution: '1920x1080',
             browser_lang: 'ka',
+            device_memory: '8GB',
+            cpu_cores: 8,
+            data_saver: false,
+            screen_orientation: 'Landscape (ჰორიზონტალური)',
+            system_theme_pref: 'Dark',
+            timezone: 'Asia/Tbilisi',
             load_time_seconds: 0.7,
             duration_seconds: 180,
             hour_of_day: 12,
@@ -8251,6 +8412,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Samsung Internet',
             screen_resolution: '384x854',
             browser_lang: 'az',
+            device_memory: '2GB',
+            cpu_cores: 4,
+            data_saver: true,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Light',
+            timezone: 'Asia/Tbilisi',
             load_time_seconds: 1.8,
             duration_seconds: 95,
             hour_of_day: 11,
@@ -8273,6 +8440,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Safari',
             screen_resolution: '1440x900',
             browser_lang: 'en',
+            device_memory: '8GB',
+            cpu_cores: 8,
+            data_saver: false,
+            screen_orientation: 'Landscape (ჰორიზონტალური)',
+            system_theme_pref: 'Dark',
+            timezone: 'Europe/Berlin',
             load_time_seconds: 1.0,
             duration_seconds: 310,
             hour_of_day: 10,
@@ -8295,6 +8468,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Instagram Webview',
             screen_resolution: '375x812',
             browser_lang: 'ka',
+            device_memory: '4GB',
+            cpu_cores: 6,
+            data_saver: false,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Dark',
+            timezone: 'Asia/Tbilisi',
             load_time_seconds: 1.1,
             duration_seconds: 60,
             hour_of_day: 8,
@@ -8317,6 +8496,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Chrome',
             screen_resolution: '412x915',
             browser_lang: 'az',
+            device_memory: '4GB',
+            cpu_cores: 8,
+            data_saver: true,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Light',
+            timezone: 'Asia/Baku',
             load_time_seconds: 1.3,
             duration_seconds: 190,
             hour_of_day: 6,
@@ -8339,6 +8524,12 @@ async function loadAndRenderAnalytics() {
             browser: 'Safari',
             screen_resolution: '810x1080',
             browser_lang: 'en',
+            device_memory: '6GB',
+            cpu_cores: 8,
+            data_saver: false,
+            screen_orientation: 'Portrait (ვერტიკალური)',
+            system_theme_pref: 'Light',
+            timezone: 'America/New_York',
             load_time_seconds: 0.8,
             duration_seconds: 130,
             hour_of_day: 4,
