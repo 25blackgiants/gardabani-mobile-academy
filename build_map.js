@@ -41,12 +41,12 @@ const GEORGIAN_FONT_HEAD_TAG = `
 const MOBILE_BOTTOM_NAV_CSS = `
     /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
     .mobile-bottom-nav {
-      display: none;
+      display: none !important;
     }
 
     @media (max-width: 768px) {
       .mobile-bottom-nav {
-        display: flex;
+        display: flex !important;
         position: fixed;
         bottom: 0;
         left: 0;
@@ -128,19 +128,19 @@ function getBottomNavHtml(activeTab) {
   return `
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
   <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
-    <a href="index.html" class="bottom-nav-item \${activeTab === 'map' ? 'active' : ''}">
+    <a href="index.html" class="bottom-nav-item ${activeTab === 'map' ? 'active' : ''}">
       <span class="bottom-nav-icon">🗺️</span>
       <span class="bottom-nav-label">მთავარი გვერდი</span>
     </a>
-    <a href="calendar.html" class="bottom-nav-item \${activeTab === 'calendar' ? 'active' : ''}">
+    <a href="calendar.html" class="bottom-nav-item ${activeTab === 'calendar' ? 'active' : ''}">
       <span class="bottom-nav-icon">📅</span>
       <span class="bottom-nav-label">კალენდარი</span>
     </a>
-    <a href="mentors.html" class="bottom-nav-item \${activeTab === 'mentors' ? 'active' : ''}">
+    <a href="mentors.html" class="bottom-nav-item ${activeTab === 'mentors' ? 'active' : ''}">
       <span class="bottom-nav-icon">👥</span>
       <span class="bottom-nav-label">მენტორები</span>
     </a>
-    <a href="settings.html" class="bottom-nav-item \${activeTab === 'settings' ? 'active' : ''}">
+    <a href="settings.html" class="bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}">
       <span class="bottom-nav-icon">⚙️</span>
       <span class="bottom-nav-label">პარამეტრები</span>
     </a>
@@ -7941,7 +7941,15 @@ ${GEORGIAN_FONT_HEAD_TAG}
       .activity-badges-group { justify-content: flex-start; }
       .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(12, 1fr); }
     }
-${MOBILE_BOTTOM_NAV_CSS}
+
+    /* Hide floating cookie trigger button on settings page */
+    #cookie-floating-trigger,
+    .cookie-floating-trigger {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
@@ -9812,11 +9820,14 @@ async function loadAndRenderAnalytics() {
 
       // Synchronize Admin View and render if logged in
       syncAdminView();
+
+      // Ensure floating cookie button is hidden on settings page
+      const floatingCookie = document.getElementById('cookie-floating-trigger');
+      if (floatingCookie) floatingCookie.style.setProperty('display', 'none', 'important');
     });
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
-${getBottomNavHtml('settings')}
 </body>
 </html>`;
 

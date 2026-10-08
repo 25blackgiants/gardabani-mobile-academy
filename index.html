@@ -1427,12 +1427,12 @@
 
     /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
     .mobile-bottom-nav {
-      display: none;
+      display: none !important;
     }
 
     @media (max-width: 768px) {
       .mobile-bottom-nav {
-        display: flex;
+        display: flex !important;
         position: fixed;
         bottom: 0;
         left: 0;
@@ -4809,19 +4809,19 @@
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
   <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
-    <a href="index.html" class="bottom-nav-item ${activeTab === 'map' ? 'active' : ''}">
+    <a href="index.html" class="bottom-nav-item active">
       <span class="bottom-nav-icon">🗺️</span>
       <span class="bottom-nav-label">მთავარი გვერდი</span>
     </a>
-    <a href="calendar.html" class="bottom-nav-item ${activeTab === 'calendar' ? 'active' : ''}">
+    <a href="calendar.html" class="bottom-nav-item ">
       <span class="bottom-nav-icon">📅</span>
       <span class="bottom-nav-label">კალენდარი</span>
     </a>
-    <a href="mentors.html" class="bottom-nav-item ${activeTab === 'mentors' ? 'active' : ''}">
+    <a href="mentors.html" class="bottom-nav-item ">
       <span class="bottom-nav-icon">👥</span>
       <span class="bottom-nav-label">მენტორები</span>
     </a>
-    <a href="settings.html" class="bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}">
+    <a href="settings.html" class="bottom-nav-item ">
       <span class="bottom-nav-icon">⚙️</span>
       <span class="bottom-nav-label">პარამეტრები</span>
     </a>
