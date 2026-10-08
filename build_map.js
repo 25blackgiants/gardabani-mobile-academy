@@ -37,111 +37,11 @@ const GEORGIAN_FONT_HEAD_TAG = `
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 `;
 
-// Mobile Bottom Navigation Bar CSS
-const MOBILE_BOTTOM_NAV_CSS = `
-    /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
-    .mobile-bottom-nav {
-      display: none !important;
-    }
-
-    @media (max-width: 768px) {
-      .mobile-bottom-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.94);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid var(--border-light);
-        z-index: 1500;
-        align-items: center;
-        justify-content: space-around;
-        padding: 4px 6px env(safe-area-inset-bottom, 6px);
-        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
-      }
-
-      [data-theme="dark"] .mobile-bottom-nav {
-        background: rgba(10, 10, 10, 0.94);
-        border-top-color: #262626;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
-      }
-
-      .bottom-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 3px;
-        text-decoration: none;
-        color: var(--text-muted);
-        flex: 1;
-        padding: 6px 2px;
-        border-radius: var(--radius-sm);
-        transition: all 0.15s ease;
-      }
-
-      .bottom-nav-icon {
-        font-size: 1.15rem;
-        line-height: 1;
-        transition: transform 0.15s ease;
-      }
-
-      .bottom-nav-label {
-        font-size: 0.66rem;
-        font-weight: 700;
-      }
-
-      .bottom-nav-item.active {
-        color: #2563eb;
-      }
-
-      [data-theme="dark"] .bottom-nav-item.active {
-        color: #60a5fa;
-      }
-
-      .bottom-nav-item.active .bottom-nav-icon {
-        transform: scale(1.15);
-      }
-
-      .bottom-nav-item:active {
-        transform: scale(0.92);
-      }
-
-      body {
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
-      }
-
-      .leaflet-bottom {
-        bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-      }
-    }
-`;
+// Mobile Bottom Navigation Bar removed - single top navigation preserved for all viewports
+const MOBILE_BOTTOM_NAV_CSS = ``;
 
 function getBottomNavHtml(activeTab) {
-  return `
-  <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
-    <a href="index.html" class="bottom-nav-item ${activeTab === 'map' ? 'active' : ''}">
-      <span class="bottom-nav-icon">🗺️</span>
-      <span class="bottom-nav-label">მთავარი გვერდი</span>
-    </a>
-    <a href="calendar.html" class="bottom-nav-item ${activeTab === 'calendar' ? 'active' : ''}">
-      <span class="bottom-nav-icon">📅</span>
-      <span class="bottom-nav-label">კალენდარი</span>
-    </a>
-    <a href="mentors.html" class="bottom-nav-item ${activeTab === 'mentors' ? 'active' : ''}">
-      <span class="bottom-nav-icon">👥</span>
-      <span class="bottom-nav-label">მენტორები</span>
-    </a>
-    <a href="settings.html" class="bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}">
-      <span class="bottom-nav-icon">⚙️</span>
-      <span class="bottom-nav-label">პარამეტრები</span>
-    </a>
-  </nav>
-  `;
+  return ``;
 }
 
 // ============================================================================
@@ -2459,7 +2359,6 @@ ${GEORGIAN_FONT_HEAD_TAG}
         margin: 6px 8px !important;
       }
     }
-${MOBILE_BOTTOM_NAV_CSS}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
@@ -3691,7 +3590,6 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
-${getBottomNavHtml('map')}
 </body>
 </html>`;
 
@@ -4981,7 +4879,6 @@ ${GEORGIAN_FONT_HEAD_TAG}
       color: #99f6e4;
       border-color: #0f766e;
     }
-${MOBILE_BOTTOM_NAV_CSS}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
@@ -5609,7 +5506,6 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
-${getBottomNavHtml('calendar')}
 </body>
 </html>`;
 
@@ -6540,7 +6436,6 @@ ${GEORGIAN_FONT_HEAD_TAG}
       border-color: #3b82f6;
     }
 
-${MOBILE_BOTTOM_NAV_CSS}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
@@ -7213,7 +7108,6 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
-${getBottomNavHtml('mentors')}
 </body>
 </html>`;
 
