@@ -4903,44 +4903,21 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
-      padding: 24px 28px;
+      padding: 20px 24px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: #eff6ff;
-      color: #1e40af;
-      border: 1px solid #bfdbfe;
-      padding: 3px 10px;
-      border-radius: var(--radius-full);
-      font-size: 0.74rem;
-      font-weight: 700;
-      width: fit-content;
-    }
-
-    [data-theme="dark"] .hero-badge {
-      background: #141414;
-      color: #ffffff;
-      border-color: #333333;
+      justify-content: center;
+      text-align: center;
     }
 
     .hero-title {
       font-size: 1.4rem;
       font-weight: 800;
       color: var(--text-main);
-    }
-
-    .hero-desc {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      max-width: 820px;
-      line-height: 1.55;
+      text-align: center;
+      margin: 0;
     }
 
     /* Mentors Grid */
@@ -4961,13 +4938,20 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       align-items: center;
       text-align: center;
       gap: 12px;
-      transition: all 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
     }
 
     .mentor-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       box-shadow: var(--shadow-md);
       border-color: #3b82f6;
+    }
+
+    .mentor-card:active {
+      transform: scale(0.975);
+      box-shadow: var(--shadow-sm);
     }
 
     .avatar-wrapper {
@@ -5121,15 +5105,10 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       /* Mentors Hero */
       .mentors-hero {
         padding: 14px 16px;
-        gap: 6px;
       }
 
       .hero-title {
         font-size: 1.15rem;
-      }
-
-      .hero-desc {
-        font-size: 0.80rem;
       }
 
       /* Mentors Grid */
@@ -5187,19 +5166,26 @@ const mentorsHtmlContent = `<!DOCTYPE html>
 
     /* Modal */
     .modal-backdrop {
-      display: none;
+      display: flex;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 2000;
       align-items: center;
       justify-content: center;
       padding: 16px;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .modal-backdrop.open {
-      display: flex;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     .modal-window {
@@ -5213,6 +5199,12 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       flex-direction: column;
       box-shadow: var(--shadow-popup);
       overflow: hidden;
+      transform: translateY(22px) scale(0.96);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-backdrop.open .modal-window {
+      transform: translateY(0) scale(1);
     }
 
     .modal-header {
@@ -5351,47 +5343,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       opacity: 1;
     }
 
-    /* Mentor Card Interaction & Profile Button */
-    .mentor-card {
-      cursor: pointer;
-    }
 
-    .btn-mentor-view-profile {
-      width: 100%;
-      background: var(--bg-hover);
-      border: 1px solid var(--border-light);
-      color: var(--text-main);
-      padding: 7px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-      margin-top: 6px;
-    }
-
-    .btn-mentor-view-profile:hover {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
-      transform: translateY(-1px);
-    }
-
-    [data-theme="dark"] .btn-mentor-view-profile {
-      background: #171717;
-      border-color: #262626;
-      color: #e5e5e5;
-    }
-
-    [data-theme="dark"] .btn-mentor-view-profile:hover {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
-    }
 
     /* Mentor Profile Popup Styles (Short CV / Bio) */
     .mentor-profile-window {
@@ -5461,64 +5413,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       margin: 0;
     }
 
-    /* Auth prompt box inside Profile modal */
-    .mentor-auth-prompt {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: var(--radius-md);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      animation: cookieFadeIn 0.2s ease-out;
-    }
 
-    [data-theme="dark"] .mentor-auth-prompt {
-      background: #0f172a;
-      border-color: #1e3a8a;
-    }
-
-    .auth-prompt-header {
-      font-size: 0.86rem;
-      font-weight: 800;
-      color: #1e40af;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    [data-theme="dark"] .auth-prompt-header {
-      color: #93c5fd;
-    }
-
-    .auth-prompt-desc {
-      font-size: 0.78rem;
-      color: #1e3a8a;
-      line-height: 1.4;
-      margin: 0;
-    }
-
-    [data-theme="dark"] .auth-prompt-desc {
-      color: #bfdbfe;
-    }
-
-    .auth-prompt-inputs {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .auth-prompt-error {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #dc2626;
-      margin-top: 2px;
-    }
-
-    [data-theme="dark"] .auth-prompt-error {
-      color: #f87171;
-    }
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
   </style>
@@ -5564,11 +5459,7 @@ ${COOKIE_CONSENT_CSS}
 
     <!-- HERO INTRODUCTION -->
     <section class="mentors-hero">
-      <span class="hero-badge">გარდაბნის მობილური აკადემიის გუნდი</span>
       <h2 class="hero-title">აკადემიის მენტორები</h2>
-      <p class="hero-desc">
-        მენტორების გუნდი წარმართავს საგანმანათლებლო, შემოქმედებით და სამოქალაქო აქტივობებს გარდაბნის მუნიციპალიტეტის სოფლებში. ჩვენი მიზანია ქართველ და აზერბაიჯანელ ახალგაზრდებს შორის პარტნიორობის, მეგობრობისა და არაფორმალური განათლების გაძლიერება.
-      </p>
     </section>
 
     <!-- DYNAMIC MENTORS GRID (CONNECTED TO SUPABASE) -->
@@ -5623,30 +5514,6 @@ ${COOKIE_CONSENT_CSS}
           <div class="tags-row" id="profile-mentor-tags" style="justify-content:flex-start;"></div>
         </div>
 
-        <!-- Inline Admin Password Prompt (Shown when non-admin clicks Edit) -->
-        <div class="mentor-auth-prompt" id="profile-auth-prompt" style="display:none;">
-          <div class="auth-prompt-header">
-            <span>🔐</span>
-            <strong>ადმინისტრატორის ავტორიზაცია რედაქტირებისთვის</strong>
-          </div>
-          <p class="auth-prompt-desc">
-            მენტორის მონაცემებისა და CV-ის ჩასასწორებლად შეიყვანეთ ადმინისტრატორის პაროლი:
-          </p>
-          <div class="auth-prompt-inputs">
-            <input type="password" id="profile-admin-password" class="form-input" style="flex:1; min-width:180px;" placeholder="შეიყვანეთ პაროლი..." autocomplete="current-password">
-            <button type="button" class="btn btn-primary" id="btn-profile-auth-submit">დადასტურება</button>
-            <button type="button" class="btn btn-outline" id="btn-profile-auth-cancel">გაუქმება</button>
-          </div>
-          <div class="auth-prompt-error" id="profile-auth-error" style="display:none;"></div>
-        </div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="btn-cancel-profile-modal">დახურვა</button>
-        <button type="button" class="btn btn-primary" id="btn-edit-from-profile">
-          <span id="btn-edit-profile-icon">✏️</span>
-          <span id="btn-edit-profile-text">რედაქტირება</span>
-        </button>
       </div>
     </div>
   </div>
@@ -5789,9 +5656,6 @@ ${STEALTH_ADMIN_JS}
             <p class="mentor-desc">\${m.description}</p>
             <div class="tags-row">\${tagsHtml}</div>
           </div>
-          <button type="button" class="btn-mentor-view-profile" onclick="event.stopPropagation(); openMentorProfileModal(\${m.id})">
-            <span>👁️</span> სრული პროფილი & CV
-          </button>
           \${isAdmin ? \`
             <div class="mentor-card-admin-actions" style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
               <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(\${m.id})">✏️ ჩასწორება</button>
@@ -5846,28 +5710,6 @@ ${STEALTH_ADMIN_JS}
         tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => \`<span class="tag-badge">\${t.trim()}</span>\`).join('');
       }
 
-      // Reset inline auth prompt
-      const authPrompt = document.getElementById('profile-auth-prompt');
-      const authPassInput = document.getElementById('profile-admin-password');
-      const authError = document.getElementById('profile-auth-error');
-      if (authPrompt) authPrompt.style.display = 'none';
-      if (authPassInput) authPassInput.value = '';
-      if (authError) {
-        authError.style.display = 'none';
-        authError.textContent = '';
-      }
-
-      // Update Edit button label
-      const isAdmin = isAdminMode();
-      const editBtnText = document.getElementById('btn-edit-profile-text');
-      const editBtnIcon = document.getElementById('btn-edit-profile-icon');
-      if (editBtnText) {
-        editBtnText.textContent = isAdmin ? 'რედაქტირება' : 'რედაქტირება (ადმინისტრატორის პაროლით)';
-      }
-      if (editBtnIcon) {
-        editBtnIcon.textContent = isAdmin ? '✏️' : '🔐';
-      }
-
       const modal = document.getElementById('mentor-profile-modal');
       if (modal) modal.classList.add('open');
     }
@@ -5875,87 +5717,6 @@ ${STEALTH_ADMIN_JS}
     function closeMentorProfileModal() {
       const modal = document.getElementById('mentor-profile-modal');
       if (modal) modal.classList.remove('open');
-      const authPrompt = document.getElementById('profile-auth-prompt');
-      if (authPrompt) authPrompt.style.display = 'none';
-    }
-
-    function handleEditFromProfile() {
-      if (!currentProfileMentorId) return;
-      if (isAdminMode()) {
-        closeMentorProfileModal();
-        openEditMentor(currentProfileMentorId);
-      } else {
-        const authPrompt = document.getElementById('profile-auth-prompt');
-        const passInput = document.getElementById('profile-admin-password');
-        const authError = document.getElementById('profile-auth-error');
-        if (authPrompt) {
-          authPrompt.style.display = 'flex';
-          if (authError) authError.style.display = 'none';
-          if (passInput) {
-            passInput.value = '';
-            setTimeout(() => passInput.focus(), 100);
-          }
-        }
-      }
-    }
-
-    async function handleProfileAuthSubmit() {
-      if (isLockedOut()) {
-        const until = getLockoutUntil();
-        const diffSec = Math.ceil((until - Date.now()) / 1000);
-        const m = Math.floor(diffSec / 60);
-        showToast('🔒 სისტემა დროებით დაბლოკილია (' + m + ' წთ)');
-        return;
-      }
-
-      const passInput = document.getElementById('profile-admin-password');
-      const authError = document.getElementById('profile-auth-error');
-      const enteredPass = (passInput ? passInput.value : '').trim();
-
-      if (!enteredPass) {
-        if (authError) {
-          authError.textContent = 'გთხოვთ შეიყვანოთ ადმინისტრატორის პაროლი.';
-          authError.style.display = 'block';
-        }
-        return;
-      }
-
-      const hash = await computeSHA256(enteredPass);
-      if (hash === ADMIN_HASH) {
-        // Success
-        resetAdminLockout();
-        sessionStorage.setItem('gardabani_admin_session', 'true');
-        sessionStorage.setItem('gardabani_admin_mode_type', 'local');
-        sessionStorage.setItem('gardabani_last_active', Date.now().toString());
-        startInactivityWatcher();
-        syncAdminUI();
-
-        showToast('ადმინისტრატორის სესია გააქტიურდა ✅');
-        const mentorIdToEdit = currentProfileMentorId;
-        closeMentorProfileModal();
-        openEditMentor(mentorIdToEdit);
-      } else {
-        const res = recordFailedAttempt();
-        if (res.locked) {
-          updateLockoutUI();
-          if (authError) {
-            authError.textContent = '🔒 3 არასწორი მცდელობა! სისტემა დაიბლოკა ' + res.minutes + ' წუთით.';
-            authError.style.display = 'block';
-          }
-          showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
-        } else {
-          if (authError) {
-            authError.textContent = '❌ არასწორი პაროლი! დარჩენილია ' + res.remaining + ' მცდელობა.';
-            authError.style.display = 'block';
-          }
-          if (passInput) {
-            passInput.classList.add('shake');
-            setTimeout(() => passInput.classList.remove('shake'), 400);
-            passInput.focus();
-            passInput.select();
-          }
-        }
-      }
     }
 
     async function syncMentorsFromSupabase() {
@@ -5995,15 +5756,6 @@ ${STEALTH_ADMIN_JS}
       if (adminIndicator) adminIndicator.style.display = isAdmin ? 'inline-flex' : 'none';
       if (btnAddMentor) btnAddMentor.style.display = isAdmin ? 'inline-flex' : 'none';
       renderMentorsList(mentors);
-      
-      const editBtnText = document.getElementById('btn-edit-profile-text');
-      const editBtnIcon = document.getElementById('btn-edit-profile-icon');
-      if (editBtnText) {
-        editBtnText.textContent = isAdmin ? 'რედაქტირება' : 'რედაქტირება (ადმინისტრატორის პაროლით)';
-      }
-      if (editBtnIcon) {
-        editBtnIcon.textContent = isAdmin ? '✏️' : '🔐';
-      }
     }
 
     // Modal Handlers
@@ -6178,34 +5930,8 @@ ${STEALTH_ADMIN_JS}
       if (mentorForm) mentorForm.addEventListener('submit', saveMentor);
 
       // Profile Modal Listeners
-      const btnEditFromProfile = document.getElementById('btn-edit-from-profile');
-      if (btnEditFromProfile) btnEditFromProfile.addEventListener('click', handleEditFromProfile);
-
       const btnCloseProfile = document.getElementById('btn-close-profile-modal');
       if (btnCloseProfile) btnCloseProfile.addEventListener('click', closeMentorProfileModal);
-      const btnCancelProfile = document.getElementById('btn-cancel-profile-modal');
-      if (btnCancelProfile) btnCancelProfile.addEventListener('click', closeMentorProfileModal);
-
-      const btnProfileAuthSubmit = document.getElementById('btn-profile-auth-submit');
-      if (btnProfileAuthSubmit) btnProfileAuthSubmit.addEventListener('click', handleProfileAuthSubmit);
-
-      const btnProfileAuthCancel = document.getElementById('btn-profile-auth-cancel');
-      if (btnProfileAuthCancel) {
-        btnProfileAuthCancel.addEventListener('click', () => {
-          const authPrompt = document.getElementById('profile-auth-prompt');
-          if (authPrompt) authPrompt.style.display = 'none';
-        });
-      }
-
-      const profileAdminPass = document.getElementById('profile-admin-password');
-      if (profileAdminPass) {
-        profileAdminPass.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            handleProfileAuthSubmit();
-          }
-        });
-      }
 
       // Close modals on backdrop click
       const profileModalBackdrop = document.getElementById('mentor-profile-modal');
