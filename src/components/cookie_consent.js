@@ -121,6 +121,11 @@ const COOKIE_CONSENT_CSS = `
   }
   .cookie-details-box.open {
     display: flex !important;
+    animation: cookieDetailsSlideDown 0.22s ease-out;
+  }
+  @keyframes cookieDetailsSlideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Category Item Cards */
@@ -633,13 +638,20 @@ const COOKIE_CONSENT_JS = `
         backdrop.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       }
-      if (showDetailsInitially) {
-        const detailsBox = document.getElementById('cookie-details-box');
-        const btnDetails = document.getElementById('btn-cookie-toggle-details');
-        const btnSave = document.getElementById('btn-cookie-save');
+
+      const detailsBox = document.getElementById('cookie-details-box');
+      const btnDetails = document.getElementById('btn-cookie-toggle-details');
+      const btnSave = document.getElementById('btn-cookie-save');
+
+      // Default: always collapsed unless explicitly true
+      if (showDetailsInitially === true) {
         if (detailsBox) detailsBox.classList.add('open');
         if (btnDetails) btnDetails.textContent = '▲ პარამეტრების შეკუმშვა';
         if (btnSave) btnSave.style.display = 'inline-flex';
+      } else {
+        if (detailsBox) detailsBox.classList.remove('open');
+        if (btnDetails) btnDetails.textContent = '⚙️ პარამეტრების მორგება';
+        if (btnSave) btnSave.style.display = 'none';
       }
     }
 
@@ -654,7 +666,7 @@ const COOKIE_CONSENT_JS = `
 
     function initCookieBanner() {
       const consent = getStoredConsent();
-      // Zero-cookieless state: Prompt user on first visit
+      // Zero-cookieless state: Prompt user on first visit (collapsed by default)
       if (!consent) {
         setTimeout(() => openCookieModal(false), 900);
       }
@@ -700,7 +712,7 @@ const COOKIE_CONSENT_JS = `
       }
 
       if (floatingTrigger) {
-        floatingTrigger.addEventListener('click', () => openCookieModal(true));
+        floatingTrigger.addEventListener('click', () => openCookieModal(false));
       }
 
       if (btnDetails && detailsBox) {
@@ -714,14 +726,17 @@ const COOKIE_CONSENT_JS = `
             detailsBox.classList.add('open');
             btnDetails.textContent = '▲ პარამეტრების შეკუმშვა';
             if (btnSave) btnSave.style.display = 'inline-flex';
+            setTimeout(() => {
+              detailsBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
           }
         });
       }
     }
 
-    // Expose global helper to re-open cookie banner anywhere
+    // Expose global helper to re-open cookie banner anywhere (collapsed by default)
     window.openCookieConsentSettings = function() {
-      openCookieModal(true);
+      openCookieModal(false);
     };
 
     window.getGDPRConsentState = function() {
