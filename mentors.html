@@ -676,6 +676,175 @@
       opacity: 1;
     }
 
+    /* Mentor Card Interaction & Profile Button */
+    .mentor-card {
+      cursor: pointer;
+    }
+
+    .btn-mentor-view-profile {
+      width: 100%;
+      background: var(--bg-hover);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      margin-top: 6px;
+    }
+
+    .btn-mentor-view-profile:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .btn-mentor-view-profile {
+      background: #171717;
+      border-color: #262626;
+      color: #e5e5e5;
+    }
+
+    [data-theme="dark"] .btn-mentor-view-profile:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    /* Mentor Profile Popup Styles (Short CV / Bio) */
+    .mentor-profile-window {
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .profile-header-user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .profile-header-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .profile-header-avatar svg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .profile-modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 20px;
+    }
+
+    .cv-section-block {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    [data-theme="dark"] .cv-section-block {
+      background: #141414;
+      border-color: #262626;
+    }
+
+    .cv-section-title {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+    }
+
+    .cv-section-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      white-space: pre-line;
+      margin: 0;
+    }
+
+    /* Auth prompt box inside Profile modal */
+    .mentor-auth-prompt {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: cookieFadeIn 0.2s ease-out;
+    }
+
+    [data-theme="dark"] .mentor-auth-prompt {
+      background: #0f172a;
+      border-color: #1e3a8a;
+    }
+
+    .auth-prompt-header {
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: #1e40af;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    [data-theme="dark"] .auth-prompt-header {
+      color: #93c5fd;
+    }
+
+    .auth-prompt-desc {
+      font-size: 0.78rem;
+      color: #1e3a8a;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    [data-theme="dark"] .auth-prompt-desc {
+      color: #bfdbfe;
+    }
+
+    .auth-prompt-inputs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .auth-prompt-error {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #dc2626;
+      margin-top: 2px;
+    }
+
+    [data-theme="dark"] .auth-prompt-error {
+      color: #f87171;
+    }
+
     /* Stealth Admin Modal - Perfectly Centered in Viewport */
     .stealth-modal-backdrop {
       position: fixed !important;
@@ -1316,6 +1485,79 @@
 
   </div>
 
+  <!-- MENTOR PROFILE POPUP MODAL (Short CV / Biography) -->
+  <div class="modal-backdrop" id="mentor-profile-modal">
+    <div class="modal-window mentor-profile-window" role="dialog" aria-modal="true" aria-labelledby="profile-mentor-name">
+      <div class="modal-header">
+        <div class="profile-header-user">
+          <div class="profile-header-avatar" id="profile-avatar-wrap"></div>
+          <div>
+            <h3 class="modal-title" id="profile-mentor-name">მენტორის პროფილი</h3>
+            <span class="mentor-role" id="profile-mentor-role">მენტორი</span>
+          </div>
+        </div>
+        <button type="button" class="stealth-close-btn" id="btn-close-profile-modal" title="დახურვა">✕</button>
+      </div>
+      <div class="modal-body profile-modal-body">
+        
+        <!-- Summary / Focus -->
+        <div class="cv-section-block">
+          <h4 class="cv-section-title"><span>📝</span> საქმიანობის მიმართულება და ბიოგრაფია</h4>
+          <p class="cv-section-text" id="profile-mentor-desc"></p>
+        </div>
+
+        <!-- Education -->
+        <div class="cv-section-block">
+          <h4 class="cv-section-title"><span>🎓</span> განათლება და კვალიფიკაცია</h4>
+          <p class="cv-section-text" id="profile-mentor-education"></p>
+        </div>
+
+        <!-- Work Experience -->
+        <div class="cv-section-block">
+          <h4 class="cv-section-title"><span>💼</span> სამუშაო გამოცდილება</h4>
+          <p class="cv-section-text" id="profile-mentor-experience"></p>
+        </div>
+
+        <!-- Achievements -->
+        <div class="cv-section-block">
+          <h4 class="cv-section-title"><span>🏆</span> მიღწევები და სათემო პროექტები</h4>
+          <p class="cv-section-text" id="profile-mentor-achievements"></p>
+        </div>
+
+        <!-- Tags / Skills -->
+        <div class="cv-section-block">
+          <h4 class="cv-section-title"><span>🏷️</span> კომპეტენციები და საკვანძო თემები</h4>
+          <div class="tags-row" id="profile-mentor-tags" style="justify-content:flex-start;"></div>
+        </div>
+
+        <!-- Inline Admin Password Prompt (Shown when non-admin clicks Edit) -->
+        <div class="mentor-auth-prompt" id="profile-auth-prompt" style="display:none;">
+          <div class="auth-prompt-header">
+            <span>🔐</span>
+            <strong>ადმინისტრატორის ავტორიზაცია რედაქტირებისთვის</strong>
+          </div>
+          <p class="auth-prompt-desc">
+            მენტორის მონაცემებისა და CV-ის ჩასასწორებლად შეიყვანეთ ადმინისტრატორის პაროლი:
+          </p>
+          <div class="auth-prompt-inputs">
+            <input type="password" id="profile-admin-password" class="form-input" style="flex:1; min-width:180px;" placeholder="შეიყვანეთ პაროლი..." autocomplete="current-password">
+            <button type="button" class="btn btn-primary" id="btn-profile-auth-submit">დადასტურება</button>
+            <button type="button" class="btn btn-outline" id="btn-profile-auth-cancel">გაუქმება</button>
+          </div>
+          <div class="auth-prompt-error" id="profile-auth-error" style="display:none;"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-cancel-profile-modal">დახურვა</button>
+        <button type="button" class="btn btn-primary" id="btn-edit-from-profile">
+          <span id="btn-edit-profile-icon">✏️</span>
+          <span id="btn-edit-profile-text">რედაქტირება</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MENTOR MODAL (Add / Edit) -->
   <div class="modal-backdrop" id="mentor-modal">
     <div class="modal-window">
@@ -1341,8 +1583,23 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="mentor-desc">აღწერა / მიმართულება</label>
-            <textarea id="mentor-desc" class="form-textarea" rows="3" required placeholder="მიმართულება და საქმიანობის სფერო..."></textarea>
+            <label class="form-label" for="mentor-desc">აღწერა / მიმართულება / ბიოგრაფია</label>
+            <textarea id="mentor-desc" class="form-textarea" rows="2" required placeholder="მიმართულება და საქმიანობის სფერო..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mentor-education">🎓 განათლება და კვალიფიკაცია</label>
+            <textarea id="mentor-education" class="form-textarea" rows="2" placeholder="უმაღლესი განათლება, კურსები, სერტიფიკატები..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mentor-experience">💼 სამუშაო გამოცდილება</label>
+            <textarea id="mentor-experience" class="form-textarea" rows="2" placeholder="სამუშაო გამოცდილება, სათემო პროექტები, მენტორინგი..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mentor-achievements">🏆 მიღწევები და სათემო პროექტები</label>
+            <textarea id="mentor-achievements" class="form-textarea" rows="2" placeholder="მნიშვნელოვანი მიღწევები, გრანტები, შედეგები..."></textarea>
           </div>
 
           <div class="form-grid-2">
@@ -1935,61 +2192,87 @@
   {
     "id": 1,
     "name": "დაკო კეჟერაშვილი",
-    "role": "მენტორი",
+    "role": "მენტორი / არაფორმალური განათლების ექსპერტი",
     "description": "არაფორმალური განათლება, კულტურათაშორისი დიალოგი და შემოქმედებითი უნარების განვითარება ახალგაზრდებში.",
+    "education": "• ივანე ჯავახიშვილის სახელობის თბილისის სახელმწიფო უნივერსიტეტი (თსუ) — სოციალურ და პოლიტიკურ მეცნიერებათა ბაკალავრი\n• Erasmus+ Youth in Action — საერთაშორისო ტრენერთა სასერტიფიკატო პროგრამა არაფორმალურ განათლებასა და ფასილიტაციაში",
+    "experience": "• 5+ წლიანი გამოცდილება ახალგაზრდულ სექტორში ტრენერისა და ფასილიტატორის პოზიციაზე\n• კულტურათაშორისი დიალოგისა და მშვიდობის მშენებლობის პროექტების კოორდინატორი ქვემო ქართლის რეგიონში\n• გარდაბნის მუნიციპალიტეტში ქართულ-აზერბაიჯანული ახალგაზრდული ინიციატივების წამყვანი მენტორი",
+    "achievements": "• 30-ზე მეტი სათემო ვორქშოფისა და საგანმანათლებლო ბანაკის წარმატებული ორგანიზება\n• ქვემო ქართლის ახალგაზრდული ჩართულობის პროგრამის თანაავტორი\n• ახალგაზრდული ინიციატივების ევროპული ფორუმის მონაწილე და დელეგატი",
     "tags": [
       "არაფორმალური განათლება",
-      "კულტურათაშორისი დიალოგი"
+      "კულტურათაშორისი დიალოგი",
+      "ფასილიტაცია",
+      "ახალგაზრდული პოლიტიკა"
     ],
     "avatar_color": "#8b5cf6"
   },
   {
     "id": 2,
     "name": "ნია ჩინტლაძე",
-    "role": "მენტორი",
+    "role": "მენტორი / სათემო განვითარების კოორდინატორი",
     "description": "ახალგაზრდული ინიციატივები, სამოქალაქო აქტივიზმი და სათემო პროექტების დაგეგმვა.",
+    "education": "• ილიას სახელმწიფო უნივერსიტეტი — საზოგადოებასთან ურთიერთობისა და კომუნიკაციის ბაკალავრი\n• სათემო ლიდერობისა და სამოქალაქო ადვოკატირების აკადემიის კურსდამთავრებული",
+    "experience": "• 4 წლიანი გამოცდილება რეგიონული არასამთავრობო ორგანიზაციების სათემო პროექტების მართვაში\n• ახალგაზრდული საინიციატივო ჯგუფების მენტორინგი სოფლად მცხოვრები გოგონების გაძლიერების მიმართულებით\n• ადგილობრივი საჭიროებების კვლევისა და ადვოკატირების კამპანიების ხელმძღვანელი",
+    "achievements": "• 15-ზე მეტი ადგილობრივი მცირე გრანტისა და სათემო ინიციატივის წარმატებული იმპლემენტაცია\n• გარემოსდაცვითი და ეკო-აქტივიზმის რეგიონული კამპანიების ავტორი\n• ახალგაზრდა ქალთა ლიდერობის რეგიონული პლატფორმის თანადამფუძნებელი",
     "tags": [
       "ახალგაზრდული პროექტები",
-      "სამოქალაქო აქტივიზმი"
+      "სამოქალაქო აქტივიზმი",
+      "სათემო განვითარება",
+      "იდეების გენერირება"
     ],
     "avatar_color": "#ec4899"
   },
   {
     "id": 3,
     "name": "მიშო გოგიაშვილი",
-    "role": "მენტორი",
+    "role": "მენტორი / გუნდური ლიდერობის ტრენერი",
     "description": "კომუნიკაცია, გუნდური ლიდერობა და ახალგაზრდების ჩართულობის პროგრამების კოორდინაცია.",
+    "education": "• საქართველოს საზოგადოებრივ საქმეთა ინსტიტუტი (GIPA) — მართვა და საჯარო პოლიტიკა\n• გუნდური ქოუჩინგის, საჯარო გამოსვლებისა და მოლაპარაკებების მართვის ინტენსიური კურსი",
+    "experience": "• რეგიონული ახალგაზრდული ფორუმებისა და დებატ-კლუბების მთავარი მოდერატორი\n• გუნდური შეჭიდულობის (Team Building) და ლიდერული უნარების მენტორი 100+ მონაწილისთვის\n• ახალგაზრდული გაცვლითი პროგრამების კოორდინატორი",
+    "achievements": "• რეგიონული ახალგაზრდული დებატ-ტურნირის დამფუძნებელი ქვემო ქართლში\n• ახალგაზრდული მედიაციისა და კონფლიქტების მშვიდობიანი მოგვარების პლატფორმის თანაშემქმნელი\n• 500-ზე მეტი ახალგაზრდის გადამზადება ეფექტურ კომუნიკაციასა და ლიდერობაში",
     "tags": [
       "გუნდური ლიდერობა",
-      "კომუნიკაცია"
+      "კომუნიკაცია",
+      "დებატები",
+      "კონფლიქტების მართვა"
     ],
     "avatar_color": "#3b82f6"
   },
   {
     "id": 4,
     "name": "დავით მაკარიანი",
-    "role": "მენტორი",
+    "role": "მენტორი / ციფრული ტექნოლოგიების სპეციალისტი",
     "description": "ტექნოლოგიები, ციფრული წიგნიერება და რეგიონული ახალგაზრდების ინოვაციური პროექტები.",
+    "education": "• თბილისის სახელმწიფო უნივერსიტეტი (თსუ) — კომპიუტერული მეცნიერებები და ინფორმაციული ტექნოლოგიები\n• Google Developers & UI/UX დიზაინის სასერტიფიკატო პროგრამა",
+    "experience": "• 4+ წელი ვებ-დეველოპმენტისა და ტექნოლოგიური პროექტების მართვაში\n• რეგიონულ სკოლებში ციფრული წიგნიერებისა და ვებ-ტექნოლოგიების ვორქშოფების ხელმძღვანელი\n• მედიაწიგნიერებისა და კიბერუსაფრთხოების ტრენერი",
+    "achievements": "• გარდაბნის მობილური აკადემიის ციფრული პლატფორმის და ინტერაქტიული რუკის თანაავტორი\n• ახალგაზრდული ტექ-ჰაკათონების მენტორი და ჟიურის წევრი\n• ადგილობრივი სოციალური პროექტებისთვის 10-ზე მეტი ციფრული ხელსაწყოს შემქმნელი",
     "tags": [
       "ციფრული უნარები",
-      "ინოვაციები"
+      "ინოვაციები",
+      "ვებ-ტექნოლოგიები",
+      "მედიაწიგნიერება"
     ],
     "avatar_color": "#10b981"
   },
   {
     "id": 5,
     "name": "ანდრია საჯაია",
-    "role": "მენტორი",
+    "role": "მენტორი / სოციალური მეწარმეობის მკვლევარი",
     "description": "სოციალური მეწარმეობა, კვლევა და საგანმანათლებლო მოდულების განვითარება.",
+    "education": "• თავისუფალი უნივერსიტეტი — ბიზნესის ადმინისტრირება და ეკონომიკა (ESM)\n• სოციალური ინოვაციებისა და მდგრადი განვითარების საერთაშორისო საგანმანათლებლო პროგრამა",
+    "experience": "• სოციალური საწარმოების კონსულტანტი და ბიზნეს-გეგმების მენტორი\n• რეგიონული საჭიროებების კვლევისა და საგანმანათლებლო მოდულების შემმუშავებელი\n• ახალგაზრდული სტარტაპ-აქსელერატორის მენტორი",
+    "achievements": "• 10-ზე მეტი სოციალური სტარტაპის ინკუბაციისა და დაფინანსების მენტორინგი\n• ახალგაზრდული მეწარმეობის საგანმანათლებლო სახელმძღვანელოს თანაავტორი\n• რეგიონული ეკონომიკური გაძლიერების პროექტების კოორდინატორი",
     "tags": [
       "სოციალური მეწარმეობა",
-      "საგანმანათლებლო მოდულები"
+      "საგანმანათლებლო მოდულები",
+      "კვლევა",
+      "ბიზნეს-მოდელირება"
     ],
     "avatar_color": "#0d9488"
   }
 ];
 
     let mentors = [...INITIAL_MENTORS];
+    let currentProfileMentorId = null;
 
     function showToast(msg) {
       let toast = document.getElementById('toast-msg');
@@ -2024,6 +2307,9 @@
         const card = document.createElement('article');
         card.className = 'mentor-card';
         card.id = 'mentor-card-' + m.id;
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', m.name + ' — პროფილის ნახვა');
 
         const tagsList = Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []);
         const tagsHtml = tagsList.filter(t => t.trim()).map(t => `<span class="tag-badge">${t.trim()}</span>`).join('');
@@ -2039,15 +2325,173 @@
             <p class="mentor-desc">${m.description}</p>
             <div class="tags-row">${tagsHtml}</div>
           </div>
+          <button type="button" class="btn-mentor-view-profile" onclick="event.stopPropagation(); openMentorProfileModal(${m.id})">
+            <span>👁️</span> სრული პროფილი & CV
+          </button>
           ${isAdmin ? `
-            <div style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="openEditMentor(${m.id})">✏️ ჩასწორება</button>
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="deleteMentor(${m.id})">🗑️ წაშლა</button>
+            <div class="mentor-card-admin-actions" style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(${m.id})">✏️ ჩასწორება</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="event.stopPropagation(); deleteMentor(${m.id})">🗑️ წაშლა</button>
             </div>
           ` : ''}
         `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.mentor-card-admin-actions')) return;
+          openMentorProfileModal(m.id);
+        });
+
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            if (e.target === card) {
+              e.preventDefault();
+              openMentorProfileModal(m.id);
+            }
+          }
+        });
+
         grid.appendChild(card);
       });
+    }
+
+    // Profile Modal Open & Fill
+    function openMentorProfileModal(id) {
+      const mentor = mentors.find(m => m.id === id);
+      if (!mentor) return;
+      currentProfileMentorId = mentor.id;
+
+      const nameEl = document.getElementById('profile-mentor-name');
+      const roleEl = document.getElementById('profile-mentor-role');
+      const avatarWrap = document.getElementById('profile-avatar-wrap');
+      const descEl = document.getElementById('profile-mentor-desc');
+      const eduEl = document.getElementById('profile-mentor-education');
+      const expEl = document.getElementById('profile-mentor-experience');
+      const achEl = document.getElementById('profile-mentor-achievements');
+      const tagsEl = document.getElementById('profile-mentor-tags');
+
+      if (nameEl) nameEl.textContent = mentor.name;
+      if (roleEl) roleEl.textContent = mentor.role || 'მენტორი';
+      if (avatarWrap) avatarWrap.innerHTML = getAvatarSvg(mentor.avatar_color || '#8b5cf6');
+      if (descEl) descEl.textContent = mentor.description || '';
+      if (eduEl) eduEl.textContent = mentor.education || '';
+      if (expEl) expEl.textContent = mentor.experience || '';
+      if (achEl) achEl.textContent = mentor.achievements || '';
+
+      if (tagsEl) {
+        const tagsList = Array.isArray(mentor.tags) ? mentor.tags : (typeof mentor.tags === 'string' ? mentor.tags.replace(/[{}"]/g, '').split(',') : []);
+        tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => `<span class="tag-badge">${t.trim()}</span>`).join('');
+      }
+
+      // Reset inline auth prompt
+      const authPrompt = document.getElementById('profile-auth-prompt');
+      const authPassInput = document.getElementById('profile-admin-password');
+      const authError = document.getElementById('profile-auth-error');
+      if (authPrompt) authPrompt.style.display = 'none';
+      if (authPassInput) authPassInput.value = '';
+      if (authError) {
+        authError.style.display = 'none';
+        authError.textContent = '';
+      }
+
+      // Update Edit button label
+      const isAdmin = isAdminMode();
+      const editBtnText = document.getElementById('btn-edit-profile-text');
+      const editBtnIcon = document.getElementById('btn-edit-profile-icon');
+      if (editBtnText) {
+        editBtnText.textContent = isAdmin ? 'რედაქტირება' : 'რედაქტირება (ადმინისტრატორის პაროლით)';
+      }
+      if (editBtnIcon) {
+        editBtnIcon.textContent = isAdmin ? '✏️' : '🔐';
+      }
+
+      const modal = document.getElementById('mentor-profile-modal');
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeMentorProfileModal() {
+      const modal = document.getElementById('mentor-profile-modal');
+      if (modal) modal.classList.remove('open');
+      const authPrompt = document.getElementById('profile-auth-prompt');
+      if (authPrompt) authPrompt.style.display = 'none';
+    }
+
+    function handleEditFromProfile() {
+      if (!currentProfileMentorId) return;
+      if (isAdminMode()) {
+        closeMentorProfileModal();
+        openEditMentor(currentProfileMentorId);
+      } else {
+        const authPrompt = document.getElementById('profile-auth-prompt');
+        const passInput = document.getElementById('profile-admin-password');
+        const authError = document.getElementById('profile-auth-error');
+        if (authPrompt) {
+          authPrompt.style.display = 'flex';
+          if (authError) authError.style.display = 'none';
+          if (passInput) {
+            passInput.value = '';
+            setTimeout(() => passInput.focus(), 100);
+          }
+        }
+      }
+    }
+
+    async function handleProfileAuthSubmit() {
+      if (isLockedOut()) {
+        const until = getLockoutUntil();
+        const diffSec = Math.ceil((until - Date.now()) / 1000);
+        const m = Math.floor(diffSec / 60);
+        showToast('🔒 სისტემა დროებით დაბლოკილია (' + m + ' წთ)');
+        return;
+      }
+
+      const passInput = document.getElementById('profile-admin-password');
+      const authError = document.getElementById('profile-auth-error');
+      const enteredPass = (passInput ? passInput.value : '').trim();
+
+      if (!enteredPass) {
+        if (authError) {
+          authError.textContent = 'გთხოვთ შეიყვანოთ ადმინისტრატორის პაროლი.';
+          authError.style.display = 'block';
+        }
+        return;
+      }
+
+      const hash = await computeSHA256(enteredPass);
+      if (hash === ADMIN_HASH) {
+        // Success
+        resetAdminLockout();
+        sessionStorage.setItem('gardabani_admin_session', 'true');
+        sessionStorage.setItem('gardabani_admin_mode_type', 'local');
+        sessionStorage.setItem('gardabani_last_active', Date.now().toString());
+        startInactivityWatcher();
+        syncAdminUI();
+
+        showToast('ადმინისტრატორის სესია გააქტიურდა ✅');
+        const mentorIdToEdit = currentProfileMentorId;
+        closeMentorProfileModal();
+        openEditMentor(mentorIdToEdit);
+      } else {
+        const res = recordFailedAttempt();
+        if (res.locked) {
+          updateLockoutUI();
+          if (authError) {
+            authError.textContent = '🔒 3 არასწორი მცდელობა! სისტემა დაიბლოკა ' + res.minutes + ' წუთით.';
+            authError.style.display = 'block';
+          }
+          showToast('🔒 სისტემა დაიბლოკა ' + res.minutes + ' წუთით!');
+        } else {
+          if (authError) {
+            authError.textContent = '❌ არასწორი პაროლი! დარჩენილია ' + res.remaining + ' მცდელობა.';
+            authError.style.display = 'block';
+          }
+          if (passInput) {
+            passInput.classList.add('shake');
+            setTimeout(() => passInput.classList.remove('shake'), 400);
+            passInput.focus();
+            passInput.select();
+          }
+        }
+      }
     }
 
     async function syncMentorsFromSupabase() {
@@ -2064,9 +2508,15 @@
             name: m.name,
             role: m.role || 'მენტორი',
             description: m.description,
+            education: m.education || '',
+            experience: m.experience || '',
+            achievements: m.achievements || '',
             tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []),
             avatar_color: m.avatar_color || '#8b5cf6'
           }));
+          try {
+            localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
+          } catch(e) {}
           renderMentorsList(mentors);
         }
       } catch (err) {
@@ -2081,6 +2531,15 @@
       if (adminIndicator) adminIndicator.style.display = isAdmin ? 'inline-flex' : 'none';
       if (btnAddMentor) btnAddMentor.style.display = isAdmin ? 'inline-flex' : 'none';
       renderMentorsList(mentors);
+      
+      const editBtnText = document.getElementById('btn-edit-profile-text');
+      const editBtnIcon = document.getElementById('btn-edit-profile-icon');
+      if (editBtnText) {
+        editBtnText.textContent = isAdmin ? 'რედაქტირება' : 'რედაქტირება (ადმინისტრატორის პაროლით)';
+      }
+      if (editBtnIcon) {
+        editBtnIcon.textContent = isAdmin ? '✏️' : '🔐';
+      }
     }
 
     // Modal Handlers
@@ -2090,6 +2549,9 @@
       document.getElementById('mentor-name').value = '';
       document.getElementById('mentor-role').value = 'მენტორი';
       document.getElementById('mentor-desc').value = '';
+      document.getElementById('mentor-education').value = '';
+      document.getElementById('mentor-experience').value = '';
+      document.getElementById('mentor-achievements').value = '';
       document.getElementById('mentor-tags').value = '';
       document.getElementById('mentor-color').value = '#8b5cf6';
       document.getElementById('mentor-modal').classList.add('open');
@@ -2102,8 +2564,11 @@
       document.getElementById('mentor-form-id').value = mentor.id;
       document.getElementById('mentor-name').value = mentor.name;
       document.getElementById('mentor-role').value = mentor.role || 'მენტორი';
-      document.getElementById('mentor-desc').value = mentor.description;
-      document.getElementById('mentor-tags').value = Array.isArray(mentor.tags) ? mentor.tags.join(', ') : mentor.tags;
+      document.getElementById('mentor-desc').value = mentor.description || '';
+      document.getElementById('mentor-education').value = mentor.education || '';
+      document.getElementById('mentor-experience').value = mentor.experience || '';
+      document.getElementById('mentor-achievements').value = mentor.achievements || '';
+      document.getElementById('mentor-tags').value = Array.isArray(mentor.tags) ? mentor.tags.join(', ') : (mentor.tags || '');
       document.getElementById('mentor-color').value = mentor.avatar_color || '#8b5cf6';
       document.getElementById('mentor-modal').classList.add('open');
     }
@@ -2120,11 +2585,14 @@
       const name = document.getElementById('mentor-name').value.trim();
       const role = document.getElementById('mentor-role').value.trim();
       const description = document.getElementById('mentor-desc').value.trim();
+      const education = document.getElementById('mentor-education').value.trim();
+      const experience = document.getElementById('mentor-experience').value.trim();
+      const achievements = document.getElementById('mentor-achievements').value.trim();
       const tagsStr = document.getElementById('mentor-tags').value.trim();
       const tags = tagsStr ? tagsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
       const avatar_color = document.getElementById('mentor-color').value;
 
-      const record = { id, name, role, description, tags, avatar_color };
+      const record = { id, name, role, description, education, experience, achievements, tags, avatar_color };
 
       if (isNew) {
         mentors.push(record);
@@ -2132,9 +2600,21 @@
         const idx = mentors.findIndex(m => m.id === id);
         if (idx !== -1) mentors[idx] = record;
       }
+
+      try {
+        localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
+      } catch(err) {}
+
       renderMentorsList(mentors);
       closeMentorModal();
-      showToast('მენტორი წარმატებით შეინახა ✅');
+      showToast('მენტორის მონაცემები წარმატებით შეინახა ✅');
+
+      if (currentProfileMentorId === id) {
+        const modal = document.getElementById('mentor-profile-modal');
+        if (modal && modal.classList.contains('open')) {
+          openMentorProfileModal(id);
+        }
+      }
 
       const client = initSupabase();
       if (client) {
@@ -2149,6 +2629,9 @@
     async function deleteMentor(id) {
       if (!confirm('ნამდვილად გსურთ მენტორის წაშლა?')) return;
       mentors = mentors.filter(m => m.id !== id);
+      try {
+        localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
+      } catch(err) {}
       renderMentorsList(mentors);
       showToast('მენტორი წაიშალა 🗑️');
 
@@ -2164,6 +2647,16 @@
 
     // Theme toggle handling for mentors page
     document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const localCustom = localStorage.getItem('gardabani_mentors_custom');
+        if (localCustom) {
+          const parsed = JSON.parse(localCustom);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            mentors = parsed;
+          }
+        }
+      } catch(e) {}
+
       renderMentorsList(mentors);
       syncMentorsFromSupabase();
       syncAdminUI();
@@ -2210,7 +2703,7 @@
       const btnAddMentor = document.getElementById('btn-add-mentor');
       if (btnAddMentor) btnAddMentor.addEventListener('click', openAddMentor);
 
-      // Close Modal Buttons
+      // Close Modal Buttons for Edit Modal
       const btnCloseModal = document.getElementById('btn-close-mentor-modal');
       if (btnCloseModal) btnCloseModal.addEventListener('click', closeMentorModal);
       const btnCancelModal = document.getElementById('btn-cancel-mentor-modal');
@@ -2219,6 +2712,59 @@
       // Mentor Form Submit
       const mentorForm = document.getElementById('mentor-form');
       if (mentorForm) mentorForm.addEventListener('submit', saveMentor);
+
+      // Profile Modal Listeners
+      const btnEditFromProfile = document.getElementById('btn-edit-from-profile');
+      if (btnEditFromProfile) btnEditFromProfile.addEventListener('click', handleEditFromProfile);
+
+      const btnCloseProfile = document.getElementById('btn-close-profile-modal');
+      if (btnCloseProfile) btnCloseProfile.addEventListener('click', closeMentorProfileModal);
+      const btnCancelProfile = document.getElementById('btn-cancel-profile-modal');
+      if (btnCancelProfile) btnCancelProfile.addEventListener('click', closeMentorProfileModal);
+
+      const btnProfileAuthSubmit = document.getElementById('btn-profile-auth-submit');
+      if (btnProfileAuthSubmit) btnProfileAuthSubmit.addEventListener('click', handleProfileAuthSubmit);
+
+      const btnProfileAuthCancel = document.getElementById('btn-profile-auth-cancel');
+      if (btnProfileAuthCancel) {
+        btnProfileAuthCancel.addEventListener('click', () => {
+          const authPrompt = document.getElementById('profile-auth-prompt');
+          if (authPrompt) authPrompt.style.display = 'none';
+        });
+      }
+
+      const profileAdminPass = document.getElementById('profile-admin-password');
+      if (profileAdminPass) {
+        profileAdminPass.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleProfileAuthSubmit();
+          }
+        });
+      }
+
+      // Close modals on backdrop click
+      const profileModalBackdrop = document.getElementById('mentor-profile-modal');
+      if (profileModalBackdrop) {
+        profileModalBackdrop.addEventListener('click', (e) => {
+          if (e.target === profileModalBackdrop) closeMentorProfileModal();
+        });
+      }
+
+      const mentorModalBackdrop = document.getElementById('mentor-modal');
+      if (mentorModalBackdrop) {
+        mentorModalBackdrop.addEventListener('click', (e) => {
+          if (e.target === mentorModalBackdrop) closeMentorModal();
+        });
+      }
+
+      // ESC key closes modals
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeMentorProfileModal();
+          closeMentorModal();
+        }
+      });
     });
   </script>
 
