@@ -81,10 +81,17 @@
       --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
     }
 
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -97,6 +104,13 @@
       display: flex;
       flex-direction: column;
       transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    body, h1, h2, h3, h4, h5, h6, p, span, a, li, button, input, textarea {
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .app-container {
@@ -777,6 +791,8 @@
         border-radius: var(--radius-full);
         gap: 4px;
         background: var(--bg-nav);
+        touch-action: pan-x;
+        scroll-behavior: smooth;
       }
 
       .nav-tabs::-webkit-scrollbar {
@@ -790,6 +806,11 @@
         padding: 7px 10px;
         font-size: 0.74rem;
         white-space: nowrap;
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .nav-tab:active {
+        transform: scale(0.96);
       }
 
       .theme-toggle-btn {
@@ -838,8 +859,9 @@
       }
 
       .month-btn {
-        padding: 4px 8px;
-        font-size: 0.74rem;
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        min-height: 36px;
       }
 
       .calendar-weekdays {
@@ -856,9 +878,16 @@
       }
 
       .calendar-day-cell {
-        min-height: 42px;
-        padding: 3px 2px;
+        min-height: 44px;
+        padding: 4px 2px;
         border-radius: 6px;
+        touch-action: manipulation;
+        transition: all 0.15s ease;
+      }
+
+      .calendar-day-cell:active {
+        transform: scale(0.95);
+        background: var(--bg-hover);
       }
 
       .day-number {
@@ -866,14 +895,14 @@
       }
 
       .calendar-day-cell.today .day-number {
-        width: 20px;
-        height: 20px;
-        font-size: 0.68rem;
+        width: 22px;
+        height: 22px;
+        font-size: 0.70rem;
       }
 
       .event-dot {
-        width: 5px;
-        height: 5px;
+        width: 6px;
+        height: 6px;
       }
 
       .details-header {
@@ -886,6 +915,14 @@
 
       .event-card {
         padding: 10px 12px;
+      }
+
+      .event-detail-item {
+        padding: 12px 14px;
+      }
+
+      .event-detail-item:active {
+        transform: scale(0.99);
       }
 
       /* Timeline Card */
@@ -905,6 +942,43 @@
 
       .timeline-item-card {
         padding: 12px 14px;
+      }
+
+      .timeline-item-card:active {
+        transform: scale(0.99);
+      }
+
+      .event-bottom-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .event-bottom-row > div {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+      }
+
+      .event-bottom-row .btn-goto-map,
+      .event-bottom-row .btn-outline {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        min-height: 38px;
+      }
+
+      .timeline-item-card div[style*="justify-content:flex-end"] {
+        justify-content: stretch !important;
+        width: 100%;
+      }
+
+      .timeline-item-card .btn-goto-map,
+      .timeline-item-card .btn-outline {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        min-height: 38px;
       }
     }
 
@@ -932,11 +1006,20 @@
       }
 
       .calendar-day-cell {
-        min-height: 38px;
+        min-height: 40px;
+        padding: 3px 1px;
       }
 
       .day-number {
-        font-size: 0.70rem;
+        font-size: 0.72rem;
+      }
+
+      .event-bottom-row > div {
+        flex-direction: column;
+      }
+
+      .timeline-item-card div[style*="justify-content:flex-end"] {
+        flex-direction: column;
       }
     }
 
@@ -1066,6 +1149,75 @@
       background: #1d4ed8;
       transform: translateY(-2px);
       box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    @media (max-width: 768px) {
+      .next-event-banner {
+        padding: 12px 14px;
+        gap: 12px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .banner-title {
+        font-size: 1.05rem;
+      }
+
+      .banner-sub {
+        font-size: 0.76rem;
+      }
+
+      .banner-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .countdown-timer {
+        width: 100%;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .timer-box {
+        min-width: 42px;
+        padding: 5px 6px;
+      }
+
+      .timer-val {
+        font-size: 1.05rem;
+      }
+
+      .timer-lbl {
+        font-size: 0.58rem;
+      }
+
+      .btn-banner-map {
+        width: 100%;
+        min-height: 40px;
+        justify-content: center;
+        font-size: 0.82rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .next-event-banner {
+        padding: 10px 10px;
+      }
+
+      .banner-title {
+        font-size: 0.98rem;
+      }
+
+      .timer-box {
+        min-width: 36px;
+        padding: 4px 4px;
+      }
+
+      .timer-val {
+        font-size: 0.95rem;
+      }
     }
 
     /* THEMATIC CATEGORY BADGES */
@@ -1207,15 +1359,11 @@
       }
 
       body {
-        padding-bottom: 68px !important;
-      }
-
-      .map-floating-left {
-        bottom: 74px !important;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
       .leaflet-bottom {
-        bottom: 70px !important;
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
       }
     }
 

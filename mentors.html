@@ -77,10 +77,17 @@
       --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
     }
 
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -93,6 +100,13 @@
       display: flex;
       flex-direction: column;
       transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    body, h1, h2, h3, h4, h5, h6, p, span, a, li, button, input, textarea {
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .app-container {
@@ -409,6 +423,8 @@
         border-radius: var(--radius-full);
         gap: 4px;
         background: var(--bg-nav);
+        touch-action: pan-x;
+        scroll-behavior: smooth;
       }
 
       .nav-tabs::-webkit-scrollbar {
@@ -422,6 +438,11 @@
         padding: 7px 10px;
         font-size: 0.74rem;
         white-space: nowrap;
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .nav-tab:active {
+        transform: scale(0.96);
       }
 
       .theme-toggle-btn {
@@ -450,12 +471,16 @@
 
       .mentor-card {
         padding: 16px 14px;
-        gap: 10px;
+        gap: 12px;
+      }
+
+      .mentor-card:active {
+        transform: scale(0.98);
       }
 
       .avatar-wrapper {
-        width: 80px;
-        height: 80px;
+        width: 72px;
+        height: 72px;
       }
 
       .mentor-name {
@@ -468,6 +493,101 @@
 
       .mentor-desc {
         font-size: 0.78rem;
+        line-height: 1.5;
+      }
+
+      .tags-row {
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+
+      .tag-badge {
+        font-size: 0.66rem;
+        padding: 2px 7px;
+      }
+
+      /* Mentor Profile Modal (CV) Mobile Optimization */
+      .mentor-profile-window {
+        max-width: 95vw;
+        max-height: 90vh;
+        border-radius: var(--radius-md);
+      }
+
+      .mentor-profile-window .modal-header {
+        padding: 12px 14px;
+        gap: 8px;
+      }
+
+      .profile-header-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .profile-header-user > div {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .profile-header-avatar {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+      }
+
+      #profile-mentor-name {
+        font-size: 0.92rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #profile-mentor-role {
+        font-size: 0.72rem;
+      }
+
+      .profile-social-links {
+        gap: 6px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+
+      .social-link-btn {
+        width: 32px;
+        height: 32px;
+      }
+
+      #btn-close-profile-modal,
+      .stealth-close-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .profile-modal-body {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+
+      .cv-section-block {
+        padding: 10px 12px;
+        gap: 4px;
+      }
+
+      .cv-section-title {
+        font-size: 0.80rem;
+      }
+
+      .cv-section-text {
+        font-size: 0.76rem;
+        line-height: 1.5;
       }
     }
 
@@ -492,6 +612,29 @@
       .theme-toggle-btn {
         padding: 4px 8px;
         font-size: 0.70rem;
+      }
+
+      .mentor-card {
+        padding: 14px 12px;
+      }
+
+      .avatar-wrapper {
+        width: 64px;
+        height: 64px;
+      }
+
+      .profile-header-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+      }
+
+      #profile-mentor-name {
+        font-size: 0.86rem;
+      }
+
+      .cv-section-block {
+        padding: 8px 10px;
       }
     }
 
@@ -857,15 +1000,11 @@
       }
 
       body {
-        padding-bottom: 68px !important;
-      }
-
-      .map-floating-left {
-        bottom: 74px !important;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
       .leaflet-bottom {
-        bottom: 70px !important;
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
       }
     }
 

@@ -79,10 +79,17 @@
       --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.95);
     }
 
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -95,6 +102,13 @@
       display: flex;
       flex-direction: column;
       transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    body, h1, h2, h3, h4, h5, h6, p, span, a, li, button, input, textarea {
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .app-container {
@@ -294,6 +308,8 @@
       display: flex;
       flex-direction: column;
       gap: 3px;
+      min-width: 0;
+      flex: 1;
     }
 
     .switch-title {
@@ -628,6 +644,8 @@
         border-radius: var(--radius-full);
         gap: 4px;
         background: var(--bg-nav);
+        touch-action: pan-x;
+        scroll-behavior: smooth;
       }
 
       .nav-tabs::-webkit-scrollbar {
@@ -641,6 +659,11 @@
         padding: 7px 10px;
         font-size: 0.74rem;
         white-space: nowrap;
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .nav-tab:active {
+        transform: scale(0.96);
       }
 
       .theme-toggle-btn {
@@ -668,16 +691,42 @@
       }
 
       .switch-row {
-        padding: 10px 12px;
-        gap: 10px;
+        padding: 12px 14px;
+        gap: 12px;
+        min-height: 52px;
+      }
+
+      .switch-row:active {
+        transform: scale(0.99);
       }
 
       .switch-title {
-        font-size: 0.82rem;
+        font-size: 0.84rem;
       }
 
       .switch-desc {
-        font-size: 0.72rem;
+        font-size: 0.74rem;
+        line-height: 1.4;
+      }
+
+      #row-cookie-settings {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      #row-cookie-settings #btn-reopen-cookie-banner {
+        width: 100%;
+        justify-content: center;
+        min-height: 38px;
+        font-size: 0.78rem;
+      }
+
+      #btn-reset-all-settings {
+        width: 100%;
+        justify-content: center;
+        min-height: 38px;
+        font-size: 0.78rem;
       }
 
       .action-btn-row {
@@ -689,6 +738,7 @@
         width: 100%;
         justify-content: center;
         padding: 9px 12px;
+        min-height: 40px;
       }
     }
 
@@ -1108,12 +1158,26 @@
     }
 
     @media (max-width: 640px) {
-      .analytics-kpi-grid { grid-template-columns: 1fr 1fr; }
-      .analytics-charts-grid { grid-template-columns: 1fr; }
+      .analytics-kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .analytics-charts-grid { grid-template-columns: 1fr; gap: 12px; }
       .analytics-details-grid { grid-template-columns: 1fr; }
       .activity-item { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .activity-badges-group { justify-content: flex-start; }
-      .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(12, 1fr); }
+      .activity-badges-group { justify-content: flex-start; flex-wrap: wrap; gap: 4px; }
+      .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(12, 1fr); gap: 2px; }
+      .analytics-kpi-card { padding: 12px 10px; }
+      .kpi-main-val { font-size: 1.15rem !important; }
+      .kpi-sub-label { font-size: 0.65rem !important; }
+      .analytics-header-actions { width: 100%; justify-content: space-between; }
+      .analytics-header-actions .btn { flex: 1; min-height: 36px; justify-content: center; }
+    }
+
+    @media (max-width: 420px) {
+      .analytics-kpi-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .analytics-kpi-card { padding: 10px 8px; }
+      .kpi-main-val { font-size: 1.05rem !important; }
+      .kpi-card-title { font-size: 0.70rem !important; }
+      .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(8, 1fr); gap: 2px; }
+      .chart-card { padding: 12px 10px; }
     }
 
     /* Hide floating cookie trigger button on settings page */
