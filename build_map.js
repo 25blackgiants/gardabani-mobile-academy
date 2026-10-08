@@ -7536,7 +7536,13 @@ ${GEORGIAN_FONT_HEAD_TAG}
         font-size: 0.69rem;
       }
 
-        /* ==========================================================================
+      .theme-toggle-btn {
+        padding: 4px 8px;
+        font-size: 0.70rem;
+      }
+    }
+
+    /* ==========================================================================
        MODERN ADMIN ANALYTICS DASHBOARD STYLES (EXECUTIVE LEVEL)
        ========================================================================== */
     .analytics-header-actions {
