@@ -29,6 +29,125 @@ ${COOKIE_CONSENT_JS}
   </script>
 `;
 
+// Modern Clean Georgian Font Link (Noto Sans Georgian)
+const GEORGIAN_FONT_HEAD_TAG = `
+  <!-- Modern Clean Georgian Font (Noto Sans Georgian) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+`;
+
+// Mobile Bottom Navigation Bar CSS
+const MOBILE_BOTTOM_NAV_CSS = `
+    /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-light);
+        z-index: 1500;
+        align-items: center;
+        justify-content: space-around;
+        padding: 4px 6px env(safe-area-inset-bottom, 6px);
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      [data-theme="dark"] .mobile-bottom-nav {
+        background: rgba(10, 10, 10, 0.94);
+        border-top-color: #262626;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--text-muted);
+        flex: 1;
+        padding: 6px 2px;
+        border-radius: var(--radius-sm);
+        transition: all 0.15s ease;
+      }
+
+      .bottom-nav-icon {
+        font-size: 1.15rem;
+        line-height: 1;
+        transition: transform 0.15s ease;
+      }
+
+      .bottom-nav-label {
+        font-size: 0.66rem;
+        font-weight: 700;
+      }
+
+      .bottom-nav-item.active {
+        color: #2563eb;
+      }
+
+      [data-theme="dark"] .bottom-nav-item.active {
+        color: #60a5fa;
+      }
+
+      .bottom-nav-item.active .bottom-nav-icon {
+        transform: scale(1.15);
+      }
+
+      .bottom-nav-item:active {
+        transform: scale(0.92);
+      }
+
+      body {
+        padding-bottom: 68px !important;
+      }
+
+      .map-floating-left {
+        bottom: 74px !important;
+      }
+
+      .leaflet-bottom {
+        bottom: 70px !important;
+      }
+    }
+`;
+
+function getBottomNavHtml(activeTab) {
+  return `
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
+    <a href="index.html" class="bottom-nav-item \${activeTab === 'map' ? 'active' : ''}">
+      <span class="bottom-nav-icon">🗺️</span>
+      <span class="bottom-nav-label">მთავარი გვერდი</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item \${activeTab === 'calendar' ? 'active' : ''}">
+      <span class="bottom-nav-icon">📅</span>
+      <span class="bottom-nav-label">კალენდარი</span>
+    </a>
+    <a href="mentors.html" class="bottom-nav-item \${activeTab === 'mentors' ? 'active' : ''}">
+      <span class="bottom-nav-icon">👥</span>
+      <span class="bottom-nav-label">მენტორები</span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item \${activeTab === 'settings' ? 'active' : ''}">
+      <span class="bottom-nav-icon">⚙️</span>
+      <span class="bottom-nav-label">პარამეტრები</span>
+    </a>
+  </nav>
+  `;
+}
+
 // ============================================================================
 // STEALTH ADMIN ACCESS CONFIG & COMPONENT (SHA-256, RATE LIMIT, INACTIVITY)
 // ============================================================================
@@ -791,6 +910,7 @@ const mapHtmlContent = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია</title>
+${GEORGIAN_FONT_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -844,7 +964,7 @@ const mapHtmlContent = `<!DOCTYPE html>
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       --shadow-popup: 0 20px 25px -5px rgba(0, 0, 0, 0.22), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* Night Mode Theme Variables (TRUE PURE BLACK - NO BLUE TINT) */
@@ -1664,6 +1784,37 @@ const mapHtmlContent = `<!DOCTYPE html>
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       border: 2px solid #ffffff;
       transition: all 0.2s ease;
+      position: relative;
+    }
+
+    /* Pulse Radar Animation for Next Upcoming Activity */
+    .custom-marker-pin.pulse-pin::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50% 50% 50% 0;
+      border: 2.5px solid #2563eb;
+      animation: radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      pointer-events: none;
+    }
+
+    .custom-marker-pin.pulse-pin.hub::after {
+      border-color: #ef4444;
+    }
+
+    @keyframes radarPulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.95;
+      }
+      50% {
+        transform: scale(1.55);
+        opacity: 0.35;
+      }
+      100% {
+        transform: scale(2.05);
+        opacity: 0;
+      }
     }
 
     .custom-marker-pin.hub {
@@ -2174,6 +2325,7 @@ const mapHtmlContent = `<!DOCTYPE html>
         width: 230px !important;
       }
     }
+${MOBILE_BOTTOM_NAV_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
   </style>
@@ -2500,11 +2652,16 @@ ${STEALTH_ADMIN_JS}
       // Move zoom control to bottomright so it never collides with top-left drawer trigger
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // 1. Google Maps Roadmap Tile Layer
-      const roadmapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        maxZoom: 19,
-        attribution: '© Google Maps'
+      // 1. CartoDB Positron (Light) / Dark Matter (Dark) Modern Map Tile Layer
+      const isInitialDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const cartoTileUrl = isInitialDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+      const roadmapLayer = L.tileLayer(cartoTileUrl, {
+        subdomains: ['a', 'b', 'c', 'd'],
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       });
 
       // 2. Google Maps Hybrid Satellite
@@ -2630,7 +2787,13 @@ ${STEALTH_ADMIN_JS}
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const mapEl = document.getElementById('map');
       if (!mapEl) return;
-      if (isDark && (currentBaseLayerName === 'roadmap' || currentBaseLayerName === 'terrain')) {
+      if (baseLayers && baseLayers.roadmap) {
+        const targetCartoUrl = isDark
+          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        baseLayers.roadmap.setUrl(targetCartoUrl);
+      }
+      if (isDark && currentBaseLayerName === 'terrain') {
         mapEl.classList.add('dark-tiles');
       } else {
         mapEl.classList.remove('dark-tiles');
@@ -2648,13 +2811,26 @@ ${STEALTH_ADMIN_JS}
 
       const hub = locations.find(l => l.type === 'hub') || locations[0];
 
+      // Determine closest upcoming activity to highlight with pulsing radar
+      let nextUpcomingId = null;
+      const nowStr = new Date().toISOString().slice(0, 10);
+      const sortedUpcoming = [...locations]
+        .filter(l => l.date && l.date >= nowStr)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      if (sortedUpcoming.length > 0) {
+        nextUpcomingId = sortedUpcoming[0].id;
+      } else if (locations.length > 0) {
+        nextUpcomingId = locations[0].id;
+      }
+
       locations.forEach((loc, index) => {
         const isHub = loc.type === 'hub';
         const numLabel = isHub ? '★' : (index);
+        const isPulse = loc.id === nextUpcomingId;
 
         // Custom HTML Marker Icon
         const iconHtml = \`
-          <div class="custom-marker-pin \${isHub ? 'hub' : 'village'}">
+          <div class="custom-marker-pin \${isHub ? 'hub' : 'village'} \${isPulse ? 'pulse-pin' : ''}">
             <span>\${numLabel}</span>
           </div>
         \`;
@@ -3289,6 +3465,7 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
+${getBottomNavHtml('map')}
 </body>
 </html>`;
 
@@ -3301,6 +3478,7 @@ const calendarHtmlContent = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — კალენდარი</title>
+${GEORGIAN_FONT_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -3348,7 +3526,7 @@ const calendarHtmlContent = `<!DOCTYPE html>
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* True Pure Black Dark Theme (No Blue Tint) */
@@ -4230,6 +4408,202 @@ const calendarHtmlContent = `<!DOCTYPE html>
         font-size: 0.70rem;
       }
     }
+
+    /* NEXT EVENT COUNTDOWN BANNER */
+    .next-event-banner {
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 16px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] .next-event-banner {
+      background: linear-gradient(135deg, #0b1329 0%, #061c14 100%);
+      border-color: #1e3a8a;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .banner-left {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .banner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #2563eb;
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 800;
+      width: fit-content;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .banner-title {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .banner-sub {
+      font-size: 0.80rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .countdown-timer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 5px 9px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 44px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] .timer-box {
+      background: #121212;
+      border-color: #262626;
+    }
+
+    .timer-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #2563eb;
+      line-height: 1.1;
+    }
+
+    [data-theme="dark"] .timer-val {
+      color: #60a5fa;
+    }
+
+    .timer-lbl {
+      font-size: 0.60rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+    }
+
+    .timer-colon {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-subtle);
+    }
+
+    .btn-banner-map {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 8px 15px;
+      border-radius: var(--radius-md);
+      font-size: 0.80rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .btn-banner-map:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* THEMATIC CATEGORY BADGES */
+    .cat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.69rem;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .cat-badge.sport {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    [data-theme="dark"] .cat-badge.sport {
+      background: #064e3b;
+      color: #a7f3d0;
+      border-color: #047857;
+    }
+
+    .cat-badge.art {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    [data-theme="dark"] .cat-badge.art {
+      background: #78350f;
+      color: #fde68a;
+      border-color: #92400e;
+    }
+
+    .cat-badge.debate {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    [data-theme="dark"] .cat-badge.debate {
+      background: #1e3a8a;
+      color: #bfdbfe;
+      border-color: #2563eb;
+    }
+
+    .cat-badge.tech {
+      background: #f5f3ff;
+      color: #5b21b6;
+      border: 1px solid #ddd6fe;
+    }
+    [data-theme="dark"] .cat-badge.tech {
+      background: #4c1d95;
+      color: #ddd6fe;
+      border-color: #6d28d9;
+    }
+
+    .cat-badge.civic {
+      background: #f0fdfa;
+      color: #115e59;
+      border: 1px solid #99f6e4;
+    }
+    [data-theme="dark"] .cat-badge.civic {
+      background: #134e4a;
+      color: #99f6e4;
+      border-color: #0f766e;
+    }
+${MOBILE_BOTTOM_NAV_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
   </style>
@@ -4262,6 +4636,27 @@ ${COOKIE_CONSENT_CSS}
         </a>
       </div>
     </header>
+
+    <!-- NEXT EVENT COUNTDOWN BANNER -->
+    <section class="next-event-banner" id="next-event-banner">
+      <div class="banner-left">
+        <span class="banner-badge">⏳ შემდეგი შეხვედრა</span>
+        <div class="banner-info">
+          <h3 class="banner-title" id="countdown-title">სართიჭალა — 4 დღეში</h3>
+          <p class="banner-sub" id="countdown-subtitle">სათემო ლიდერობა და დებატები • 12 ოქტომბერი, 2026</p>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <div class="countdown-timer" id="countdown-timer">
+          <div class="timer-box"><span class="timer-val" id="timer-days">4</span><span class="timer-lbl">დღე</span></div>
+          <span class="timer-colon">:</span>
+          <div class="timer-box"><span class="timer-val" id="timer-hours">12</span><span class="timer-lbl">სთ</span></div>
+          <span class="timer-colon">:</span>
+          <div class="timer-box"><span class="timer-val" id="timer-mins">00</span><span class="timer-lbl">წთ</span></div>
+        </div>
+        <a href="index.html" class="btn-banner-map" id="btn-banner-map">რუკაზე ნახვა 📍</a>
+      </div>
+    </section>
 
     <!-- CALENDAR 2-COLUMN VIEW -->
     <main class="calendar-layout">
@@ -4481,6 +4876,56 @@ ${STEALTH_ADMIN_JS}
 
       renderSelectedDayDetails();
       renderTimeline();
+      renderCountdownBanner();
+    }
+
+    function getThematicCategoryBadge(actTitle) {
+      const text = (actTitle || '').toLowerCase();
+      if (text.includes('სპორტ') || text.includes('გუნდ')) return '<span class="cat-badge sport">⚽ სპორტი & გუნდურობა</span>';
+      if (text.includes('ხელოვნ') || text.includes('შემოქმედ') || text.includes('კულტურ')) return '<span class="cat-badge art">🎨 ხელოვნება & შემოქმედება</span>';
+      if (text.includes('დებატ') || text.includes('ლიდერ') || text.includes('მედია')) return '<span class="cat-badge debate">🗣️ დებატები & ლიდერობა</span>';
+      if (text.includes('ტექნოლ') || text.includes('ციფრულ') || text.includes('ინოვაც')) return '<span class="cat-badge tech">💡 ტექნოლოგიები & ინოვაცია</span>';
+      return '<span class="cat-badge civic">🤝 სათემო აქტივობა</span>';
+    }
+
+    function renderCountdownBanner() {
+      const banner = document.getElementById('next-event-banner');
+      if (!banner) return;
+      const now = new Date();
+      const nowStr = now.toISOString().slice(0, 10);
+      const upcoming = [...locations]
+        .filter(l => l.date && l.date >= nowStr)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const nextLoc = upcoming.length > 0 ? upcoming[0] : (locations.length > 0 ? locations[0] : null);
+      if (!nextLoc) {
+        banner.style.display = 'none';
+        return;
+      }
+      banner.style.display = 'flex';
+      const eventDate = new Date(nextLoc.date + 'T10:00:00');
+      const diffMs = eventDate.getTime() - now.getTime();
+      let days = 0, hours = 0, mins = 0;
+      if (diffMs > 0) {
+        days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      }
+      const titleEl = document.getElementById('countdown-title');
+      const subEl = document.getElementById('countdown-subtitle');
+      const dEl = document.getElementById('timer-days');
+      const hEl = document.getElementById('timer-hours');
+      const mEl = document.getElementById('timer-mins');
+      const btnMap = document.getElementById('btn-banner-map');
+      if (titleEl) {
+        titleEl.textContent = \`\${nextLoc.name} — \${days > 0 ? days + ' დღეში' : 'დღეს!'}\`;
+      }
+      if (subEl) {
+        subEl.textContent = \`\${nextLoc.activityTitle} • \${formatGeorgianDate(nextLoc.date)}\`;
+      }
+      if (dEl) dEl.textContent = String(days);
+      if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+      if (mEl) mEl.textContent = String(mins).padStart(2, '0');
+      if (btnMap) btnMap.href = \`index.html?loc=\${nextLoc.id}\`;
     }
 
     function renderSelectedDayDetails() {
@@ -4521,7 +4966,10 @@ ${STEALTH_ADMIN_JS}
           </div>
 
           <div>
-            <div class="event-activity-title">🎯 \${loc.activityTitle}</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+              <span class="event-activity-title" style="margin-bottom:0;">🎯 \${loc.activityTitle}</span>
+              \${getThematicCategoryBadge(loc.activityTitle)}
+            </div>
             <p class="event-activity-desc">\${loc.activityDescription}</p>
           </div>
 
@@ -4565,7 +5013,10 @@ ${STEALTH_ADMIN_JS}
           </div>
           <div>
             <h4 style="font-size:0.92rem; font-weight:800; color:var(--text-main); margin-bottom:2px;">\${loc.name}</h4>
-            <div style="font-size:0.80rem; font-weight:700; color:var(--text-muted);">🎯 \${loc.activityTitle}</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+              <span style="font-size:0.80rem; font-weight:700; color:var(--text-muted);">🎯 \${loc.activityTitle}</span>
+              \${getThematicCategoryBadge(loc.activityTitle)}
+            </div>
           </div>
           <p style="font-size:0.75rem; color:var(--text-subtle); line-height:1.4;">\${loc.activityDescription}</p>
           <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:4px; flex-wrap:wrap; align-items:center;">
@@ -4667,6 +5118,7 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
+${getBottomNavHtml('calendar')}
 </body>
 </html>`;
 
@@ -4679,6 +5131,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
+${GEORGIAN_FONT_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -4723,7 +5176,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* True Pure Black Dark Theme (No Blue Tint) */
@@ -5413,7 +5866,47 @@ const mentorsHtmlContent = `<!DOCTYPE html>
       margin: 0;
     }
 
+    /* Mentor Social Media Links */
+    .profile-social-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
 
+    .social-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .social-link-btn:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    [data-theme="dark"] .social-link-btn {
+      background: #1c1c1c;
+      border-color: #333333;
+    }
+
+    [data-theme="dark"] .social-link-btn:hover {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #3b82f6;
+    }
+
+${MOBILE_BOTTOM_NAV_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
   </style>
@@ -5478,6 +5971,7 @@ ${COOKIE_CONSENT_CSS}
           <div>
             <h3 class="modal-title" id="profile-mentor-name">მენტორის პროფილი</h3>
             <span class="mentor-role" id="profile-mentor-role">მენტორი</span>
+            <div class="profile-social-links" id="profile-social-links"></div>
           </div>
         </div>
         <button type="button" class="stealth-close-btn" id="btn-close-profile-modal" title="დახურვა">✕</button>
@@ -5710,6 +6204,27 @@ ${STEALTH_ADMIN_JS}
         tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => \`<span class="tag-badge">\${t.trim()}</span>\`).join('');
       }
 
+      const socialsEl = document.getElementById('profile-social-links');
+      if (socialsEl) {
+        socialsEl.innerHTML = '';
+        const s = mentor.socials || {};
+        if (s.linkedin) {
+          socialsEl.innerHTML += \`<a href="\${s.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          </a>\`;
+        }
+        if (s.facebook) {
+          socialsEl.innerHTML += \`<a href="\${s.facebook}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
+          </a>\`;
+        }
+        if (s.email) {
+          socialsEl.innerHTML += \`<a href="mailto:\${s.email}" class="social-link-btn" title="Email" aria-label="Email">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </a>\`;
+        }
+      }
+
       const modal = document.getElementById('mentor-profile-modal');
       if (modal) modal.classList.add('open');
     }
@@ -5728,17 +6243,21 @@ ${STEALTH_ADMIN_JS}
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          mentors = data.map(m => ({
-            id: Number(m.id),
-            name: m.name,
-            role: m.role || 'მენტორი',
-            description: m.description,
-            education: m.education || '',
-            experience: m.experience || '',
-            achievements: m.achievements || '',
-            tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []),
-            avatar_color: m.avatar_color || '#8b5cf6'
-          }));
+          mentors = data.map(m => {
+            const fallbackSocials = (INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {}).socials || {};
+            return {
+              id: Number(m.id),
+              name: m.name,
+              role: m.role || 'მენტორი',
+              description: m.description,
+              education: m.education || '',
+              experience: m.experience || '',
+              achievements: m.achievements || '',
+              tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []),
+              avatar_color: m.avatar_color || '#8b5cf6',
+              socials: m.socials || fallbackSocials
+            };
+          });
           try {
             localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
           } catch(e) {}
@@ -5959,6 +6478,7 @@ ${STEALTH_ADMIN_JS}
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
+${getBottomNavHtml('mentors')}
 </body>
 </html>`;
 
@@ -5971,6 +6491,7 @@ const settingsHtmlContent = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — პარამეტრები</title>
+${GEORGIAN_FONT_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -6016,7 +6537,7 @@ const settingsHtmlContent = `<!DOCTYPE html>
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* True Pure Black Dark Theme (No Blue Tint) */
@@ -7070,7 +7591,7 @@ const settingsHtmlContent = `<!DOCTYPE html>
       .activity-badges-group { justify-content: flex-start; }
       .heatmap-grid, .heatmap-labels { grid-template-columns: repeat(12, 1fr); }
     }
-
+${MOBILE_BOTTOM_NAV_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
   </style>
@@ -8944,6 +9465,7 @@ async function loadAndRenderAnalytics() {
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
 ${SITE_ANALYTICS_TRACKER_HTML}
+${getBottomNavHtml('settings')}
 </body>
 </html>`;
 

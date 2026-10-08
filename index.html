@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია</title>
+
+  <!-- Modern Clean Georgian Font (Noto Sans Georgian) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -57,7 +63,7 @@
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       --shadow-popup: 0 20px 25px -5px rgba(0, 0, 0, 0.22), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* Night Mode Theme Variables (TRUE PURE BLACK - NO BLUE TINT) */
@@ -877,6 +883,37 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       border: 2px solid #ffffff;
       transition: all 0.2s ease;
+      position: relative;
+    }
+
+    /* Pulse Radar Animation for Next Upcoming Activity */
+    .custom-marker-pin.pulse-pin::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50% 50% 50% 0;
+      border: 2.5px solid #2563eb;
+      animation: radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      pointer-events: none;
+    }
+
+    .custom-marker-pin.pulse-pin.hub::after {
+      border-color: #ef4444;
+    }
+
+    @keyframes radarPulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.95;
+      }
+      50% {
+        transform: scale(1.55);
+        opacity: 0.35;
+      }
+      100% {
+        transform: scale(2.05);
+        opacity: 0;
+      }
     }
 
     .custom-marker-pin.hub {
@@ -1387,6 +1424,91 @@
         width: 230px !important;
       }
     }
+
+    /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-light);
+        z-index: 1500;
+        align-items: center;
+        justify-content: space-around;
+        padding: 4px 6px env(safe-area-inset-bottom, 6px);
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      [data-theme="dark"] .mobile-bottom-nav {
+        background: rgba(10, 10, 10, 0.94);
+        border-top-color: #262626;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--text-muted);
+        flex: 1;
+        padding: 6px 2px;
+        border-radius: var(--radius-sm);
+        transition: all 0.15s ease;
+      }
+
+      .bottom-nav-icon {
+        font-size: 1.15rem;
+        line-height: 1;
+        transition: transform 0.15s ease;
+      }
+
+      .bottom-nav-label {
+        font-size: 0.66rem;
+        font-weight: 700;
+      }
+
+      .bottom-nav-item.active {
+        color: #2563eb;
+      }
+
+      [data-theme="dark"] .bottom-nav-item.active {
+        color: #60a5fa;
+      }
+
+      .bottom-nav-item.active .bottom-nav-icon {
+        transform: scale(1.15);
+      }
+
+      .bottom-nav-item:active {
+        transform: scale(0.92);
+      }
+
+      body {
+        padding-bottom: 68px !important;
+      }
+
+      .map-floating-left {
+        bottom: 74px !important;
+      }
+
+      .leaflet-bottom {
+        bottom: 70px !important;
+      }
+    }
+
 
     /* Stealth Admin Modal - Perfectly Centered in Viewport */
     .stealth-modal-backdrop {
@@ -2921,11 +3043,16 @@
       // Move zoom control to bottomright so it never collides with top-left drawer trigger
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // 1. Google Maps Roadmap Tile Layer
-      const roadmapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        maxZoom: 19,
-        attribution: '© Google Maps'
+      // 1. CartoDB Positron (Light) / Dark Matter (Dark) Modern Map Tile Layer
+      const isInitialDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const cartoTileUrl = isInitialDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+      const roadmapLayer = L.tileLayer(cartoTileUrl, {
+        subdomains: ['a', 'b', 'c', 'd'],
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       });
 
       // 2. Google Maps Hybrid Satellite
@@ -3051,7 +3178,13 @@
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const mapEl = document.getElementById('map');
       if (!mapEl) return;
-      if (isDark && (currentBaseLayerName === 'roadmap' || currentBaseLayerName === 'terrain')) {
+      if (baseLayers && baseLayers.roadmap) {
+        const targetCartoUrl = isDark
+          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        baseLayers.roadmap.setUrl(targetCartoUrl);
+      }
+      if (isDark && currentBaseLayerName === 'terrain') {
         mapEl.classList.add('dark-tiles');
       } else {
         mapEl.classList.remove('dark-tiles');
@@ -3069,13 +3202,26 @@
 
       const hub = locations.find(l => l.type === 'hub') || locations[0];
 
+      // Determine closest upcoming activity to highlight with pulsing radar
+      let nextUpcomingId = null;
+      const nowStr = new Date().toISOString().slice(0, 10);
+      const sortedUpcoming = [...locations]
+        .filter(l => l.date && l.date >= nowStr)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      if (sortedUpcoming.length > 0) {
+        nextUpcomingId = sortedUpcoming[0].id;
+      } else if (locations.length > 0) {
+        nextUpcomingId = locations[0].id;
+      }
+
       locations.forEach((loc, index) => {
         const isHub = loc.type === 'hub';
         const numLabel = isHub ? '★' : (index);
+        const isPulse = loc.id === nextUpcomingId;
 
         // Custom HTML Marker Icon
         const iconHtml = `
-          <div class="custom-marker-pin ${isHub ? 'hub' : 'village'}">
+          <div class="custom-marker-pin ${isHub ? 'hub' : 'village'} ${isPulse ? 'pulse-pin' : ''}">
             <span>${numLabel}</span>
           </div>
         `;
@@ -4535,5 +4681,26 @@
 
   </script>
 
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
+    <a href="index.html" class="bottom-nav-item ${activeTab === 'map' ? 'active' : ''}">
+      <span class="bottom-nav-icon">🗺️</span>
+      <span class="bottom-nav-label">მთავარი გვერდი</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item ${activeTab === 'calendar' ? 'active' : ''}">
+      <span class="bottom-nav-icon">📅</span>
+      <span class="bottom-nav-label">კალენდარი</span>
+    </a>
+    <a href="mentors.html" class="bottom-nav-item ${activeTab === 'mentors' ? 'active' : ''}">
+      <span class="bottom-nav-icon">👥</span>
+      <span class="bottom-nav-label">მენტორები</span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}">
+      <span class="bottom-nav-icon">⚙️</span>
+      <span class="bottom-nav-label">პარამეტრები</span>
+    </a>
+  </nav>
+  
 </body>
 </html>

@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
+
+  <!-- Modern Clean Georgian Font (Noto Sans Georgian) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -48,7 +54,7 @@
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
       
-      --font-stack: "BPG Nino Mtavruli", "Noto Sans Georgian", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --font-stack: 'Noto Sans Georgian', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* True Pure Black Dark Theme (No Blue Tint) */
@@ -738,6 +744,130 @@
       margin: 0;
     }
 
+    /* Mentor Social Media Links */
+    .profile-social-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .social-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .social-link-btn:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    [data-theme="dark"] .social-link-btn {
+      background: #1c1c1c;
+      border-color: #333333;
+    }
+
+    [data-theme="dark"] .social-link-btn:hover {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #3b82f6;
+    }
+
+
+    /* Mobile Bottom Navigation Bar (App-like thumb navigation) */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-light);
+        z-index: 1500;
+        align-items: center;
+        justify-content: space-around;
+        padding: 4px 6px env(safe-area-inset-bottom, 6px);
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      [data-theme="dark"] .mobile-bottom-nav {
+        background: rgba(10, 10, 10, 0.94);
+        border-top-color: #262626;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--text-muted);
+        flex: 1;
+        padding: 6px 2px;
+        border-radius: var(--radius-sm);
+        transition: all 0.15s ease;
+      }
+
+      .bottom-nav-icon {
+        font-size: 1.15rem;
+        line-height: 1;
+        transition: transform 0.15s ease;
+      }
+
+      .bottom-nav-label {
+        font-size: 0.66rem;
+        font-weight: 700;
+      }
+
+      .bottom-nav-item.active {
+        color: #2563eb;
+      }
+
+      [data-theme="dark"] .bottom-nav-item.active {
+        color: #60a5fa;
+      }
+
+      .bottom-nav-item.active .bottom-nav-icon {
+        transform: scale(1.15);
+      }
+
+      .bottom-nav-item:active {
+        transform: scale(0.92);
+      }
+
+      body {
+        padding-bottom: 68px !important;
+      }
+
+      .map-floating-left {
+        bottom: 74px !important;
+      }
+
+      .leaflet-bottom {
+        bottom: 70px !important;
+      }
+    }
 
 
     /* Stealth Admin Modal - Perfectly Centered in Viewport */
@@ -1385,6 +1515,7 @@
           <div>
             <h3 class="modal-title" id="profile-mentor-name">მენტორის პროფილი</h3>
             <span class="mentor-role" id="profile-mentor-role">მენტორი</span>
+            <div class="profile-social-links" id="profile-social-links"></div>
           </div>
         </div>
         <button type="button" class="stealth-close-btn" id="btn-close-profile-modal" title="დახურვა">✕</button>
@@ -2070,7 +2201,12 @@
       "ფასილიტაცია",
       "ახალგაზრდული პოლიტიკა"
     ],
-    "avatar_color": "#8b5cf6"
+    "avatar_color": "#8b5cf6",
+    "socials": {
+      "linkedin": "https://linkedin.com",
+      "facebook": "https://facebook.com",
+      "email": "dako@gardabani.edu.ge"
+    }
   },
   {
     "id": 2,
@@ -2086,7 +2222,12 @@
       "სათემო განვითარება",
       "იდეების გენერირება"
     ],
-    "avatar_color": "#ec4899"
+    "avatar_color": "#ec4899",
+    "socials": {
+      "linkedin": "https://linkedin.com",
+      "facebook": "https://facebook.com",
+      "email": "nia@gardabani.edu.ge"
+    }
   },
   {
     "id": 3,
@@ -2102,7 +2243,12 @@
       "დებატები",
       "კონფლიქტების მართვა"
     ],
-    "avatar_color": "#3b82f6"
+    "avatar_color": "#3b82f6",
+    "socials": {
+      "linkedin": "https://linkedin.com",
+      "facebook": "https://facebook.com",
+      "email": "mikheil@gardabani.edu.ge"
+    }
   },
   {
     "id": 4,
@@ -2118,7 +2264,12 @@
       "ვებ-ტექნოლოგიები",
       "მედიაწიგნიერება"
     ],
-    "avatar_color": "#10b981"
+    "avatar_color": "#10b981",
+    "socials": {
+      "linkedin": "https://linkedin.com",
+      "facebook": "https://facebook.com",
+      "email": "davit@gardabani.edu.ge"
+    }
   },
   {
     "id": 5,
@@ -2134,7 +2285,12 @@
       "კვლევა",
       "ბიზნეს-მოდელირება"
     ],
-    "avatar_color": "#0d9488"
+    "avatar_color": "#0d9488",
+    "socials": {
+      "linkedin": "https://linkedin.com",
+      "facebook": "https://facebook.com",
+      "email": "andria@gardabani.edu.ge"
+    }
   }
 ];
 
@@ -2246,6 +2402,27 @@
         tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => `<span class="tag-badge">${t.trim()}</span>`).join('');
       }
 
+      const socialsEl = document.getElementById('profile-social-links');
+      if (socialsEl) {
+        socialsEl.innerHTML = '';
+        const s = mentor.socials || {};
+        if (s.linkedin) {
+          socialsEl.innerHTML += `<a href="${s.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          </a>`;
+        }
+        if (s.facebook) {
+          socialsEl.innerHTML += `<a href="${s.facebook}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
+          </a>`;
+        }
+        if (s.email) {
+          socialsEl.innerHTML += `<a href="mailto:${s.email}" class="social-link-btn" title="Email" aria-label="Email">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </a>`;
+        }
+      }
+
       const modal = document.getElementById('mentor-profile-modal');
       if (modal) modal.classList.add('open');
     }
@@ -2264,17 +2441,21 @@
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          mentors = data.map(m => ({
-            id: Number(m.id),
-            name: m.name,
-            role: m.role || 'მენტორი',
-            description: m.description,
-            education: m.education || '',
-            experience: m.experience || '',
-            achievements: m.achievements || '',
-            tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []),
-            avatar_color: m.avatar_color || '#8b5cf6'
-          }));
+          mentors = data.map(m => {
+            const fallbackSocials = (INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {}).socials || {};
+            return {
+              id: Number(m.id),
+              name: m.name,
+              role: m.role || 'მენტორი',
+              description: m.description,
+              education: m.education || '',
+              experience: m.experience || '',
+              achievements: m.achievements || '',
+              tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []),
+              avatar_color: m.avatar_color || '#8b5cf6',
+              socials: m.socials || fallbackSocials
+            };
+          });
           try {
             localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
           } catch(e) {}
@@ -3320,5 +3501,26 @@
 
   </script>
 
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="mobile-bottom-nav" aria-label="მობილური ნავიგაცია">
+    <a href="index.html" class="bottom-nav-item ${activeTab === 'map' ? 'active' : ''}">
+      <span class="bottom-nav-icon">🗺️</span>
+      <span class="bottom-nav-label">მთავარი გვერდი</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item ${activeTab === 'calendar' ? 'active' : ''}">
+      <span class="bottom-nav-icon">📅</span>
+      <span class="bottom-nav-label">კალენდარი</span>
+    </a>
+    <a href="mentors.html" class="bottom-nav-item ${activeTab === 'mentors' ? 'active' : ''}">
+      <span class="bottom-nav-icon">👥</span>
+      <span class="bottom-nav-label">მენტორები</span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}">
+      <span class="bottom-nav-icon">⚙️</span>
+      <span class="bottom-nav-label">პარამეტრები</span>
+    </a>
+  </nav>
+  
 </body>
 </html>
