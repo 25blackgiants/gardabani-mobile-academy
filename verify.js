@@ -1,3 +1,6 @@
+// ============================================================================
+// GARDABANI MOBILE ACADEMY — AUTOMATED VERIFICATION SUITE
+// ============================================================================
 const fs = require('fs');
 
 const index = fs.readFileSync('index.html', 'utf8');
