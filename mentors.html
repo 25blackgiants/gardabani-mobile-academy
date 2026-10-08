@@ -870,6 +870,40 @@
     }
 
 
+    /* Skeleton Shimmer Keyframes & Base Classes */
+    @keyframes skeletonShimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .skeleton-box {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.6s infinite ease-in-out;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    [data-theme="dark"] .skeleton-box {
+      background: linear-gradient(90deg, #121212 25%, #242424 50%, #121212 75%);
+      background-size: 200% 100%;
+    }
+
+    .skeleton-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+
     /* Stealth Admin Modal - Perfectly Centered in Viewport */
     .stealth-modal-backdrop {
       position: fixed !important;
@@ -1501,7 +1535,78 @@
 
     <!-- DYNAMIC MENTORS GRID (CONNECTED TO SUPABASE) -->
     <section class="mentors-grid" id="mentors-grid">
-      <!-- Mentors rendered dynamically by JS from Supabase / Fallback -->
+      <article class="mentor-card skeleton-mentor-card" style="pointer-events:none; opacity:0.88; cursor:default;">
+        <div class="avatar-wrapper" style="background:transparent;">
+          <span class="skeleton-box" style="width:96px; height:96px; border-radius:50%;"></span>
+        </div>
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <span class="skeleton-box" style="width:140px; height:20px; border-radius:4px;"></span>
+          <span class="skeleton-box" style="width:85px; height:18px; border-radius:12px;"></span>
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:4px;">
+            <span class="skeleton-box" style="width:90%; height:13px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:75%; height:13px; border-radius:3px;"></span>
+          </div>
+          <div class="tags-row" style="margin-top:6px; justify-content:center;">
+            <span class="skeleton-box" style="width:55px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:65px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:18px; border-radius:4px;"></span>
+          </div>
+        </div>
+      </article>
+      <article class="mentor-card skeleton-mentor-card" style="pointer-events:none; opacity:0.88; cursor:default;">
+        <div class="avatar-wrapper" style="background:transparent;">
+          <span class="skeleton-box" style="width:96px; height:96px; border-radius:50%;"></span>
+        </div>
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <span class="skeleton-box" style="width:130px; height:20px; border-radius:4px;"></span>
+          <span class="skeleton-box" style="width:85px; height:18px; border-radius:12px;"></span>
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:4px;">
+            <span class="skeleton-box" style="width:85%; height:13px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:70%; height:13px; border-radius:3px;"></span>
+          </div>
+          <div class="tags-row" style="margin-top:6px; justify-content:center;">
+            <span class="skeleton-box" style="width:55px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:65px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:18px; border-radius:4px;"></span>
+          </div>
+        </div>
+      </article>
+      <article class="mentor-card skeleton-mentor-card" style="pointer-events:none; opacity:0.88; cursor:default;">
+        <div class="avatar-wrapper" style="background:transparent;">
+          <span class="skeleton-box" style="width:96px; height:96px; border-radius:50%;"></span>
+        </div>
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <span class="skeleton-box" style="width:150px; height:20px; border-radius:4px;"></span>
+          <span class="skeleton-box" style="width:85px; height:18px; border-radius:12px;"></span>
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:4px;">
+            <span class="skeleton-box" style="width:92%; height:13px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:78%; height:13px; border-radius:3px;"></span>
+          </div>
+          <div class="tags-row" style="margin-top:6px; justify-content:center;">
+            <span class="skeleton-box" style="width:55px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:65px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:18px; border-radius:4px;"></span>
+          </div>
+        </div>
+      </article>
+      <article class="mentor-card skeleton-mentor-card" style="pointer-events:none; opacity:0.88; cursor:default;">
+        <div class="avatar-wrapper" style="background:transparent;">
+          <span class="skeleton-box" style="width:96px; height:96px; border-radius:50%;"></span>
+        </div>
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <span class="skeleton-box" style="width:135px; height:20px; border-radius:4px;"></span>
+          <span class="skeleton-box" style="width:85px; height:18px; border-radius:12px;"></span>
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:4px;">
+            <span class="skeleton-box" style="width:88%; height:13px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:72%; height:13px; border-radius:3px;"></span>
+          </div>
+          <div class="tags-row" style="margin-top:6px; justify-content:center;">
+            <span class="skeleton-box" style="width:55px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:65px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:18px; border-radius:4px;"></span>
+          </div>
+        </div>
+      </article>
     </section>
 
   </div>
@@ -2318,6 +2423,35 @@
           <circle cx="60" cy="45" r="13" fill="${color}80"/>
         </svg>
       `;
+    }
+
+    function renderMentorsSkeleton() {
+      const grid = document.getElementById('mentors-grid');
+      if (!grid) return;
+      let html = '';
+      for (let i = 0; i < 4; i++) {
+        html += `
+          <article class="mentor-card skeleton-mentor-card" style="pointer-events:none; opacity:0.88; cursor:default;">
+            <div class="avatar-wrapper" style="background:transparent;">
+              <span class="skeleton-box" style="width:96px; height:96px; border-radius:50%;"></span>
+            </div>
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
+              <span class="skeleton-box" style="width:140px; height:20px; border-radius:4px;"></span>
+              <span class="skeleton-box" style="width:85px; height:18px; border-radius:12px;"></span>
+              <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:4px;">
+                <span class="skeleton-box" style="width:90%; height:13px; border-radius:3px;"></span>
+                <span class="skeleton-box" style="width:75%; height:13px; border-radius:3px;"></span>
+              </div>
+              <div class="tags-row" style="margin-top:6px; justify-content:center;">
+                <span class="skeleton-box" style="width:55px; height:18px; border-radius:4px;"></span>
+                <span class="skeleton-box" style="width:65px; height:18px; border-radius:4px;"></span>
+                <span class="skeleton-box" style="width:50px; height:18px; border-radius:4px;"></span>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+      grid.innerHTML = html;
     }
 
     function renderMentorsList(mentorsData) {

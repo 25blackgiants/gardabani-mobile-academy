@@ -1510,6 +1510,40 @@
     }
 
 
+    /* Skeleton Shimmer Keyframes & Base Classes */
+    @keyframes skeletonShimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .skeleton-box {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.6s infinite ease-in-out;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    [data-theme="dark"] .skeleton-box {
+      background: linear-gradient(90deg, #121212 25%, #242424 50%, #121212 75%);
+      background-size: 200% 100%;
+    }
+
+    .skeleton-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+
     /* Stealth Admin Modal - Perfectly Centered in Viewport */
     .stealth-modal-backdrop {
       position: fixed !important;
@@ -2198,7 +2232,42 @@
 
         <!-- Scrollable Locations List (Strictly internal scroll) -->
         <ul class="locations-list" id="locations-list">
-          <!-- Dynamically populated -->
+          <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="skeleton-box" style="width:130px; height:18px; border-radius:4px;"></span>
+              <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+            </div>
+            <div class="skeleton-box" style="width:85%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+            <div class="skeleton-box" style="width:60%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+              <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+              <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+            </div>
+          </li>
+          <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="skeleton-box" style="width:115px; height:18px; border-radius:4px;"></span>
+              <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+            </div>
+            <div class="skeleton-box" style="width:90%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+            <div class="skeleton-box" style="width:55%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+              <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+              <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+            </div>
+          </li>
+          <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="skeleton-box" style="width:140px; height:18px; border-radius:4px;"></span>
+              <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+            </div>
+            <div class="skeleton-box" style="width:80%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+            <div class="skeleton-box" style="width:65%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+              <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+              <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+            </div>
+          </li>
         </ul>
       </aside>
 
@@ -3383,6 +3452,52 @@
       } else {
         openDrawer();
       }
+    }
+
+    // ==========================================================================
+    // SIDEBAR SKELETON LOADER
+    // ==========================================================================
+    function renderSidebarSkeleton() {
+      const listEl = document.getElementById('locations-list');
+      if (!listEl) return;
+      listEl.innerHTML = `
+        <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="skeleton-box" style="width:130px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+          </div>
+          <div class="skeleton-box" style="width:85%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+          <div class="skeleton-box" style="width:60%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+            <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+          </div>
+        </li>
+        <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="skeleton-box" style="width:115px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+          </div>
+          <div class="skeleton-box" style="width:90%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+          <div class="skeleton-box" style="width:55%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+            <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+          </div>
+        </li>
+        <li class="loc-card-item skeleton-loc-item" style="pointer-events:none; border-left:3px solid var(--border-light); opacity:0.88;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="skeleton-box" style="width:140px; height:18px; border-radius:4px;"></span>
+            <span class="skeleton-box" style="width:50px; height:16px; border-radius:12px;"></span>
+          </div>
+          <div class="skeleton-box" style="width:80%; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+          <div class="skeleton-box" style="width:65%; height:12px; margin-bottom:10px; border-radius:4px;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-light); padding-top:8px;">
+            <span class="skeleton-box" style="width:90px; height:11px; border-radius:3px;"></span>
+            <span class="skeleton-box" style="width:65px; height:20px; border-radius:4px;"></span>
+          </div>
+        </li>
+      `;
     }
 
     // ==========================================================================
