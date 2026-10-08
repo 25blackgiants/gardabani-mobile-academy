@@ -2652,16 +2652,11 @@ ${STEALTH_ADMIN_JS}
       // Move zoom control to bottomright so it never collides with top-left drawer trigger
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // 1. CartoDB Positron (Light) / Dark Matter (Dark) Modern Map Tile Layer
-      const isInitialDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const cartoTileUrl = isInitialDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-
-      const roadmapLayer = L.tileLayer(cartoTileUrl, {
-        subdomains: ['a', 'b', 'c', 'd'],
-        maxZoom: 20,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      // 1. Google Maps Roadmap Tile Layer (No API Key Required)
+      const roadmapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 19,
+        attribution: '© Google Maps'
       });
 
       // 2. Google Maps Hybrid Satellite
@@ -2787,13 +2782,7 @@ ${STEALTH_ADMIN_JS}
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const mapEl = document.getElementById('map');
       if (!mapEl) return;
-      if (baseLayers && baseLayers.roadmap) {
-        const targetCartoUrl = isDark
-          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-        baseLayers.roadmap.setUrl(targetCartoUrl);
-      }
-      if (isDark && currentBaseLayerName === 'terrain') {
+      if (isDark && (currentBaseLayerName === 'roadmap' || currentBaseLayerName === 'terrain')) {
         mapEl.classList.add('dark-tiles');
       } else {
         mapEl.classList.remove('dark-tiles');
