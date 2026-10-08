@@ -2652,25 +2652,46 @@ ${STEALTH_ADMIN_JS}
       // Move zoom control to bottomright so it never collides with top-left drawer trigger
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // 1. Google Maps Roadmap Tile Layer (No API Key Required)
-      const roadmapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      // 1. OpenStreetMap Roadmap Tile Layer (100% Free, Official OSM, No API Key Required)
+      const roadmapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        subdomains: ['a', 'b', 'c'],
         maxZoom: 19,
-        attribution: '© Google Maps'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       });
 
-      // 2. Google Maps Hybrid Satellite
+      roadmapLayer.on('tileerror', function(error, tile) {
+        if (tile && !tile._hasFallback && error && error.coords) {
+          tile._hasFallback = true;
+          tile.src = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/' + error.coords.z + '/' + error.coords.y + '/' + error.coords.x;
+        }
+      });
+
+      // 2. Google Maps Hybrid Satellite (with ESRI World Imagery Fallback)
       const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         maxZoom: 19,
         attribution: '© Google Maps Satellite'
       });
 
-      // 3. Google Maps Terrain Tile Layer
+      satelliteLayer.on('tileerror', function(error, tile) {
+        if (tile && !tile._hasFallback && error && error.coords) {
+          tile._hasFallback = true;
+          tile.src = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + error.coords.z + '/' + error.coords.y + '/' + error.coords.x;
+        }
+      });
+
+      // 3. Google Maps Terrain Tile Layer (with ESRI World Topo Fallback)
       const terrainLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         maxZoom: 19,
         attribution: '© Google Maps Terrain'
+      });
+
+      terrainLayer.on('tileerror', function(error, tile) {
+        if (tile && !tile._hasFallback && error && error.coords) {
+          tile._hasFallback = true;
+          tile.src = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/' + error.coords.z + '/' + error.coords.y + '/' + error.coords.x;
+        }
       });
 
       baseLayers = {
