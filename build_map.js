@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { serializeForInlineScript, writeGeneratedPages } = require('./src/build/generator_utils');
 
 // 1. Read Gardabani boundary compact GeoJSON
 const boundaryGeoJson = fs.readFileSync(path.join(__dirname, 'gardabani_boundary_compact.json'), 'utf8');
@@ -7,24 +8,21 @@ const boundaryGeoJson = fs.readFileSync(path.join(__dirname, 'gardabani_boundary
 // Modular Data Sources from src/data/
 const { INITIAL_LOCATIONS } = require('./src/data/locations');
 const { INITIAL_MENTORS } = require('./src/data/mentors');
-const { validateLocations, validateMentors } = require('./src/data/validation');
+const { PUBLIC_CONTENT_TRANSLATIONS } = require('./src/data/localized_content');
+const { validateLocations, validateMentors, validateLocalizedContent } = require('./src/data/validation');
 const { SAFE_RENDER_JS } = require('./src/components/safe_render');
 const { DESIGN_SYSTEM_CSS } = require('./src/components/design_system');
 const { LANGUAGE_SWITCHER_CSS, LANGUAGE_SWITCHER_HTML, LOCALIZATION_JS } = require('./src/components/localization');
+const { createContentLocalizationRuntime } = require('./src/components/content_localization');
+const { PWA_HEAD_TAG, PWA_REGISTER_JS } = require('./src/components/pwa');
 
 validateLocations(INITIAL_LOCATIONS);
 validateMentors(INITIAL_MENTORS);
-
-function serializeForInlineScript(value) {
-  return JSON.stringify(value, null, 2)
-    .replace(/</g, '\\u003c')
-    .replace(/>/g, '\\u003e')
-    .replace(/\u2028/g, '\\u2028')
-    .replace(/\u2029/g, '\\u2029');
-}
+validateLocalizedContent(PUBLIC_CONTENT_TRANSLATIONS, INITIAL_LOCATIONS, INITIAL_MENTORS);
 
 const INITIAL_LOCATIONS_JS = serializeForInlineScript(INITIAL_LOCATIONS);
 const INITIAL_MENTORS_JS = serializeForInlineScript(INITIAL_MENTORS);
+const CONTENT_LOCALIZATION_JS = createContentLocalizationRuntime(PUBLIC_CONTENT_TRANSLATIONS);
 
 // Modular Cookie Consent Component
 const { COOKIE_CONSENT_CSS, COOKIE_CONSENT_HTML, COOKIE_CONSENT_JS } = require('./src/components/cookie_consent');
@@ -46,6 +44,7 @@ ${COOKIE_CONSENT_JS}
   <script>
 ${LOCALIZATION_JS}
   </script>
+${PWA_REGISTER_JS}
 `;
 
 // Modern Clean Georgian Font Link (Noto Sans Georgian)
@@ -61,6 +60,13 @@ const FAVICON_HEAD_TAG = `
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.svg">
   <meta name="theme-color" content="#2563eb">
+`;
+
+const PERFORMANCE_HEAD_TAG = `
+  <!-- Reduce connection setup time for page-specific public resources -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
 `;
 
 // Mobile Bottom Navigation Bar removed - single top navigation preserved for all viewports
@@ -872,7 +878,9 @@ const mapHtmlContent = `<!DOCTYPE html>
   <title>გარდაბნის მობილური აკადემია</title>
 ${GEORGIAN_FONT_HEAD_TAG}
 ${FAVICON_HEAD_TAG}
-  
+${PWA_HEAD_TAG}
+${PERFORMANCE_HEAD_TAG}
+
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
@@ -2613,6 +2621,7 @@ ${STEALTH_ADMIN_HTML}
     // PROJECT DATA: CONFIRMED LOCATIONS & ACTIVITIES (OCTOBER 2026 TEST DATES)
     // ==========================================================================
     const INITIAL_LOCATIONS = ${INITIAL_LOCATIONS_JS};
+${CONTENT_LOCALIZATION_JS}
 
     // Load from localStorage if present
     function loadSavedLocations() {
@@ -2942,6 +2951,7 @@ ${SAFE_RENDER_JS}
       }
 
       locations.forEach((loc, index) => {
+        loc = localizePublicRecord('locations', loc);
         const isHub = loc.type === 'hub';
         const numLabel = isHub ? '★' : (index);
         const isPulse = loc.id === nextUpcomingId;
@@ -3172,6 +3182,7 @@ ${SAFE_RENDER_JS}
       }
 
       filtered.forEach((loc) => {
+        loc = localizePublicRecord('locations', loc);
         const isHub = loc.type === 'hub';
         const li = document.createElement('li');
         li.className = \`loc-card-item \${isHub ? 'hub-item' : 'village-item'} \${activeLocationId === loc.id ? 'active' : ''}\`;
@@ -3626,6 +3637,10 @@ ${SAFE_RENDER_JS}
       setupThemeToggle();
       syncAdminUI();
       syncLocationsFromSupabase();
+      window.addEventListener('gardabani_language_changed', () => {
+        renderMapOverlays();
+        renderSidebar();
+      });
     });
   </script>
 ${COOKIE_CONSENT_FULL_BLOCK}
@@ -3644,7 +3659,9 @@ const calendarHtmlContent = `<!DOCTYPE html>
   <title>გარდაბნის მობილური აკადემია — კალენდარი</title>
 ${GEORGIAN_FONT_HEAD_TAG}
 ${FAVICON_HEAD_TAG}
-  
+${PWA_HEAD_TAG}
+${PERFORMANCE_HEAD_TAG}
+
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
@@ -5128,6 +5145,7 @@ ${SAFE_RENDER_JS}
     ];
 
     const INITIAL_LOCATIONS = ${INITIAL_LOCATIONS_JS};
+${CONTENT_LOCALIZATION_JS}
 
     function loadLocations() {
       try {
@@ -5354,6 +5372,7 @@ ${SAFE_RENDER_JS}
         banner.style.display = 'none';
         return;
       }
+      const localizedNextLoc = localizePublicRecord('locations', nextLoc);
       banner.style.display = 'flex';
       const eventDate = new Date(nextLoc.date + 'T10:00:00');
       const diffMs = eventDate.getTime() - now.getTime();
@@ -5370,10 +5389,10 @@ ${SAFE_RENDER_JS}
       const mEl = document.getElementById('timer-mins');
       const btnMap = document.getElementById('btn-banner-map');
       if (titleEl) {
-        titleEl.textContent = \`\${nextLoc.name} — \${days > 0 ? days + ' დღეში' : 'დღეს!'}\`;
+        titleEl.textContent = \`\${localizedNextLoc.name} — \${days > 0 ? days + ' დღეში' : 'დღეს!'}\`;
       }
       if (subEl) {
-        subEl.textContent = \`\${nextLoc.activityTitle} • \${formatGeorgianDate(nextLoc.date)}\`;
+        subEl.textContent = \`\${localizedNextLoc.activityTitle} • \${formatGeorgianDate(nextLoc.date)}\`;
       }
       if (dEl) dEl.textContent = String(days);
       if (hEl) hEl.textContent = String(hours).padStart(2, '0');
@@ -5404,6 +5423,7 @@ ${SAFE_RENDER_JS}
       }
 
       events.forEach(loc => {
+        loc = localizePublicRecord('locations', loc);
         const isHub = loc.type === 'hub';
         const item = document.createElement('div');
         item.className = \`event-detail-item \${isHub ? 'hub' : 'village'}\`;
@@ -5456,6 +5476,7 @@ ${SAFE_RENDER_JS}
       });
 
       sorted.forEach(loc => {
+        loc = localizePublicRecord('locations', loc);
         const isHub = loc.type === 'hub';
         const card = document.createElement('div');
         card.className = 'timeline-item-card ' + (isHub ? 'timeline-hub' : 'timeline-village');
@@ -5491,6 +5512,7 @@ ${SAFE_RENDER_JS}
     document.addEventListener('DOMContentLoaded', () => {
       renderCalendar();
       syncLocationsFromSupabase();
+      window.addEventListener('gardabani_language_changed', renderCalendar);
 
       // Month Navigation Buttons
       document.getElementById('btn-prev-month').addEventListener('click', () => {
@@ -5585,7 +5607,9 @@ const mentorsHtmlContent = `<!DOCTYPE html>
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
 ${GEORGIAN_FONT_HEAD_TAG}
 ${FAVICON_HEAD_TAG}
-  
+${PWA_HEAD_TAG}
+${PERFORMANCE_HEAD_TAG}
+
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
@@ -6766,6 +6790,7 @@ ${STEALTH_ADMIN_JS}
 ${SAFE_RENDER_JS}
 
     const INITIAL_MENTORS = ${INITIAL_MENTORS_JS};
+${CONTENT_LOCALIZATION_JS}
 
     let mentors = [...INITIAL_MENTORS];
     let currentProfileMentorId = null;
@@ -6842,6 +6867,7 @@ ${SAFE_RENDER_JS}
       }
 
       mentorsData.forEach(m => {
+        m = localizePublicRecord('mentors', m);
         const card = document.createElement('article');
         card.className = 'mentor-card';
         card.id = 'mentor-card-' + m.id;
@@ -6894,7 +6920,8 @@ ${SAFE_RENDER_JS}
 
     // Profile Modal Open & Fill
     function openMentorProfileModal(id) {
-      const mentor = mentors.find(m => m.id === id);
+      const storedMentor = mentors.find(m => m.id === id);
+      const mentor = localizePublicRecord('mentors', storedMentor);
       if (!mentor) return;
       currentProfileMentorId = mentor.id;
 
@@ -7156,6 +7183,10 @@ ${SAFE_RENDER_JS}
       renderMentorsList(mentors);
       syncMentorsFromSupabase();
       syncAdminUI();
+      window.addEventListener('gardabani_language_changed', () => {
+        renderMentorsList(mentors);
+        if (currentProfileMentorId) openMentorProfileModal(currentProfileMentorId);
+      });
 
       // Theme UI
       const themeBtn = document.getElementById('theme-toggle');
@@ -7253,7 +7284,9 @@ const settingsHtmlContent = `<!DOCTYPE html>
   <title>გარდაბნის მობილური აკადემია — პარამეტრები</title>
 ${GEORGIAN_FONT_HEAD_TAG}
 ${FAVICON_HEAD_TAG}
-  
+${PWA_HEAD_TAG}
+${PERFORMANCE_HEAD_TAG}
+
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
@@ -10367,11 +10400,13 @@ ${SITE_ANALYTICS_TRACKER_HTML}
 // ============================================================================
 // 6. Write All Files & Logs
 // ============================================================================
-fs.writeFileSync(path.join(__dirname, 'gardabani_map.html'), mapHtmlContent, 'utf8');
-fs.writeFileSync(path.join(__dirname, 'index.html'), mapHtmlContent, 'utf8');
-fs.writeFileSync(path.join(__dirname, 'calendar.html'), calendarHtmlContent, 'utf8');
-fs.writeFileSync(path.join(__dirname, 'mentors.html'), mentorsHtmlContent, 'utf8');
-fs.writeFileSync(path.join(__dirname, 'settings.html'), settingsHtmlContent, 'utf8');
+writeGeneratedPages(__dirname, {
+  'gardabani_map.html': mapHtmlContent,
+  'index.html': mapHtmlContent,
+  'calendar.html': calendarHtmlContent,
+  'mentors.html': mentorsHtmlContent,
+  'settings.html': settingsHtmlContent
+});
 
 console.log('Successfully generated gardabani_map.html, index.html, calendar.html, mentors.html, and settings.html with full Calendar Integration!');
 console.log('Map HTML size: ' + mapHtmlContent.length + ' bytes');

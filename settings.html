@@ -16,7 +16,20 @@
   <link rel="alternate icon" href="favicon.svg">
   <meta name="theme-color" content="#2563eb">
 
-  
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="application-name" content="Gardabani Mobile Academy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gardabani Academy">
+
+
+  <!-- Reduce connection setup time for page-specific public resources -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
+
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
     (function() {
@@ -6013,6 +6026,17 @@ async function loadAndRenderAnalytics() {
 })();
 
   </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch((error) => {
+          console.info('Offline mode is unavailable:', error);
+        });
+      });
+    }
+  </script>
+
 
 
   <!-- Privacy-First Analytics Tracker -->

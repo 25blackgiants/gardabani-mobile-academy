@@ -15,7 +15,13 @@ const localizationSource = fs.readFileSync('src/components/localization.js', 'ut
 const gitignore = fs.readFileSync('.gitignore', 'utf8');
 const { INITIAL_LOCATIONS } = require('./src/data/locations');
 const { INITIAL_MENTORS } = require('./src/data/mentors');
-const { validateLocations, validateMentors } = require('./src/data/validation');
+const { validateLocations, validateMentors, validateLocalizedContent } = require('./src/data/validation');
+const { PUBLIC_CONTENT_TRANSLATIONS } = require('./src/data/localized_content');
+const generatorUtilsSource = fs.readFileSync('src/build/generator_utils.js', 'utf8');
+const contentLocalizationSource = fs.readFileSync('src/components/content_localization.js', 'utf8');
+const workflowSource = fs.readFileSync('.github/workflows/quality.yml', 'utf8');
+const serviceWorkerSource = fs.readFileSync('service-worker.js', 'utf8');
+const manifestSource = fs.readFileSync('manifest.webmanifest', 'utf8');
 const { SAFE_RENDER_JS } = require('./src/components/safe_render');
 const { LOCALIZATION_JS } = require('./src/components/localization');
 
@@ -53,6 +59,7 @@ let malformedContentRejected = false;
 try {
   validateLocations(INITIAL_LOCATIONS);
   validateMentors(INITIAL_MENTORS);
+  validateLocalizedContent(PUBLIC_CONTENT_TRANSLATIONS, INITIAL_LOCATIONS, INITIAL_MENTORS);
 } catch (error) {
   sourceValidationPassed = false;
 }
@@ -340,6 +347,43 @@ const tests = [
            [index, calendar, mentors, settings].every(page =>
              page.includes('<link rel="icon" type="image/svg+xml" href="favicon.svg">') &&
              page.includes('<meta name="theme-color" content="#2563eb">'))
+  },
+  {
+    name: '39. Public content has validated source-controlled Azerbaijani records',
+    check: sourceValidationPassed &&
+           Object.keys(PUBLIC_CONTENT_TRANSLATIONS.locations).length === INITIAL_LOCATIONS.length &&
+           Object.keys(PUBLIC_CONTENT_TRANSLATIONS.mentors).length === INITIAL_MENTORS.length &&
+           contentLocalizationSource.includes('localizePublicRecord')
+  },
+  {
+    name: '40. Generator has separate safe serialization and output responsibilities',
+    check: generatorUtilsSource.includes('serializeForInlineScript') &&
+           generatorUtilsSource.includes('writeGeneratedPages') &&
+           buildSource.includes("require('./src/build/generator_utils')")
+  },
+  {
+    name: '41. PWA manifest, service worker, and offline fallback are present',
+    check: fs.existsSync('offline.html') &&
+           manifestSource.includes('Gardabani Mobile Academy') &&
+           serviceWorkerSource.includes("CACHE_NAME = 'gardabani-academy-v1'") &&
+           serviceWorkerSource.includes("caches.match('./offline.html')") &&
+           serviceWorkerSource.includes("endsWith('/supabase_config.js')") &&
+           [index, calendar, mentors, settings].every(page =>
+             page.includes('rel="manifest" href="manifest.webmanifest"') &&
+             page.includes("navigator.serviceWorker.register('service-worker.js')"))
+  },
+  {
+    name: '42. Performance resource hints avoid blocking public page rendering',
+    check: [index, calendar, mentors, settings].every(page =>
+      page.includes('rel="preconnect" href="https://cdn.jsdelivr.net"') &&
+      page.includes('rel="preconnect" href="https://unpkg.com"') &&
+      page.includes('rel="dns-prefetch" href="https://tile.openstreetmap.org"'))
+  },
+  {
+    name: '43. GitHub Actions rebuilds and verifies generated public pages',
+    check: workflowSource.includes('node build_map.js') &&
+           workflowSource.includes('node verify.js') &&
+           workflowSource.includes('git diff --exit-code')
   }
 ];
 

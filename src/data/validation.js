@@ -103,4 +103,28 @@ function validateMentors(mentors) {
   });
 }
 
-module.exports = { validateLocations, validateMentors };
+function validateLocalizedContent(translations, locations, mentors) {
+  assert(translations && typeof translations === 'object', 'localized content must be an object');
+  const collections = [
+    ['locations', locations, ['name', 'shortName', 'activityTitle', 'activityDescription']],
+    ['mentors', mentors, ['name', 'role', 'description', 'education', 'experience', 'achievements', 'tags']]
+  ];
+  collections.forEach(([collection, records, fields]) => {
+    const translationsForCollection = translations[collection];
+    assert(translationsForCollection && typeof translationsForCollection === 'object', `${collection} translations are required`);
+    records.forEach((record) => {
+      const translated = translationsForCollection[record.id] && translationsForCollection[record.id].az;
+      assert(translated && typeof translated === 'object', `${collection}.${record.id}.az is required`);
+      fields.forEach((field) => {
+        if (field === 'tags') {
+          assert(Array.isArray(translated.tags) && translated.tags.length > 0, `${collection}.${record.id}.az.tags must be a non-empty array`);
+          translated.tags.forEach((tag, index) => assertText(tag, `${collection}.${record.id}.az.tags[${index}]`, 80));
+        } else {
+          assertText(translated[field], `${collection}.${record.id}.az.${field}`, field === 'description' ? 5000 : 8000);
+        }
+      });
+    });
+  });
+}
+
+module.exports = { validateLocations, validateMentors, validateLocalizedContent };
