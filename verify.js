@@ -11,6 +11,7 @@ const settings = fs.readFileSync('settings.html', 'utf8');
 const gardabaniMap = fs.readFileSync('gardabani_map.html', 'utf8');
 const buildSource = fs.readFileSync('build_map.js', 'utf8');
 const trackerSource = fs.readFileSync('src/analytics/tracker.js', 'utf8');
+const localizationSource = fs.readFileSync('src/components/localization.js', 'utf8');
 const gitignore = fs.readFileSync('.gitignore', 'utf8');
 const { INITIAL_LOCATIONS } = require('./src/data/locations');
 const { INITIAL_MENTORS } = require('./src/data/mentors');
@@ -275,6 +276,22 @@ const tests = [
            calendar.includes('ui-state-panel') &&
            mentors.includes('ui-state-panel') &&
            settings.includes('status-badge')
+  },
+  {
+    name: '33. Azerbaijani language switcher is present on every public page',
+    check: [index, calendar, mentors, settings].every(page =>
+      page.includes('id="language-switcher"') &&
+      page.includes('data-language="ka"') &&
+      page.includes('data-language="az"') &&
+      page.includes('gardabani_language') &&
+      page.includes('Qardabani Mobil Akademiyası'))
+  },
+  {
+    name: '34. Localization preserves Georgian and translates dynamic UI text safely',
+    check: buildSource.includes('LOCALIZATION_JS') &&
+           localizationSource.includes('MutationObserver') &&
+           localizationSource.includes("activeLanguage === 'ka'") &&
+           !localizationSource.includes('innerHTML = translations')
   }
 ];
 

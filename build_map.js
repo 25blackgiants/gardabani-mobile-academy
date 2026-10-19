@@ -10,6 +10,7 @@ const { INITIAL_MENTORS } = require('./src/data/mentors');
 const { validateLocations, validateMentors } = require('./src/data/validation');
 const { SAFE_RENDER_JS } = require('./src/components/safe_render');
 const { DESIGN_SYSTEM_CSS } = require('./src/components/design_system');
+const { LANGUAGE_SWITCHER_CSS, LANGUAGE_SWITCHER_HTML, LOCALIZATION_JS } = require('./src/components/localization');
 
 validateLocations(INITIAL_LOCATIONS);
 validateMentors(INITIAL_MENTORS);
@@ -41,6 +42,9 @@ const COOKIE_CONSENT_FULL_BLOCK = `
 ${COOKIE_CONSENT_HTML}
   <script>
 ${COOKIE_CONSENT_JS}
+  </script>
+  <script>
+${LOCALIZATION_JS}
   </script>
 `;
 
@@ -2378,6 +2382,7 @@ ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
 ${DESIGN_SYSTEM_CSS}
+${LANGUAGE_SWITCHER_CSS}
   </style>
 </head>
 <body>
@@ -2417,6 +2422,7 @@ ${DESIGN_SYSTEM_CSS}
         </div>
 
         <!-- Day / Night Mode Toggle Button -->
+${LANGUAGE_SWITCHER_HTML}
         <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
           <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
         </button>
@@ -4909,6 +4915,7 @@ ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
 ${DESIGN_SYSTEM_CSS}
+${LANGUAGE_SWITCHER_CSS}
   </style>
 </head>
 <body>
@@ -4931,6 +4938,7 @@ ${DESIGN_SYSTEM_CSS}
       </div>
 
       <div class="header-actions">
+${LANGUAGE_SWITCHER_HTML}
         <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
           <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
         </button>
@@ -6488,6 +6496,7 @@ ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
 ${DESIGN_SYSTEM_CSS}
+${LANGUAGE_SWITCHER_CSS}
   </style>
 </head>
 <body>
@@ -6520,6 +6529,7 @@ ${DESIGN_SYSTEM_CSS}
           <span>➕</span> ახალი მენტორი
         </button>
 
+${LANGUAGE_SWITCHER_HTML}
         <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
           <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
         </button>
@@ -8414,6 +8424,7 @@ ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
 ${DESIGN_SYSTEM_CSS}
+${LANGUAGE_SWITCHER_CSS}
   </style>
 </head>
 <body>
@@ -8436,6 +8447,7 @@ ${DESIGN_SYSTEM_CSS}
       </div>
 
       <div class="header-actions">
+${LANGUAGE_SWITCHER_HTML}
         <button class="theme-toggle-btn" id="theme-toggle" title="დღის და ღამის რეჟიმი">
           <span id="theme-icon">🌙</span> <span id="theme-text">ღამე</span>
         </button>
