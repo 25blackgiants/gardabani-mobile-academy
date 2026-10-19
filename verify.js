@@ -112,7 +112,7 @@ const tests = [
            index.includes('2026-10-29')
   },
   {
-    name: '11. Boundary switch remains and the 5km service-area feature is removed',
+    name: '11. Boundary switch remains without the deprecated service-area control',
     check: settings.includes('id="setting-boundary"') &&
            settings.includes('lever-switch') &&
            settings.includes('lever-slider') &&
