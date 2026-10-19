@@ -7,8 +7,23 @@ const boundaryGeoJson = fs.readFileSync(path.join(__dirname, 'gardabani_boundary
 // Modular Data Sources from src/data/
 const { INITIAL_LOCATIONS } = require('./src/data/locations');
 const { INITIAL_MENTORS } = require('./src/data/mentors');
-const INITIAL_LOCATIONS_JS = JSON.stringify(INITIAL_LOCATIONS, null, 2);
-const INITIAL_MENTORS_JS = JSON.stringify(INITIAL_MENTORS, null, 2);
+const { validateLocations, validateMentors } = require('./src/data/validation');
+const { SAFE_RENDER_JS } = require('./src/components/safe_render');
+const { DESIGN_SYSTEM_CSS } = require('./src/components/design_system');
+
+validateLocations(INITIAL_LOCATIONS);
+validateMentors(INITIAL_MENTORS);
+
+function serializeForInlineScript(value) {
+  return JSON.stringify(value, null, 2)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
+const INITIAL_LOCATIONS_JS = serializeForInlineScript(INITIAL_LOCATIONS);
+const INITIAL_MENTORS_JS = serializeForInlineScript(INITIAL_MENTORS);
 
 // Modular Cookie Consent Component
 const { COOKIE_CONSENT_CSS, COOKIE_CONSENT_HTML, COOKIE_CONSENT_JS } = require('./src/components/cookie_consent');
@@ -2362,6 +2377,7 @@ ${GEORGIAN_FONT_HEAD_TAG}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
+${DESIGN_SYSTEM_CSS}
   </style>
 </head>
 <body>
@@ -2376,7 +2392,7 @@ ${COOKIE_CONSENT_CSS}
           <span>გარდაბნის მობილური აკადემია</span>
         </h1>
         <nav class="nav-tabs">
-          <a href="index.html" class="nav-tab active">მთავარი გვერდი</a>
+          <a href="index.html" class="nav-tab active" aria-current="page">მთავარი გვერდი</a>
           <a href="calendar.html" class="nav-tab">კალენდარი</a>
           <a href="mentors.html" class="nav-tab">მენტორები</a>
           <a href="settings.html" class="nav-tab">პარამეტრები</a>
@@ -2590,7 +2606,8 @@ ${STEALTH_ADMIN_HTML}
         const saved = localStorage.getItem('gardabani_locations');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          const normalized = Array.isArray(parsed) ? parsed.map(normalizeLocationRecord) : [];
+          if (validateLocationCollection(normalized)) return normalized;
         }
       } catch (e) {}
       return JSON.parse(JSON.stringify(INITIAL_LOCATIONS));
@@ -2612,7 +2629,7 @@ ${STEALTH_ADMIN_HTML}
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          locations = data.map(r => ({
+          const cloudLocations = data.map(r => ({
             id: Number(r.id),
             name: r.name,
             shortName: r.short_name,
@@ -2623,10 +2640,15 @@ ${STEALTH_ADMIN_HTML}
             activityTitle: r.activity_title,
             activityDescription: r.activity_description
           }));
-          saveLocationsToStorage();
-          renderMapOverlays();
-          renderSidebar();
-          console.log('✅ Supabase: ' + locations.length + ' ლოკაცია ჩაიტვირთა ღრუბლიდან');
+          if (validateLocationCollection(cloudLocations)) {
+            locations = cloudLocations;
+            saveLocationsToStorage();
+            renderMapOverlays();
+            renderSidebar();
+            console.log('✅ Supabase: ' + locations.length + ' ლოკაცია ჩაიტვირთა ღრუბლიდან');
+          } else {
+            console.warn('Supabase returned invalid location data; keeping the verified local copy.');
+          }
         }
       } catch (err) {
         console.warn('Supabase fetch notice (using local storage):', err);
@@ -2636,7 +2658,7 @@ ${STEALTH_ADMIN_HTML}
     // Write location to Supabase with RLS verification
     async function syncLocationToSupabase(locRecord) {
       const client = initSupabase();
-      if (!client) return;
+      if (!client) return 'local';
       try {
         const row = {
           id: locRecord.id,
@@ -2653,11 +2675,15 @@ ${STEALTH_ADMIN_HTML}
         if (error) {
           console.warn('Supabase upsert notice:', error);
           showToast('⚠️ ლოკალურად შეინახა, Supabase RLS შეცდომა: ' + (error.message || 'წვდომა უარყოფილია'));
+          return 'failed';
         } else {
           showToast('☁️ მონაცემები შენახულია Supabase ღრუბლოვან ბაზაში!');
+          return 'cloud';
         }
       } catch (err) {
         console.warn('Supabase sync error:', err);
+        showToast('⚠️ ლოკალურად შეინახა; ღრუბლოვან ბაზასთან კავშირი ვერ დამყარდა.');
+        return 'failed';
       }
     }
 
@@ -2695,6 +2721,7 @@ ${STEALTH_ADMIN_HTML}
     }
 
 ${STEALTH_ADMIN_JS}
+${SAFE_RENDER_JS}
 
     function syncAdminUI() {
       const isAdmin = isAdminMode();
@@ -2882,6 +2909,13 @@ ${STEALTH_ADMIN_JS}
     // ==========================================================================
     // RENDER MARKERS & OVERLAYS
     // ==========================================================================
+    function trackLocationNavigation(id) {
+      const location = locations.find(item => item.id === Number(id));
+      if (location && typeof window.gmaTrackEvent === 'function') {
+        window.gmaTrackEvent('nav_click', { village_name: location.name });
+      }
+    }
+
     function renderMapOverlays() {
       if (!map) return;
 
@@ -2939,24 +2973,24 @@ ${STEALTH_ADMIN_JS}
           <div class="popup-card">
             <div class="popup-header">
               <div>
-                <h3 class="popup-title">\${loc.name}</h3>
+                <h3 class="popup-title">\${escapeHtml(loc.name)}</h3>
                 \${distanceText}
               </div>
               <span class="type-badge \${isHub ? 'hub' : 'village'}">\${isHub ? 'ჰაბი' : 'სოფელი'}</span>
             </div>
             
             <div class="popup-date-row">
-              <span>📅</span> <span>\${formatGeorgianDate(loc.date)}</span>
+              <span>📅</span> <span>\${escapeHtml(formatGeorgianDate(loc.date))}</span>
             </div>
 
             <div>
-              <div class="popup-act-title">🎯 \${loc.activityTitle}</div>
-              <div class="popup-act-desc">\${loc.activityDescription}</div>
+              <div class="popup-act-title">🎯 \${escapeHtml(loc.activityTitle)}</div>
+              <div class="popup-act-desc">\${escapeHtml(loc.activityDescription)}</div>
             </div>
             <div class="popup-footer">
               <span style="font-size:0.70rem; color:var(--text-subtle);">📍 \${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
               <div style="display:flex; gap:4px; align-items:center;">
-                <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-gardabani" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">🚗 როგორ მივიდე</a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=\${Number(loc.latitude)},\${Number(loc.longitude)}" target="_blank" rel="noopener noreferrer" class="btn btn-gardabani" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="trackLocationNavigation(\${Number(loc.id)})">🚗 როგორ მივიდე</a>
                 <a href="calendar.html" class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem; text-decoration:none;">📅 კალენდარი</a>
                 \${isAdmin ? \`<button class="btn btn-outline" style="padding:2px 8px; font-size:0.70rem;" onclick="openEditLocation(\${loc.id})">✏️</button>\` : ''}
               </div>
@@ -2990,7 +3024,7 @@ ${STEALTH_ADMIN_JS}
           dashArray: '4, 6'
         });
 
-        circle.bindTooltip(\`<b>\${loc.shortName || loc.name}</b><br>5კმ მომსახურების არეალი\`, {
+        circle.bindTooltip(\`<b>\${escapeHtml(loc.shortName || loc.name)}</b><br>5კმ მომსახურების არეალი\`, {
           sticky: true,
           className: 'radius-tooltip'
         });
@@ -3160,18 +3194,18 @@ ${STEALTH_ADMIN_JS}
           <div class="loc-item-top">
             <span class="loc-item-name">
               <span>\${isHub ? '★' : '📍'}</span>
-              <span>\${loc.name}</span>
+              <span>\${escapeHtml(loc.name)}</span>
             </span>
             <span class="type-badge \${isHub ? 'hub' : 'village'}">\${isHub ? 'ჰაბი' : 'სოფელი'}</span>
           </div>
-          <div class="loc-item-act">\${loc.activityTitle}</div>
+          <div class="loc-item-act">\${escapeHtml(loc.activityTitle)}</div>
           <div class="loc-item-date">
             <span>📅</span> \${formatGeorgianDate(loc.date)}
           </div>
           <div class="loc-item-footer">
             <span class="loc-item-coords">\${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}</span>
             <div class="loc-item-actions">
-              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="loc-action-btn" title="როგორ მივიდე (Google Maps)" onclick="event.stopPropagation(); if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });" style="text-decoration:none;">🚗 მიმართულება</a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${Number(loc.latitude)},\${Number(loc.longitude)}" target="_blank" rel="noopener noreferrer" class="loc-action-btn" title="როგორ მივიდე (Google Maps)" onclick="event.stopPropagation(); trackLocationNavigation(\${Number(loc.id)})" style="text-decoration:none;">🚗 მიმართულება</a>
               <button class="loc-action-btn" title="რუკაზე ჩვენება" onclick="event.stopPropagation(); zoomToLocation(\${loc.id})">🔍 ჩვენება</button>
               \${isAdmin ? \`<button class="loc-action-btn" title="რედაქტირება" onclick="event.stopPropagation(); openEditLocation(\${loc.id})">✏️</button>\` : ''}
             </div>
@@ -3405,7 +3439,7 @@ ${STEALTH_ADMIN_JS}
       container.innerHTML = \`
         <div class="form-group">
           <label class="form-label">ლოკაციის სახელი</label>
-          <input type="text" class="form-input" id="form-name" value="\${loc.name}">
+          <input type="text" class="form-input" id="form-name" value="\${escapeHtml(loc.name)}">
         </div>
         <div class="form-grid-2">
           <div class="form-group">
@@ -3417,12 +3451,12 @@ ${STEALTH_ADMIN_JS}
           </div>
           <div class="form-group">
             <label class="form-label">მოკლე სახელი</label>
-            <input type="text" class="form-input" id="form-short" value="\${loc.shortName || ''}">
+            <input type="text" class="form-input" id="form-short" value="\${escapeHtml(loc.shortName || '')}">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">📅 ჩატარების თარიღი</label>
-          <input type="date" class="form-input" id="form-date" value="\${loc.date || '2026-10-15'}">
+          <input type="date" class="form-input" id="form-date" value="\${escapeHtml(loc.date || '2026-10-15')}">
         </div>
         <div class="form-grid-2">
           <div class="form-group">
@@ -3436,11 +3470,11 @@ ${STEALTH_ADMIN_JS}
         </div>
         <div class="form-group">
           <label class="form-label">აქტივობის სათაური</label>
-          <input type="text" class="form-input" id="form-act-title" value="\${loc.activityTitle}">
+          <input type="text" class="form-input" id="form-act-title" value="\${escapeHtml(loc.activityTitle)}">
         </div>
         <div class="form-group">
           <label class="form-label">აქტივობის აღწერა</label>
-          <textarea class="form-textarea" rows="3" id="form-act-desc">\${loc.activityDescription}</textarea>
+          <textarea class="form-textarea" rows="3" id="form-act-desc">\${escapeHtml(loc.activityDescription)}</textarea>
         </div>
         <div style="margin-top:6px;">
           <button class="btn btn-outline" style="color:#ef4444; border-color:#fca5a5;" onclick="deleteLocation(\${loc.id})">🗑️ ამ ლოკაციის წაშლა</button>
@@ -3455,35 +3489,54 @@ ${STEALTH_ADMIN_JS}
       container.innerHTML = \`
         <div class="form-group">
           <label class="form-label">ლოკაციების სრული JSON კონფიგურაცია</label>
-          <textarea class="form-textarea" id="form-json" rows="14" style="font-family:monospace; font-size:0.75rem;">\${JSON.stringify(locations, null, 2)}</textarea>
+          <textarea class="form-textarea" id="form-json" rows="14" style="font-family:monospace; font-size:0.75rem;">\${escapeHtml(JSON.stringify(locations, null, 2))}</textarea>
         </div>
       \`;
       openModal();
     }
 
-    function deleteLocation(id) {
+    async function deleteLocation(id) {
       if (confirm('ნამდვილად გსურთ ამ ლოკაციის წაშლა?')) {
         locations = locations.filter(l => l.id !== id);
         saveLocationsToStorage();
         renderMapOverlays();
         renderSidebar();
         closeModal();
-        showToast('ლოკაცია წარმატებით წაიშალა');
+        const client = initSupabase();
+        if (client) {
+          try {
+            const { error } = await client.from('locations').delete().eq('id', Number(id));
+            if (error) {
+              console.warn('Location Supabase delete error:', error);
+              showToast('⚠️ ლოკაცია მხოლოდ ამ ბრაუზერიდან წაიშალა; ღრუბლოვანი წაშლა ვერ შესრულდა.');
+            } else {
+              showToast('ლოკაცია წარმატებით წაიშალა');
+            }
+          } catch (err) {
+            console.warn('Location Supabase delete error:', err);
+            showToast('⚠️ ლოკაცია მხოლოდ ამ ბრაუზერიდან წაიშალა; კავშირის შეცდომაა.');
+          }
+        } else {
+          showToast('ლოკაცია ლოკალურად წაიშალა');
+        }
       }
     }
 
-    function saveModalData() {
+    async function saveModalData() {
       if (currentModalMode === 'json') {
         try {
           const val = document.getElementById('form-json').value;
           const parsed = JSON.parse(val);
-          if (Array.isArray(parsed)) {
-            locations = parsed;
+          const normalized = Array.isArray(parsed) ? parsed.map(normalizeLocationRecord) : [];
+          if (validateLocationCollection(normalized)) {
+            locations = normalized;
             saveLocationsToStorage();
             renderMapOverlays();
             renderSidebar();
             closeModal();
-            showToast('მონაცემები განახლდა');
+            showToast('მონაცემები ამ ბრაუზერში განახლდა; ღრუბლოვანი სინქრონიზაცია არ შესრულებულა.');
+          } else {
+            alert('JSON მონაცემები არ შეესაბამება ლოკაციების საჭირო სტრუქტურას.');
           }
         } catch (e) {
           alert('შეცდომა JSON ფორმატში: ' + e.message);
@@ -3500,7 +3553,9 @@ ${STEALTH_ADMIN_JS}
       const actTitle = document.getElementById('form-act-title').value.trim();
       const actDesc = document.getElementById('form-act-desc').value.trim();
 
-      if (!name || isNaN(lat) || isNaN(lng) || !actTitle) {
+      if (!name || name.length > 160 || shortName.length > 100 || isNaN(lat) || isNaN(lng) ||
+          lat < -90 || lat > 90 || lng < -180 || lng > 180 || !actTitle ||
+          actTitle.length > 240 || actDesc.length > 5000) {
         alert('გთხოვთ შეავსოთ ყველა აუცილებელი ველი!');
         return;
       }
@@ -3520,8 +3575,7 @@ ${STEALTH_ADMIN_JS}
         };
         locations.push(newLoc);
         saveLocationsToStorage();
-        syncLocationToSupabase(newLoc);
-        showToast('ახალი ლოკაცია დაემატა');
+        await syncLocationToSupabase(newLoc);
       } else if (currentModalMode === 'edit') {
         const idx = locations.findIndex(l => l.id === currentEditLocationId);
         if (idx !== -1) {
@@ -3538,8 +3592,7 @@ ${STEALTH_ADMIN_JS}
           };
           locations[idx] = updatedLoc;
           saveLocationsToStorage();
-          syncLocationToSupabase(updatedLoc);
-          showToast('ლოკაციის მონაცემები შეიცვალა');
+          await syncLocationToSupabase(updatedLoc);
         }
       }
 
@@ -4882,6 +4935,7 @@ ${GEORGIAN_FONT_HEAD_TAG}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
+${DESIGN_SYSTEM_CSS}
   </style>
 </head>
 <body>
@@ -4897,7 +4951,7 @@ ${COOKIE_CONSENT_CSS}
         </h1>
         <nav class="nav-tabs">
           <a href="index.html" class="nav-tab">მთავარი გვერდი</a>
-          <a href="calendar.html" class="nav-tab active">კალენდარი</a>
+          <a href="calendar.html" class="nav-tab active" aria-current="page">კალენდარი</a>
           <a href="mentors.html" class="nav-tab">მენტორები</a>
           <a href="settings.html" class="nav-tab">პარამეტრები</a>
         </nav>
@@ -5074,6 +5128,7 @@ ${STEALTH_ADMIN_HTML}
 
   <script>
 ${STEALTH_ADMIN_JS}
+${SAFE_RENDER_JS}
     // ==========================================================================
     // GEORGIAN CALENDAR LOCALIZATION & INITIAL LOCATIONS
     // ==========================================================================
@@ -5089,13 +5144,21 @@ ${STEALTH_ADMIN_JS}
         const saved = localStorage.getItem('gardabani_locations');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          const normalized = Array.isArray(parsed) ? parsed.map(normalizeLocationRecord) : [];
+          if (validateLocationCollection(normalized)) return normalized;
         }
       } catch (e) {}
       return JSON.parse(JSON.stringify(INITIAL_LOCATIONS));
     }
 
     let locations = loadLocations();
+
+    function trackLocationNavigation(id) {
+      const location = locations.find(item => item.id === Number(id));
+      if (location && typeof window.gmaTrackEvent === 'function') {
+        window.gmaTrackEvent('nav_click', { village_name: location.name });
+      }
+    }
 
     // Asynchronous Cloud Sync with Supabase for Calendar
     async function syncLocationsFromSupabase() {
@@ -5107,7 +5170,7 @@ ${STEALTH_ADMIN_JS}
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          locations = data.map(r => ({
+          const cloudLocations = data.map(r => ({
             id: Number(r.id),
             name: r.name,
             shortName: r.short_name,
@@ -5118,11 +5181,16 @@ ${STEALTH_ADMIN_JS}
             activityTitle: r.activity_title,
             activityDescription: r.activity_description
           }));
-          try {
-            localStorage.setItem('gardabani_locations', JSON.stringify(locations));
-          } catch (e) {}
-          renderCalendar();
-          console.log('✅ Supabase: კალენდარი სინქრონიზებულია (' + locations.length + ' ლოკაცია)');
+          if (validateLocationCollection(cloudLocations)) {
+            locations = cloudLocations;
+            try {
+              localStorage.setItem('gardabani_locations', JSON.stringify(locations));
+            } catch (e) {}
+            renderCalendar();
+            console.log('✅ Supabase: კალენდარი სინქრონიზებულია (' + locations.length + ' ლოკაცია)');
+          } else {
+            console.warn('Supabase returned invalid calendar location data; keeping the verified local copy.');
+          }
         }
       } catch (err) {
         console.warn('Supabase fetch notice in calendar:', err);
@@ -5231,18 +5299,21 @@ ${STEALTH_ADMIN_JS}
         const hasEvents = matchingLocs.length > 0;
         const hasHub = matchingLocs.some(l => l.type === 'hub');
 
-        const cell = document.createElement('div');
+        const cell = document.createElement('button');
+        cell.type = 'button';
         cell.className = 'calendar-day-cell';
         if (hasEvents) cell.classList.add('has-event');
         if (hasHub) cell.classList.add('has-hub');
         if (isCurrentMonthView && d === todayDate) cell.classList.add('today');
         if (fullDateStr === selectedDateStr) cell.classList.add('selected');
+        cell.setAttribute('aria-pressed', fullDateStr === selectedDateStr ? 'true' : 'false');
+        cell.setAttribute('aria-label', formatGeorgianDate(fullDateStr) + (hasEvents ? ' — ' + matchingLocs.length + ' აქტივობა' : ' — აქტივობა არ არის'));
 
         let dotsHtml = '';
         if (hasEvents) {
           dotsHtml = '<div class="event-dots-wrap">';
           matchingLocs.forEach(loc => {
-            dotsHtml += \`<span class="event-dot \${loc.type === 'hub' ? 'hub' : 'village'}" title="\${loc.name}"></span>\`;
+            dotsHtml += \`<span class="event-dot \${loc.type === 'hub' ? 'hub' : 'village'}" title="\${escapeHtml(loc.name)}"></span>\`;
           });
           dotsHtml += '</div>';
         }
@@ -5254,8 +5325,12 @@ ${STEALTH_ADMIN_JS}
 
         cell.addEventListener('click', () => {
           selectedDateStr = fullDateStr;
-          document.querySelectorAll('.calendar-day-cell').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('.calendar-day-cell').forEach(c => {
+            c.classList.remove('selected');
+            c.setAttribute('aria-pressed', 'false');
+          });
           cell.classList.add('selected');
+          cell.setAttribute('aria-pressed', 'true');
           renderSelectedDayDetails();
         });
 
@@ -5345,7 +5420,7 @@ ${STEALTH_ADMIN_JS}
         item.innerHTML = \`
           <div class="event-top-row">
             <div>
-              <h4 class="event-location-name">\${isHub ? '★' : '📍'} \${loc.name}</h4>
+              <h4 class="event-location-name">\${isHub ? '★' : '📍'} \${escapeHtml(loc.name)}</h4>
               <div style="font-size:0.72rem; color:var(--text-subtle); margin-top:2px;">
                 საკოორდინაციო წერტილი: \${loc.latitude.toFixed(4)}, \${loc.longitude.toFixed(4)}
               </div>
@@ -5355,10 +5430,10 @@ ${STEALTH_ADMIN_JS}
 
           <div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
-              <span class="event-activity-title" style="margin-bottom:0;">🎯 \${loc.activityTitle}</span>
+              <span class="event-activity-title" style="margin-bottom:0;">🎯 \${escapeHtml(loc.activityTitle)}</span>
               \${getThematicCategoryBadge(loc.activityTitle)}
             </div>
-            <p class="event-activity-desc">\${loc.activityDescription}</p>
+            <p class="event-activity-desc">\${escapeHtml(loc.activityDescription)}</p>
           </div>
 
           <div class="event-bottom-row">
@@ -5366,7 +5441,7 @@ ${STEALTH_ADMIN_JS}
               სტატუსი: დაგეგმილია
             </span>
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-              <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=\${Number(loc.latitude)},\${Number(loc.longitude)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="trackLocationNavigation(\${Number(loc.id)})">
                 <span>🚗</span> როგორ მივიდე
               </a>
               <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
@@ -5393,22 +5468,22 @@ ${STEALTH_ADMIN_JS}
       sorted.forEach(loc => {
         const isHub = loc.type === 'hub';
         const card = document.createElement('div');
-        card.className = 'timeline-item-card';
+        card.className = 'timeline-item-card ' + (isHub ? 'timeline-hub' : 'timeline-village');
         card.innerHTML = \`
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="timeline-meta-row">
             <span class="timeline-date-chip">📅 \${formatGeorgianDate(loc.date)}</span>
             <span class="event-type-badge \${isHub ? 'hub' : 'village'}">\${isHub ? 'ჰაბი' : 'სოფელი'}</span>
           </div>
           <div>
-            <h4 style="font-size:0.92rem; font-weight:800; color:var(--text-main); margin-bottom:2px;">\${loc.name}</h4>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
-              <span style="font-size:0.80rem; font-weight:700; color:var(--text-muted);">🎯 \${loc.activityTitle}</span>
+            <h4 class="timeline-location-title">\${escapeHtml(loc.name)}</h4>
+            <div class="timeline-activity-row">
+              <span class="timeline-activity-title">🎯 \${escapeHtml(loc.activityTitle)}</span>
               \${getThematicCategoryBadge(loc.activityTitle)}
             </div>
           </div>
-          <p style="font-size:0.75rem; color:var(--text-subtle); line-height:1.4;">\${loc.activityDescription}</p>
-          <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:4px; flex-wrap:wrap; align-items:center;">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=\${loc.latitude},\${loc.longitude}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="if(typeof window.gmaTrackEvent==='function') window.gmaTrackEvent('nav_click', { village_name: '\${loc.name.replace(/'/g, \"\\\\'\")}' });">
+          <p class="timeline-description">\${escapeHtml(loc.activityDescription)}</p>
+          <div class="timeline-actions">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=\${Number(loc.latitude)},\${Number(loc.longitude)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; text-decoration:none;" title="მარშრუტი Google Maps-ში" onclick="trackLocationNavigation(\${Number(loc.id)})">
               <span>🚗</span> როგორ მივიდე
             </a>
             <a href="index.html?loc=\${loc.id}" class="btn-goto-map">
@@ -6439,6 +6514,7 @@ ${GEORGIAN_FONT_HEAD_TAG}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
+${DESIGN_SYSTEM_CSS}
   </style>
 </head>
 <body>
@@ -6455,7 +6531,7 @@ ${COOKIE_CONSENT_CSS}
         <nav class="nav-tabs">
           <a href="index.html" class="nav-tab">მთავარი გვერდი</a>
           <a href="calendar.html" class="nav-tab">კალენდარი</a>
-          <a href="mentors.html" class="nav-tab active">მენტორები</a>
+          <a href="mentors.html" class="nav-tab active" aria-current="page">მენტორები</a>
           <a href="settings.html" class="nav-tab">პარამეტრები</a>
         </nav>
       </div>
@@ -6580,31 +6656,31 @@ ${COOKIE_CONSENT_CSS}
       <div class="modal-body profile-modal-body">
         
         <!-- Summary / Focus -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-summary">
           <h4 class="cv-section-title"><span>📝</span> საქმიანობის მიმართულება და ბიოგრაფია</h4>
           <p class="cv-section-text" id="profile-mentor-desc"></p>
         </div>
 
         <!-- Education -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-education">
           <h4 class="cv-section-title"><span>🎓</span> განათლება და კვალიფიკაცია</h4>
           <p class="cv-section-text" id="profile-mentor-education"></p>
         </div>
 
         <!-- Work Experience -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-experience">
           <h4 class="cv-section-title"><span>💼</span> სამუშაო გამოცდილება</h4>
           <p class="cv-section-text" id="profile-mentor-experience"></p>
         </div>
 
         <!-- Achievements -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-achievements">
           <h4 class="cv-section-title"><span>🏆</span> მიღწევები და სათემო პროექტები</h4>
           <p class="cv-section-text" id="profile-mentor-achievements"></p>
         </div>
 
         <!-- Tags / Skills -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-expertise">
           <h4 class="cv-section-title"><span>🏷️</span> კომპეტენციები და საკვანძო თემები</h4>
           <div class="tags-row" id="profile-mentor-tags" style="justify-content:flex-start;"></div>
         </div>
@@ -6694,6 +6770,7 @@ ${STEALTH_ADMIN_HTML}
 
   <script>
 ${STEALTH_ADMIN_JS}
+${SAFE_RENDER_JS}
 
     const INITIAL_MENTORS = ${INITIAL_MENTORS_JS};
 
@@ -6714,6 +6791,7 @@ ${STEALTH_ADMIN_JS}
     }
 
     function getAvatarSvg(color) {
+      color = safeHexColor(color, '#8b5cf6');
       return \`
         <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="60" cy="60" r="58" fill="\${color}15" stroke="\${color}40" stroke-width="2"/>
@@ -6721,6 +6799,13 @@ ${STEALTH_ADMIN_JS}
           <circle cx="60" cy="45" r="13" fill="\${color}80"/>
         </svg>
       \`;
+    }
+
+    function getMentorAvatarMarkup(mentor) {
+      const fallback = \`<span class="mentor-avatar-fallback">\${getAvatarSvg(mentor.avatar_color)}</span>\`;
+      const photo = safeImageSource(mentor.photo);
+      if (!photo) return fallback;
+      return fallback + \`<img class="mentor-photo" src="\${escapeHtml(photo)}" alt="\${escapeHtml(mentor.name)}" loading="lazy" decoding="async">\`;
     }
 
     function renderMentorsSkeleton() {
@@ -6758,6 +6843,11 @@ ${STEALTH_ADMIN_JS}
       grid.innerHTML = '';
       const isAdmin = isAdminMode();
 
+      if (!mentorsData.length) {
+        grid.innerHTML = '<div class="ui-state-panel"><span class="ui-state-icon">👥</span><strong>მენტორების სია ცარიელია</strong><span>ინფორმაცია გამოჩნდება მონაცემების დამატების შემდეგ.</span></div>';
+        return;
+      }
+
       mentorsData.forEach(m => {
         const card = document.createElement('article');
         card.className = 'mentor-card';
@@ -6766,27 +6856,30 @@ ${STEALTH_ADMIN_JS}
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', m.name + ' — პროფილის ნახვა');
 
-        const tagsList = Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []);
-        const tagsHtml = tagsList.filter(t => t.trim()).map(t => \`<span class="tag-badge">\${t.trim()}</span>\`).join('');
-        const color = m.avatar_color || '#8b5cf6';
-
+        const tagsList = normalizeTags(m.tags);
+        const tagsHtml = tagsList.map(t => \`<span class="tag-badge">\${escapeHtml(t)}</span>\`).join('');
         card.innerHTML = \`
-          <div class="avatar-wrapper">
-            \${getAvatarSvg(color)}
+          <div class="mentor-card-header">
+            <div class="avatar-wrapper">
+              \${getMentorAvatarMarkup(m)}
+            </div>
+            <div class="mentor-card-identity">
+              <h3 class="mentor-name">\${escapeHtml(m.name)}</h3>
+              <span class="mentor-role">\${escapeHtml(m.role || 'მენტორი')}</span>
+            </div>
           </div>
-          <div style="width:100%;">
-            <h3 class="mentor-name">\${m.name}</h3>
-            <span class="mentor-role">\${m.role || 'მენტორი'}</span>
-            <p class="mentor-desc">\${m.description}</p>
-            <div class="tags-row">\${tagsHtml}</div>
-          </div>
+          <p class="mentor-desc">\${escapeHtml(m.description)}</p>
+          <div class="tags-row" aria-label="ექსპერტიზის მიმართულებები">\${tagsHtml}</div>
           \${isAdmin ? \`
             <div class="mentor-card-admin-actions" style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(\${m.id})">✏️ ჩასწორება</button>
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="event.stopPropagation(); deleteMentor(\${m.id})">🗑️ წაშლა</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(\${Number(m.id)})">✏️ ჩასწორება</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="event.stopPropagation(); deleteMentor(\${Number(m.id)})">🗑️ წაშლა</button>
             </div>
           \` : ''}
         \`;
+
+        const photo = card.querySelector('.mentor-photo');
+        if (photo) photo.addEventListener('error', () => photo.remove(), { once: true });
 
         card.addEventListener('click', (e) => {
           if (e.target.closest('.mentor-card-admin-actions')) return;
@@ -6823,33 +6916,40 @@ ${STEALTH_ADMIN_JS}
 
       if (nameEl) nameEl.textContent = mentor.name;
       if (roleEl) roleEl.textContent = mentor.role || 'მენტორი';
-      if (avatarWrap) avatarWrap.innerHTML = getAvatarSvg(mentor.avatar_color || '#8b5cf6');
+      if (avatarWrap) {
+        avatarWrap.innerHTML = getMentorAvatarMarkup(mentor);
+        const profilePhoto = avatarWrap.querySelector('.mentor-photo');
+        if (profilePhoto) profilePhoto.addEventListener('error', () => profilePhoto.remove(), { once: true });
+      }
       if (descEl) descEl.textContent = mentor.description || '';
       if (eduEl) eduEl.textContent = mentor.education || '';
       if (expEl) expEl.textContent = mentor.experience || '';
       if (achEl) achEl.textContent = mentor.achievements || '';
 
       if (tagsEl) {
-        const tagsList = Array.isArray(mentor.tags) ? mentor.tags : (typeof mentor.tags === 'string' ? mentor.tags.replace(/[{}\"]/g, '').split(',') : []);
-        tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => \`<span class="tag-badge">\${t.trim()}</span>\`).join('');
+        const tagsList = normalizeTags(mentor.tags);
+        tagsEl.innerHTML = tagsList.map(t => \`<span class="tag-badge">\${escapeHtml(t)}</span>\`).join('');
       }
 
       const socialsEl = document.getElementById('profile-social-links');
       if (socialsEl) {
         socialsEl.innerHTML = '';
         const s = mentor.socials || {};
-        if (s.linkedin) {
-          socialsEl.innerHTML += \`<a href="\${s.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
+        const linkedinUrl = safeHttpsUrl(s.linkedin);
+        const facebookUrl = safeHttpsUrl(s.facebook);
+        const emailAddress = safeEmail(s.email);
+        if (linkedinUrl) {
+          socialsEl.innerHTML += \`<a href="\${escapeHtml(linkedinUrl)}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
           </a>\`;
         }
-        if (s.facebook) {
-          socialsEl.innerHTML += \`<a href="\${s.facebook}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
+        if (facebookUrl) {
+          socialsEl.innerHTML += \`<a href="\${escapeHtml(facebookUrl)}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
           </a>\`;
         }
-        if (s.email) {
-          socialsEl.innerHTML += \`<a href="mailto:\${s.email}" class="social-link-btn" title="Email" aria-label="Email">
+        if (emailAddress) {
+          socialsEl.innerHTML += \`<a href="mailto:\${escapeHtml(emailAddress)}" class="social-link-btn" title="Email" aria-label="Email">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
           </a>\`;
         }
@@ -6873,8 +6973,9 @@ ${STEALTH_ADMIN_JS}
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          mentors = data.map(m => {
-            const fallbackSocials = (INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {}).socials || {};
+          const cloudMentors = data.map(m => {
+            const fallbackMentor = INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {};
+            const fallbackSocials = fallbackMentor.socials || {};
             return {
               id: Number(m.id),
               name: m.name,
@@ -6885,13 +6986,20 @@ ${STEALTH_ADMIN_JS}
               achievements: m.achievements || '',
               tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}\"]/g, '').split(',') : []),
               avatar_color: m.avatar_color || '#8b5cf6',
+              photo: safeImageSource(m.photo || fallbackMentor.photo),
               socials: m.socials || fallbackSocials
             };
           });
-          try {
-            localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
-          } catch(e) {}
-          renderMentorsList(mentors);
+          const ids = new Set();
+          if (cloudMentors.every(mentor => validateMentorRecord(mentor) && !ids.has(mentor.id) && ids.add(mentor.id))) {
+            mentors = cloudMentors;
+            try {
+              localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
+            } catch(e) {}
+            renderMentorsList(mentors);
+          } else {
+            console.warn('Supabase returned invalid mentor data; keeping the verified local copy.');
+          }
         }
       } catch (err) {
         console.warn('Mentors Supabase sync fallback:', err);
@@ -6954,16 +7062,29 @@ ${STEALTH_ADMIN_JS}
       const experience = document.getElementById('mentor-experience').value.trim();
       const achievements = document.getElementById('mentor-achievements').value.trim();
       const tagsStr = document.getElementById('mentor-tags').value.trim();
-      const tags = tagsStr ? tagsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const avatar_color = document.getElementById('mentor-color').value;
+      const tags = normalizeTags(tagsStr);
+      const avatar_color = safeHexColor(document.getElementById('mentor-color').value, '#8b5cf6');
+
+      if (!name || name.length > 160 || !description || description.length > 2000 ||
+          role.length > 200 || education.length > 8000 || experience.length > 8000 ||
+          achievements.length > 8000 || tags.some(tag => tag.length > 80)) {
+        alert('გთხოვთ შეამოწმოთ სავალდებულო ველები და ტექსტის სიგრძე.');
+        return;
+      }
 
       const record = { id, name, role, description, education, experience, achievements, tags, avatar_color };
+      const existingMentor = mentors.find(m => m.id === id);
+      const localRecord = {
+        ...record,
+        photo: existingMentor && existingMentor.photo ? existingMentor.photo : '',
+        socials: existingMentor && existingMentor.socials ? existingMentor.socials : {}
+      };
 
       if (isNew) {
-        mentors.push(record);
+        mentors.push(localRecord);
       } else {
         const idx = mentors.findIndex(m => m.id === id);
-        if (idx !== -1) mentors[idx] = record;
+        if (idx !== -1) mentors[idx] = localRecord;
       }
 
       try {
@@ -6972,8 +7093,6 @@ ${STEALTH_ADMIN_JS}
 
       renderMentorsList(mentors);
       closeMentorModal();
-      showToast('მენტორის მონაცემები წარმატებით შეინახა ✅');
-
       if (currentProfileMentorId === id) {
         const modal = document.getElementById('mentor-profile-modal');
         if (modal && modal.classList.contains('open')) {
@@ -6984,10 +7103,19 @@ ${STEALTH_ADMIN_JS}
       const client = initSupabase();
       if (client) {
         try {
-          await client.from('mentors').upsert(record);
+          const { error } = await client.from('mentors').upsert(record);
+          if (error) {
+            console.warn('Mentors Supabase save error:', error);
+            showToast('⚠️ ცვლილება მხოლოდ ამ ბრაუზერში შეინახა; ღრუბლოვანი შენახვა ვერ შესრულდა.');
+          } else {
+            showToast('მენტორის მონაცემები წარმატებით შეინახა ✅');
+          }
         } catch (err) {
           console.warn('Mentors Supabase save error:', err);
+          showToast('⚠️ ცვლილება მხოლოდ ამ ბრაუზერში შეინახა; კავშირის შეცდომაა.');
         }
+      } else {
+        showToast('მენტორის მონაცემები ლოკალურად შეინახა ✅');
       }
     }
 
@@ -6998,15 +7126,23 @@ ${STEALTH_ADMIN_JS}
         localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
       } catch(err) {}
       renderMentorsList(mentors);
-      showToast('მენტორი წაიშალა 🗑️');
 
       const client = initSupabase();
       if (client) {
         try {
-          await client.from('mentors').delete().eq('id', id);
+          const { error } = await client.from('mentors').delete().eq('id', id);
+          if (error) {
+            console.warn('Mentors Supabase delete error:', error);
+            showToast('⚠️ მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა; ღრუბლოვანი წაშლა ვერ შესრულდა.');
+          } else {
+            showToast('მენტორი წარმატებით წაიშალა 🗑️');
+          }
         } catch (err) {
           console.warn('Mentors Supabase delete error:', err);
+          showToast('⚠️ მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა; კავშირის შეცდომაა.');
         }
+      } else {
+        showToast('მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა 🗑️');
       }
     }
 
@@ -7016,8 +7152,10 @@ ${STEALTH_ADMIN_JS}
         const localCustom = localStorage.getItem('gardabani_mentors_custom');
         if (localCustom) {
           const parsed = JSON.parse(localCustom);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            mentors = parsed;
+          const ids = new Set();
+          if (Array.isArray(parsed) && parsed.length > 0 &&
+              parsed.every(mentor => validateMentorRecord(mentor) && !ids.has(Number(mentor.id)) && ids.add(Number(mentor.id)))) {
+            mentors = parsed.map(mentor => ({ ...mentor, id: Number(mentor.id), tags: normalizeTags(mentor.tags), avatar_color: safeHexColor(mentor.avatar_color, '#8b5cf6') }));
           }
         }
       } catch(e) {}
@@ -8302,6 +8440,7 @@ ${GEORGIAN_FONT_HEAD_TAG}
 ${SKELETON_LOADER_CSS}
 ${STEALTH_ADMIN_CSS}
 ${COOKIE_CONSENT_CSS}
+${DESIGN_SYSTEM_CSS}
   </style>
 </head>
 <body>
@@ -8319,7 +8458,7 @@ ${COOKIE_CONSENT_CSS}
           <a href="index.html" class="nav-tab">მთავარი გვერდი</a>
           <a href="calendar.html" class="nav-tab">კალენდარი</a>
           <a href="mentors.html" class="nav-tab">მენტორები</a>
-          <a href="settings.html" class="nav-tab active">პარამეტრები</a>
+          <a href="settings.html" class="nav-tab active" aria-current="page">პარამეტრები</a>
         </nav>
       </div>
 
@@ -8332,6 +8471,37 @@ ${COOKIE_CONSENT_CSS}
         </a>
       </div>
     </header>
+
+    <div class="settings-group-heading" aria-labelledby="appearance-settings-title">
+      <span class="settings-group-icon">◐</span>
+      <div>
+        <h2 class="settings-group-title" id="appearance-settings-title">გარეგნობა</h2>
+        <p class="settings-group-kicker">საიტის ნათელი და მუქი რეჟიმის მართვა</p>
+      </div>
+    </div>
+
+    <section class="settings-card">
+      <div class="appearance-row">
+        <div class="appearance-preview">
+          <span class="appearance-preview-icon" id="appearance-preview-icon">☀️</span>
+          <div>
+            <h3 class="switch-title" style="margin:0;">ფერთა რეჟიმი</h3>
+            <p class="switch-desc" id="appearance-theme-status" style="margin:3px 0 0;">აქტიურია ნათელი რეჟიმი</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline" id="btn-settings-theme-toggle">
+          <span>◐</span> რეჟიმის შეცვლა
+        </button>
+      </div>
+    </section>
+
+    <div class="settings-group-heading" aria-labelledby="map-settings-title">
+      <span class="settings-group-icon">🗺️</span>
+      <div>
+        <h2 class="settings-group-title" id="map-settings-title">რუკის პარამეტრები</h2>
+        <p class="settings-group-kicker">საზღვრების და მომსახურების არეალის ვიზუალიზაცია</p>
+      </div>
+    </div>
 
     <!-- SECTION 1: MAP LAYERS WITH LEVER SWITCHES -->
     <section class="settings-card">
@@ -8374,6 +8544,18 @@ ${COOKIE_CONSENT_CSS}
         </label>
       </div>
 
+    </section>
+
+    <div class="settings-group-heading" aria-labelledby="privacy-settings-title">
+      <span class="settings-group-icon">🔐</span>
+      <div>
+        <h2 class="settings-group-title" id="privacy-settings-title">კონფიდენციალურობა და ანალიტიკის თანხმობა</h2>
+        <p class="settings-group-kicker">ქუქი-ფაილების არჩევანი და ამ ბრაუზერში შენახული პარამეტრები</p>
+      </div>
+    </div>
+
+    <section class="settings-card settings-card--privacy">
+
       <!-- Cookie Consent Management Row -->
       <div class="switch-row" id="row-cookie-settings" style="cursor:default;">
         <div class="switch-label-group">
@@ -8396,8 +8578,16 @@ ${COOKIE_CONSENT_CSS}
       </div>
     </section>
 
+    <div class="settings-group-heading" aria-labelledby="system-settings-title">
+      <span class="settings-group-icon">📡</span>
+      <div>
+        <h2 class="settings-group-title" id="system-settings-title">სისტემის სტატუსი</h2>
+        <p class="settings-group-kicker">ღრუბლოვან სერვისთან კავშირისა და დაცვის მდგომარეობა</p>
+      </div>
+    </div>
+
     <!-- SECTION 2: SERVER SECURITY STATUS -->
-    <section class="settings-card" id="supabase-status-card">
+    <section class="settings-card settings-card--system" id="supabase-status-card">
       <div class="card-header-group">
         <h2 class="card-main-title">🛡️ სერვერული უსაფრთხოება</h2>
       </div>
@@ -8408,12 +8598,20 @@ ${COOKIE_CONSENT_CSS}
             <span style="font-size:20px;">📡</span>
             <span style="font-weight:600; font-size:15px; color:var(--text-main);">კავშირის სტატუსი:</span>
           </div>
-          <span id="supabase-status-badge" style="display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:9999px; font-size:12px; font-weight:600; background:rgba(34, 197, 94, 0.15); color:#16a34a; border:1px solid rgba(34, 197, 94, 0.3);">
-            <span>🟢</span> დაკავშირებულია (RLS & სერვერული დაცვა აქტიურია)
+          <span id="supabase-status-badge" class="status-badge" data-state="loading">
+            <span>⏳</span> კავშირი მოწმდება...
           </span>
         </div>
       </div>
     </section>
+
+    <div class="settings-group-heading" id="admin-section-heading" style="display:none;" aria-labelledby="admin-tools-title">
+      <span class="settings-group-icon">🛡️</span>
+      <div>
+        <h2 class="settings-group-title" id="admin-tools-title">ადმინისტრატორის ხელსაწყოები</h2>
+        <p class="settings-group-kicker">მხოლოდ აქტიური ადმინისტრატორის სესიისთვის</p>
+      </div>
+    </div>
 
     <!-- ACTIVE ADMIN SESSION CARD (VISIBLE ONLY WHEN LOGGED IN AS ADMIN) -->
     <section class="settings-card" id="admin-active-card" style="display:none;">
@@ -8441,6 +8639,14 @@ ${COOKIE_CONSENT_CSS}
         </div>
       </div>
     </section>
+
+    <div class="settings-group-heading" id="analytics-section-heading" style="display:none;" aria-labelledby="analytics-tools-title">
+      <span class="settings-group-icon">📊</span>
+      <div>
+        <h2 class="settings-group-title" id="analytics-tools-title">ანალიტიკის პანელი</h2>
+        <p class="settings-group-kicker">ვიზიტების, მოწყობილობებისა და აქტივობის შეჯამება</p>
+      </div>
+    </div>
 
     <!-- ACTIVE ADMIN ANALYTICS CARD -->
     <section class="settings-card fade-in-anim" id="admin-analytics-card" style="display:none;">
@@ -8728,6 +8934,7 @@ ${STEALTH_ADMIN_HTML}
 
   <script>
 ${STEALTH_ADMIN_JS}
+${SAFE_RENDER_JS}
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -8779,6 +8986,10 @@ ${STEALTH_ADMIN_JS}
         const isAdmin = isAdminMode();
         const activeCard = document.getElementById('admin-active-card');
         const analyticsCard = document.getElementById('admin-analytics-card');
+        const adminHeading = document.getElementById('admin-section-heading');
+        const analyticsHeading = document.getElementById('analytics-section-heading');
+        if (adminHeading) adminHeading.style.display = isAdmin ? 'flex' : 'none';
+        if (analyticsHeading) analyticsHeading.style.display = isAdmin ? 'flex' : 'none';
         if (activeCard) {
           activeCard.style.display = isAdmin ? 'block' : 'none';
         }
@@ -8806,24 +9017,19 @@ ${STEALTH_ADMIN_JS}
           if (client) {
             client.from('locations').select('id', { count: 'exact', head: true }).then(({ error }) => {
               if (!error) {
-                statusBadge.style.background = 'rgba(34, 197, 94, 0.15)';
-                statusBadge.style.color = '#16a34a';
-                statusBadge.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                statusBadge.dataset.state = 'success';
                 statusBadge.innerHTML = '<span>🟢</span> დაკავშირებულია (RLS & სერვერული დაცვა აქტიურია)';
               } else {
-                statusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
-                statusBadge.style.color = '#dc2626';
-                statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                statusBadge.innerHTML = '<span>🔴</span> შეცდომა: ' + error.message;
+                statusBadge.dataset.state = 'error';
+                statusBadge.innerHTML = '<span>🔴</span> შეცდომა: ' + escapeHtml(error.message || 'უცნობი შეცდომა');
               }
             }).catch(e => {
+              statusBadge.dataset.state = 'offline';
               statusBadge.innerHTML = '<span>🟡</span> ხაზგარეშე (Offline რეჟიმი)';
             });
           }
         } else {
-          statusBadge.style.background = 'rgba(234, 179, 8, 0.15)';
-          statusBadge.style.color = '#ca8a04';
-          statusBadge.style.borderColor = 'rgba(234, 179, 8, 0.3)';
+          statusBadge.dataset.state = 'offline';
           statusBadge.innerHTML = '<span>🟡</span> ლოკალური რეჟიმი (Supabase არ არის დაკონფიგურირებული)';
         }
       }
@@ -8832,6 +9038,9 @@ ${STEALTH_ADMIN_JS}
       const themeBtn = document.getElementById('theme-toggle');
       const themeIcon = document.getElementById('theme-icon');
       const themeText = document.getElementById('theme-text');
+      const settingsThemeBtn = document.getElementById('btn-settings-theme-toggle');
+      const appearanceThemeStatus = document.getElementById('appearance-theme-status');
+      const appearancePreviewIcon = document.getElementById('appearance-preview-icon');
 
       function syncThemeUI(theme) {
         const isDark = theme === 'dark';
@@ -8844,6 +9053,9 @@ ${STEALTH_ADMIN_JS}
           themeText.textContent = 'ღამე';
           themeBtn.title = 'ღამის რეჟიმზე გადართვა';
         }
+        if (appearanceThemeStatus) appearanceThemeStatus.textContent = isDark ? 'აქტიურია მუქი რეჟიმი' : 'აქტიურია ნათელი რეჟიმი';
+        if (appearancePreviewIcon) appearancePreviewIcon.textContent = isDark ? '🌙' : '☀️';
+        if (settingsThemeBtn) settingsThemeBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
       }
 
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -8860,6 +9072,10 @@ ${STEALTH_ADMIN_JS}
         applyTheme(isDark ? 'light' : 'dark');
         showToast(isDark ? 'დღის რეჟიმი გააქტიურდა ☀️' : 'ღამის რეჟიმი გააქტიურდა 🌙');
       });
+
+      if (settingsThemeBtn) {
+        settingsThemeBtn.addEventListener('click', () => themeBtn.click());
+      }
 
       // 4. Reset All Settings & Dates
       document.getElementById('btn-reset-all-settings').addEventListener('click', () => {
@@ -8912,11 +9128,11 @@ ${STEALTH_ADMIN_JS}
         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
         const row = document.createElement('div');
         row.className = 'rank-row';
-        const fillBg = barColor || 'var(--primary)';
+        const fillBg = /^#[0-9a-f]{6}$/i.test(String(barColor || '')) ? barColor : 'var(--primary)';
         row.innerHTML = 
           '<div class="rank-header">' +
-            '<span>' + label + '</span>' +
-            '<span style="color:var(--text-subtle);">' + count + ' (' + (percentText || (pct + '%')) + ')</span>' +
+            '<span>' + escapeHtml(label) + '</span>' +
+            '<span style="color:var(--text-subtle);">' + escapeHtml(Number(count) || 0) + ' (' + escapeHtml(percentText || (pct + '%')) + ')</span>' +
           '</div>' +
           '<div class="rank-track">' +
             '<div class="rank-fill" style="width:' + pct + '%; background:' + fillBg + ';"></div>' +
@@ -9497,17 +9713,17 @@ ${STEALTH_ADMIN_JS}
 
               item.innerHTML = 
                 '<div class="activity-item-left">' +
-                  '<div class="activity-avatar">' + pInfo.icon + '</div>' +
+                  '<div class="activity-avatar">' + escapeHtml(pInfo.icon) + '</div>' +
                   '<div class="activity-title-group">' +
-                    '<div class="activity-page-title">' + pInfo.title + '</div>' +
-                    '<div class="activity-time-meta">' + formatTimeAgo(r.created_at) + '</div>' +
+                    '<div class="activity-page-title">' + escapeHtml(pInfo.title) + '</div>' +
+                    '<div class="activity-time-meta">' + escapeHtml(formatTimeAgo(r.created_at)) + '</div>' +
                   '</div>' +
                 '</div>' +
                 '<div class="activity-badges-group">' +
-                  '<span class="badge-pill badge-device">' + devIcon + ' ' + (r.device_type || 'Desktop') + '</span>' +
-                  '<span class="badge-pill badge-lang">' + langLabel + '</span>' +
-                  (r.device_memory ? ('<span class="badge-pill" style="color:var(--text-main);">💾 ' + r.device_memory + '</span>') : '') +
-                  (r.timezone ? ('<span class="badge-pill" style="color:#0ea5e9;">🌐 ' + (r.timezone.replace('Asia/', '').replace('Europe/', '')) + '</span>') : '') +
+                  '<span class="badge-pill badge-device">' + escapeHtml(devIcon + ' ' + (r.device_type || 'Desktop')) + '</span>' +
+                  '<span class="badge-pill badge-lang">' + escapeHtml(langLabel) + '</span>' +
+                  (r.device_memory ? ('<span class="badge-pill" style="color:var(--text-main);">💾 ' + escapeHtml(r.device_memory) + '</span>') : '') +
+                  (r.timezone ? ('<span class="badge-pill" style="color:#0ea5e9;">🌐 ' + escapeHtml(String(r.timezone).replace('Asia/', '').replace('Europe/', '')) + '</span>') : '') +
                   (r.data_saver ? ('<span class="badge-pill" style="color:#f59e0b;">📉 Data Saver</span>') : '') +
                   '<span class="badge-pill badge-duration">⏱️ ' + formatDuration(r.duration_seconds) + '</span>' +
                 '</div>';
@@ -9659,15 +9875,15 @@ ${STEALTH_ADMIN_JS}
               const geoMonths = ['იან', 'თებ', 'მარ', 'აპრ', 'მაი', 'ივნ', 'ივლ', 'აგვ', 'სექ', 'ოქტ', 'ნოე', 'დეკ'];
               
               sortedDays.forEach(day => {
-                const count = dailyData[day];
+                const count = Math.max(0, Number(dailyData[day]) || 0);
                 total14 += count;
                 const pct = Math.max((count / maxVal) * 100, 5);
                 const barColor = count >= 5 ? '#10b981' : (count >= 2 ? '#3b82f6' : '#94a3b8');
                 
                 const dObj = new Date(day);
-                const dateLbl = (!isNaN(dObj.getTime())) ? (String(dObj.getDate()).padStart(2, '0') + ' ' + geoMonths[dObj.getMonth()]) : day;
+                const dateLbl = (!isNaN(dObj.getTime())) ? (String(dObj.getDate()).padStart(2, '0') + ' ' + geoMonths[dObj.getMonth()]) : String(day);
                 
-                html += '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;" title="' + dateLbl + ': ' + count + ' ვიზიტი">' +
+                html += '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;" title="' + escapeHtml(dateLbl) + ': ' + count + ' ვიზიტი">' +
                   '<div style="font-size:10px; font-weight:700; color:' + barColor + ';">' + count + '</div>' +
                   '<div style="width:100%; max-width:24px; height:' + pct + '%; background:' + barColor + '; border-radius:4px 4px 0 0; min-height:4px; transition:height 0.5s;"></div>' +
                 '</div>';

@@ -4,3 +4,24 @@ Thumbs.db
 *.tmp
 .vscode/
 .idea/
+
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*password*.txt
+*secret*.txt
+გარდაბანი პაროლი.txt
+
+# Database exports and local recovery artifacts
+*.dump
+*.backup
+roles.sql
+schema.sql
+data.sql
+backup/
+backups/
