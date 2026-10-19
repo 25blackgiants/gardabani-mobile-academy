@@ -2693,7 +2693,6 @@ ${STEALTH_ADMIN_HTML}
     let map = null;
     let markersLayer = null;
     let boundaryLayer = null;
-    let radiusLayer = null;
     let baseLayers = {};
     let currentBaseLayerName = 'roadmap';
     let isFullscreen = false;
@@ -2828,13 +2827,12 @@ ${SAFE_RENDER_JS}
         }
       });
 
-      radiusLayer = L.layerGroup();
       markersLayer = L.layerGroup().addTo(map);
 
       // Apply settings from localStorage
       applyLayerSettings();
 
-      // Render markers & 5km radius circles
+      // Render location markers
       renderMapOverlays();
 
       // Fit map to Gardabani boundary on initial load
@@ -2862,10 +2860,9 @@ ${SAFE_RENDER_JS}
 
     // Dynamic layer settings synchronization
     function applyLayerSettings() {
-      if (!map || !boundaryLayer || !radiusLayer) return;
+      if (!map || !boundaryLayer) return;
 
       const showBoundary = localStorage.getItem('gardabani_setting_boundary') !== 'false';
-      const showRadius = localStorage.getItem('gardabani_setting_radius') === 'true';
 
       if (showBoundary) {
         if (!map.hasLayer(boundaryLayer)) boundaryLayer.addTo(map);
@@ -2873,11 +2870,6 @@ ${SAFE_RENDER_JS}
         if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
       }
 
-      if (showRadius) {
-        if (!map.hasLayer(radiusLayer)) radiusLayer.addTo(map);
-      } else {
-        if (map.hasLayer(radiusLayer)) map.removeLayer(radiusLayer);
-      }
     }
 
     function updateLayerPillsUI(layerName) {
@@ -2920,7 +2912,6 @@ ${SAFE_RENDER_JS}
       if (!map) return;
 
       markersLayer.clearLayers();
-      radiusLayer.clearLayers();
 
       const hub = locations.find(l => l.type === 'hub') || locations[0];
 
@@ -3012,24 +3003,6 @@ ${SAFE_RENDER_JS}
         });
 
         markersLayer.addLayer(marker);
-
-        // 5km Service Radius Circle
-        const circle = L.circle([loc.latitude, loc.longitude], {
-          radius: 5000,
-          color: isHub ? '#ef4444' : '#3b82f6',
-          weight: 1.2,
-          opacity: 0.7,
-          fillColor: isHub ? '#ef4444' : '#3b82f6',
-          fillOpacity: 0.06,
-          dashArray: '4, 6'
-        });
-
-        circle.bindTooltip(\`<b>\${escapeHtml(loc.shortName || loc.name)}</b><br>5კმ მომსახურების არეალი\`, {
-          sticky: true,
-          className: 'radius-tooltip'
-        });
-
-        radiusLayer.addLayer(circle);
       });
     }
 
@@ -3352,7 +3325,7 @@ ${SAFE_RENDER_JS}
           renderMapOverlays();
           renderSidebar();
         }
-        if (e.key === 'gardabani_setting_boundary' || e.key === 'gardabani_setting_radius') {
+        if (e.key === 'gardabani_setting_boundary') {
           applyLayerSettings();
         }
         if (e.key === 'gardabani_admin_session') {
@@ -8528,22 +8501,6 @@ ${DESIGN_SYSTEM_CSS}
         </label>
       </div>
 
-      <!-- Lever Switch 2: 5km Radius -->
-      <div class="switch-row" id="row-radius">
-        <div class="switch-label-group">
-          <span class="switch-title">
-            <span>⭕</span> 5 კმ მომსახურების არეალი
-          </span>
-          <span class="switch-desc">
-            თითოეული ლოკაციის ირგვლივ 5-კილომეტრიანი სამოქმედო რადიუსის წრეების გამოსახვა.
-          </span>
-        </div>
-        <label class="lever-switch">
-          <input type="checkbox" id="setting-radius">
-          <span class="lever-slider"></span>
-        </label>
-      </div>
-
     </section>
 
     <div class="settings-group-heading" aria-labelledby="privacy-settings-title">
@@ -8951,26 +8908,16 @@ ${SAFE_RENDER_JS}
 
       // 1. Layers Setup with localStorage
       const boundaryInput = document.getElementById('setting-boundary');
-      const radiusInput = document.getElementById('setting-radius');
       const rowBoundary = document.getElementById('row-boundary');
-      const rowRadius = document.getElementById('row-radius');
 
       const savedBoundary = localStorage.getItem('gardabani_setting_boundary');
-      const savedRadius = localStorage.getItem('gardabani_setting_radius');
 
       boundaryInput.checked = savedBoundary !== 'false';
-      radiusInput.checked = savedRadius === 'true';
 
       rowBoundary.addEventListener('click', () => {
         boundaryInput.checked = !boundaryInput.checked;
         localStorage.setItem('gardabani_setting_boundary', boundaryInput.checked ? 'true' : 'false');
         showToast(boundaryInput.checked ? 'გარდაბნის საზღვარი ჩაირთო 🌐' : 'გარდაბნის საზღვარი გაითიშა');
-      });
-
-      rowRadius.addEventListener('click', () => {
-        radiusInput.checked = !radiusInput.checked;
-        localStorage.setItem('gardabani_setting_radius', radiusInput.checked ? 'true' : 'false');
-        showToast(radiusInput.checked ? '5კმ არეალი ჩაირთო ⭕' : '5კმ არეალი გაითიშა');
       });
 
       // 2. Admin Mode Setup (Sync View and Logout)
@@ -9081,12 +9028,10 @@ ${SAFE_RENDER_JS}
       document.getElementById('btn-reset-all-settings').addEventListener('click', () => {
         if (confirm('ნამდვილად გსურთ ყველა პარამეტრისა და ლოკაციების საწყის მნიშვნელობებზე დაბრუნება?')) {
           localStorage.removeItem('gardabani_setting_boundary');
-          localStorage.removeItem('gardabani_setting_radius');
           localStorage.removeItem('gardabani_locations');
           resetAdminLockout();
           adminLogout('manual');
           boundaryInput.checked = true;
-          radiusInput.checked = false;
           syncAdminView();
           showToast('პარამეტრები წარმატებით განულდა');
         }

@@ -2556,22 +2556,6 @@
         </label>
       </div>
 
-      <!-- Lever Switch 2: 5km Radius -->
-      <div class="switch-row" id="row-radius">
-        <div class="switch-label-group">
-          <span class="switch-title">
-            <span>⭕</span> 5 კმ მომსახურების არეალი
-          </span>
-          <span class="switch-desc">
-            თითოეული ლოკაციის ირგვლივ 5-კილომეტრიანი სამოქმედო რადიუსის წრეების გამოსახვა.
-          </span>
-        </div>
-        <label class="lever-switch">
-          <input type="checkbox" id="setting-radius">
-          <span class="lever-slider"></span>
-        </label>
-      </div>
-
     </section>
 
     <div class="settings-group-heading" aria-labelledby="privacy-settings-title">
@@ -3628,26 +3612,16 @@
 
       // 1. Layers Setup with localStorage
       const boundaryInput = document.getElementById('setting-boundary');
-      const radiusInput = document.getElementById('setting-radius');
       const rowBoundary = document.getElementById('row-boundary');
-      const rowRadius = document.getElementById('row-radius');
 
       const savedBoundary = localStorage.getItem('gardabani_setting_boundary');
-      const savedRadius = localStorage.getItem('gardabani_setting_radius');
 
       boundaryInput.checked = savedBoundary !== 'false';
-      radiusInput.checked = savedRadius === 'true';
 
       rowBoundary.addEventListener('click', () => {
         boundaryInput.checked = !boundaryInput.checked;
         localStorage.setItem('gardabani_setting_boundary', boundaryInput.checked ? 'true' : 'false');
         showToast(boundaryInput.checked ? 'გარდაბნის საზღვარი ჩაირთო 🌐' : 'გარდაბნის საზღვარი გაითიშა');
-      });
-
-      rowRadius.addEventListener('click', () => {
-        radiusInput.checked = !radiusInput.checked;
-        localStorage.setItem('gardabani_setting_radius', radiusInput.checked ? 'true' : 'false');
-        showToast(radiusInput.checked ? '5კმ არეალი ჩაირთო ⭕' : '5კმ არეალი გაითიშა');
       });
 
       // 2. Admin Mode Setup (Sync View and Logout)
@@ -3758,12 +3732,10 @@
       document.getElementById('btn-reset-all-settings').addEventListener('click', () => {
         if (confirm('ნამდვილად გსურთ ყველა პარამეტრისა და ლოკაციების საწყის მნიშვნელობებზე დაბრუნება?')) {
           localStorage.removeItem('gardabani_setting_boundary');
-          localStorage.removeItem('gardabani_setting_radius');
           localStorage.removeItem('gardabani_locations');
           resetAdminLockout();
           adminLogout('manual');
           boundaryInput.checked = true;
-          radiusInput.checked = false;
           syncAdminView();
           showToast('პარამეტრები წარმატებით განულდა');
         }
@@ -5116,10 +5088,10 @@ async function loadAndRenderAnalytics() {
             </label>
           </div>
           <div class="cookie-cat-desc">
-            არჩეული ვიზუალური თემის (დღე/ღამე), რუკის ფილტრებისა და რადიუსის პარამეტრების დამახსოვრება მომდევნო ვიზიტებისთვის.
+            არჩეული ვიზუალური თემისა (დღე/ღამე) და რუკის პარამეტრების დამახსოვრება მომდევნო ვიზიტებისთვის.
           </div>
           <div class="cookie-cat-tags">
-            <code>gardabani_theme</code> <code>gardabani_radius_active</code> <code>gardabani_boundary_active</code>
+            <code>gardabani_theme</code> <code>gardabani_boundary_active</code>
           </div>
         </div>
 

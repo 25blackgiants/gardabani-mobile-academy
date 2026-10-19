@@ -3257,7 +3257,6 @@
     let map = null;
     let markersLayer = null;
     let boundaryLayer = null;
-    let radiusLayer = null;
     let baseLayers = {};
     let currentBaseLayerName = 'roadmap';
     let isFullscreen = false;
@@ -3982,13 +3981,12 @@
         }
       });
 
-      radiusLayer = L.layerGroup();
       markersLayer = L.layerGroup().addTo(map);
 
       // Apply settings from localStorage
       applyLayerSettings();
 
-      // Render markers & 5km radius circles
+      // Render location markers
       renderMapOverlays();
 
       // Fit map to Gardabani boundary on initial load
@@ -4016,10 +4014,9 @@
 
     // Dynamic layer settings synchronization
     function applyLayerSettings() {
-      if (!map || !boundaryLayer || !radiusLayer) return;
+      if (!map || !boundaryLayer) return;
 
       const showBoundary = localStorage.getItem('gardabani_setting_boundary') !== 'false';
-      const showRadius = localStorage.getItem('gardabani_setting_radius') === 'true';
 
       if (showBoundary) {
         if (!map.hasLayer(boundaryLayer)) boundaryLayer.addTo(map);
@@ -4027,11 +4024,6 @@
         if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
       }
 
-      if (showRadius) {
-        if (!map.hasLayer(radiusLayer)) radiusLayer.addTo(map);
-      } else {
-        if (map.hasLayer(radiusLayer)) map.removeLayer(radiusLayer);
-      }
     }
 
     function updateLayerPillsUI(layerName) {
@@ -4074,7 +4066,6 @@
       if (!map) return;
 
       markersLayer.clearLayers();
-      radiusLayer.clearLayers();
 
       const hub = locations.find(l => l.type === 'hub') || locations[0];
 
@@ -4166,24 +4157,6 @@
         });
 
         markersLayer.addLayer(marker);
-
-        // 5km Service Radius Circle
-        const circle = L.circle([loc.latitude, loc.longitude], {
-          radius: 5000,
-          color: isHub ? '#ef4444' : '#3b82f6',
-          weight: 1.2,
-          opacity: 0.7,
-          fillColor: isHub ? '#ef4444' : '#3b82f6',
-          fillOpacity: 0.06,
-          dashArray: '4, 6'
-        });
-
-        circle.bindTooltip(`<b>${escapeHtml(loc.shortName || loc.name)}</b><br>5კმ მომსახურების არეალი`, {
-          sticky: true,
-          className: 'radius-tooltip'
-        });
-
-        radiusLayer.addLayer(circle);
       });
     }
 
@@ -4506,7 +4479,7 @@
           renderMapOverlays();
           renderSidebar();
         }
-        if (e.key === 'gardabani_setting_boundary' || e.key === 'gardabani_setting_radius') {
+        if (e.key === 'gardabani_setting_boundary') {
           applyLayerSettings();
         }
         if (e.key === 'gardabani_admin_session') {
@@ -4843,10 +4816,10 @@
             </label>
           </div>
           <div class="cookie-cat-desc">
-            არჩეული ვიზუალური თემის (დღე/ღამე), რუკის ფილტრებისა და რადიუსის პარამეტრების დამახსოვრება მომდევნო ვიზიტებისთვის.
+            არჩეული ვიზუალური თემისა (დღე/ღამე) და რუკის პარამეტრების დამახსოვრება მომდევნო ვიზიტებისთვის.
           </div>
           <div class="cookie-cat-tags">
-            <code>gardabani_theme</code> <code>gardabani_radius_active</code> <code>gardabani_boundary_active</code>
+            <code>gardabani_theme</code> <code>gardabani_boundary_active</code>
           </div>
         </div>
 

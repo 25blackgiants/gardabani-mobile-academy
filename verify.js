@@ -112,11 +112,14 @@ const tests = [
            index.includes('2026-10-29')
   },
   {
-    name: '11. Settings has Lever switches for Gardabani boundary and 5km radius',
-    check: settings.includes('id="setting-boundary"') && 
-           settings.includes('id="setting-radius"') && 
-           settings.includes('lever-switch') && 
-           settings.includes('lever-slider')
+    name: '11. Boundary switch remains and the 5km service-area feature is removed',
+    check: settings.includes('id="setting-boundary"') &&
+           settings.includes('lever-switch') &&
+           settings.includes('lever-slider') &&
+           !settings.includes('id="setting-radius"') &&
+           !index.includes('gardabani_setting_radius') &&
+           !buildSource.includes('radiusLayer') &&
+           !buildSource.includes('radius: 5000')
   },
   {
     name: '12. Plaintext passcode gardabani2026 completely removed from all files',
