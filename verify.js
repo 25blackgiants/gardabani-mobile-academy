@@ -17,6 +17,7 @@ const { INITIAL_LOCATIONS } = require('./src/data/locations');
 const { INITIAL_MENTORS } = require('./src/data/mentors');
 const { validateLocations, validateMentors } = require('./src/data/validation');
 const { SAFE_RENDER_JS } = require('./src/components/safe_render');
+const { LOCALIZATION_JS } = require('./src/components/localization');
 
 const safeRenderContext = { URL, window: { location: { href: 'https://example.test/' } } };
 vm.createContext(safeRenderContext);
@@ -28,6 +29,24 @@ const safeRenderRuntimePassed =
   safeRenderContext.safeImageSource('images/mentors/profile.webp') === 'images/mentors/profile.webp' &&
   safeRenderContext.safeImageSource('../private/secret.png') === '' &&
   safeRenderContext.safeHexColor('red; background:url(x)', '#8b5cf6') === '#8b5cf6';
+
+const localizationContext = {
+  window: {},
+  document: { readyState: 'loading', addEventListener() {} }
+};
+vm.createContext(localizationContext);
+vm.runInContext(LOCALIZATION_JS, localizationContext);
+const translationMap = localizationContext.window.GARDABANI_TRANSLATIONS;
+const settingsTranslationCoveragePassed = [
+  'გარეგნობა',
+  'რუკის პარამეტრები',
+  'კონფიდენციალურობა და ანალიტიკის თანხმობა',
+  'სისტემის სტატუსი',
+  'ადმინისტრატორის ხელსაწყოები',
+  'ანალიტიკის პანელი',
+  'ვიზიტორთა ანალიტიკა და მონაცემები',
+  'კონფიდენციალურობა და ქუქი-ფაილები'
+].every(key => typeof translationMap[key] === 'string' && translationMap[key].length > 0);
 
 let sourceValidationPassed = true;
 let malformedContentRejected = false;
@@ -292,6 +311,27 @@ const tests = [
            localizationSource.includes('MutationObserver') &&
            localizationSource.includes("activeLanguage === 'ka'") &&
            !localizationSource.includes('innerHTML = translations')
+  },
+  {
+    name: '35. Settings and privacy interfaces have explicit Azerbaijani translations',
+    check: settingsTranslationCoveragePassed &&
+           settings.includes('Görünüş') &&
+           settings.includes('Məxfilik və analitika razılığı') &&
+           settings.includes('Administrator alətləri')
+  },
+  {
+    name: '36. Localization covers attributes and live dynamic text changes',
+    check: localizationSource.includes("['title', 'aria-label', 'placeholder', 'alt']") &&
+           localizationSource.includes("record.type === 'characterData'") &&
+           localizationSource.includes('attributeFilter: localizableAttributes') &&
+           localizationSource.includes('transliteration')
+  },
+  {
+    name: '37. Header dimensions remain stable when language changes',
+    check: localizationSource.includes('header.header { min-height: 62px; }') &&
+           localizationSource.includes('min-width: 290px') &&
+           localizationSource.includes('min-width: 98px') &&
+           localizationSource.includes('[data-language="az"] .header-title')
   }
 ];
 
