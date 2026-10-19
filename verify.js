@@ -2,12 +2,45 @@
 // GARDABANI MOBILE ACADEMY — AUTOMATED VERIFICATION SUITE
 // ============================================================================
 const fs = require('fs');
+const vm = require('vm');
 
 const index = fs.readFileSync('index.html', 'utf8');
 const calendar = fs.readFileSync('calendar.html', 'utf8');
 const mentors = fs.readFileSync('mentors.html', 'utf8');
 const settings = fs.readFileSync('settings.html', 'utf8');
 const gardabaniMap = fs.readFileSync('gardabani_map.html', 'utf8');
+const buildSource = fs.readFileSync('build_map.js', 'utf8');
+const trackerSource = fs.readFileSync('src/analytics/tracker.js', 'utf8');
+const gitignore = fs.readFileSync('.gitignore', 'utf8');
+const { INITIAL_LOCATIONS } = require('./src/data/locations');
+const { INITIAL_MENTORS } = require('./src/data/mentors');
+const { validateLocations, validateMentors } = require('./src/data/validation');
+const { SAFE_RENDER_JS } = require('./src/components/safe_render');
+
+const safeRenderContext = { URL, window: { location: { href: 'https://example.test/' } } };
+vm.createContext(safeRenderContext);
+vm.runInContext(SAFE_RENDER_JS, safeRenderContext);
+const safeRenderRuntimePassed =
+  safeRenderContext.escapeHtml('<img src=x onerror=alert(1)>') === '&lt;img src=x onerror=alert(1)&gt;' &&
+  safeRenderContext.safeHttpsUrl('javascript:alert(1)') === '' &&
+  safeRenderContext.safeHttpsUrl('https://example.test/profile').startsWith('https://example.test/profile') &&
+  safeRenderContext.safeImageSource('images/mentors/profile.webp') === 'images/mentors/profile.webp' &&
+  safeRenderContext.safeImageSource('../private/secret.png') === '' &&
+  safeRenderContext.safeHexColor('red; background:url(x)', '#8b5cf6') === '#8b5cf6';
+
+let sourceValidationPassed = true;
+let malformedContentRejected = false;
+try {
+  validateLocations(INITIAL_LOCATIONS);
+  validateMentors(INITIAL_MENTORS);
+} catch (error) {
+  sourceValidationPassed = false;
+}
+try {
+  validateLocations([{ id: 1, name: '<script>', latitude: 999 }]);
+} catch (error) {
+  malformedContentRejected = true;
+}
 
 const tests = [
   {
@@ -27,7 +60,7 @@ const tests = [
   {
     name: '3. Calendar tab linked on all pages',
     check: index.includes('href="calendar.html"') && 
-           calendar.includes('class="nav-tab active">კალენდარი<') &&
+           calendar.includes('class="nav-tab active" aria-current="page">კალენდარი<') &&
            mentors.includes('href="calendar.html"') && 
            settings.includes('href="calendar.html"')
   },
@@ -167,6 +200,78 @@ const tests = [
            fs.readFileSync('supabase_config.js', 'utf8').includes('.supabase.co') &&
            index.includes('isSupabaseConfigured()') &&
            settings.includes('isSupabaseConfigured()')
+  },
+  {
+    name: '23. Source content is validated before generation',
+    check: sourceValidationPassed &&
+           malformedContentRejected &&
+           buildSource.includes('validateLocations(INITIAL_LOCATIONS)') &&
+           buildSource.includes('validateMentors(INITIAL_MENTORS)')
+  },
+  {
+    name: '24. Dynamic public content uses shared escaping and URL validation',
+    check: index.includes('function escapeHtml(value)') &&
+           calendar.includes('escapeHtml(loc.activityDescription)') &&
+           mentors.includes('safeHttpsUrl(s.linkedin)') &&
+           !index.includes('<h3 class="popup-title">' + '$' + '{loc.name}</h3>') &&
+           !mentors.includes('<h3 class="mentor-name">' + '$' + '{m.name}</h3>')
+  },
+  {
+    name: '25. Supabase content writes inspect resolved error results',
+    check: buildSource.includes("const { error } = await client.from('locations').upsert(row)") &&
+           buildSource.includes("const { error } = await client.from('locations').delete()") &&
+           buildSource.includes("const { error } = await client.from('mentors').upsert(record)") &&
+           buildSource.includes("const { error } = await client.from('mentors').delete()") &&
+           trackerSource.includes("const { error } = await client.from('site_analytics').update")
+  },
+  {
+    name: '26. Common credentials and database exports are ignored',
+    check: gitignore.includes('.env.*') &&
+           gitignore.includes('*.pem') &&
+           gitignore.includes('*.backup') &&
+           gitignore.includes('roles.sql') &&
+           gitignore.includes('გარდაბანი პაროლი.txt')
+  },
+  {
+    name: '27. Rendering helpers reject executable URLs and escape HTML',
+    check: safeRenderRuntimePassed
+  },
+  {
+    name: '28. Navigation has visible active state and keyboard focus treatment',
+    check: index.includes('aria-current="page"') &&
+           calendar.includes(':focus-visible') &&
+           mentors.includes('.nav-tab.active::after') &&
+           settings.includes('grid-template-columns: repeat(4, minmax(0, 1fr))')
+  },
+  {
+    name: '29. Calendar prioritizes selected events and has semantic day controls',
+    check: calendar.includes("document.createElement('button')") &&
+           calendar.includes("cell.setAttribute('aria-pressed'") &&
+           calendar.includes('.day-events-card {') &&
+           calendar.includes('order: -1') &&
+           calendar.includes('timeline-location-title')
+  },
+  {
+    name: '30. Mentor photos are optional and preserve generated-avatar fallback',
+    check: mentors.includes('function getMentorAvatarMarkup(mentor)') &&
+           mentors.includes('mentor-avatar-fallback') &&
+           mentors.includes('class="mentor-photo"') &&
+           mentors.includes('profile-modal-body')
+  },
+  {
+    name: '31. Settings are divided into clearly labeled functional groups',
+    check: settings.includes('id="appearance-settings-title"') &&
+           settings.includes('id="map-settings-title"') &&
+           settings.includes('id="privacy-settings-title"') &&
+           settings.includes('id="admin-tools-title"') &&
+           settings.includes('id="analytics-tools-title"')
+  },
+  {
+    name: '32. Reduced-motion and standardized state styling are present',
+    check: index.includes('@media (prefers-reduced-motion: reduce)') &&
+           calendar.includes('ui-state-panel') &&
+           mentors.includes('ui-state-panel') &&
+           settings.includes('status-badge')
   }
 ];
 
@@ -179,5 +284,5 @@ tests.forEach(t => {
 });
 
 console.log('==================================================================');
-console.log('Overall Status:', allPassed ? 'ALL 22 TESTS PASSED PERFECTLY' : 'SOME TESTS FAILED');
+console.log('Overall Status:', allPassed ? 'ALL ' + tests.length + ' TESTS PASSED' : 'SOME TESTS FAILED');
 process.exit(allPassed ? 0 : 1);

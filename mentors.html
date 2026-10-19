@@ -1550,6 +1550,664 @@
     }
   }
 
+
+    :root {
+      --focus-ring: #0ea5e9;
+      --hub-accent: #dc2626;
+      --village-accent: #2563eb;
+      --admin-accent: #059669;
+    }
+
+    body {
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav-tabs {
+      gap: 4px;
+      padding: 4px;
+      border-radius: 14px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+    }
+
+    .nav-tab {
+      position: relative;
+      min-height: 40px;
+      padding: 8px 14px;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      line-height: 1.2;
+    }
+
+    .nav-tab:hover {
+      color: #1d4ed8;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .nav-tab.active,
+    .nav-tab[aria-current="page"] {
+      color: #1d4ed8;
+      border-color: rgba(37, 99, 235, 0.22);
+      background: var(--bg-card);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .nav-tab.active::after,
+    .nav-tab[aria-current="page"]::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 3px;
+      height: 3px;
+      border-radius: 999px;
+      background: #2563eb;
+    }
+
+    [data-theme="dark"] .nav-tab:hover {
+      color: #bfdbfe;
+      background: rgba(96, 165, 250, 0.12);
+    }
+
+    [data-theme="dark"] .nav-tab.active,
+    [data-theme="dark"] .nav-tab[aria-current="page"] {
+      color: #bfdbfe;
+      border-color: rgba(96, 165, 250, 0.38);
+      background: #171717;
+    }
+
+    [data-theme="dark"] .nav-tab.active::after,
+    [data-theme="dark"] .nav-tab[aria-current="page"]::after {
+      background: #60a5fa;
+    }
+
+    :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+      outline: 3px solid var(--focus-ring) !important;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.18) !important;
+    }
+
+    :where(.header-title, .mentor-name, .mentor-role, .mentor-desc, .event-location-name,
+      .event-activity-title, .event-activity-desc, .timeline-location-title,
+      .timeline-activity-title, .timeline-description, .switch-title, .switch-desc,
+      .card-main-title, .card-subtitle) {
+      overflow-wrap: anywhere;
+    }
+
+    .admin-indicator,
+    .admin-controls-group,
+    #admin-active-card {
+      border-color: rgba(5, 150, 105, 0.42) !important;
+    }
+
+    .admin-controls-group,
+    #admin-active-card {
+      box-shadow: inset 4px 0 0 var(--admin-accent);
+    }
+
+    .admin-controls-group::before {
+      content: "ადმინისტრატორის ხელსაწყოები";
+      align-self: center;
+      color: #047857;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    [data-theme="dark"] .admin-controls-group::before {
+      color: #6ee7b7;
+    }
+
+    /* Calendar hierarchy and consistent hub/village language */
+    .calendar-day-cell {
+      font-family: inherit;
+      color: var(--text-main);
+    }
+
+    .calendar-day-cell.has-event {
+      border-width: 2px;
+      border-color: var(--village-accent);
+      background: rgba(37, 99, 235, 0.09);
+      box-shadow: inset 0 -3px 0 rgba(37, 99, 235, 0.42);
+    }
+
+    .calendar-day-cell.has-hub {
+      border-color: var(--hub-accent);
+      background: rgba(220, 38, 38, 0.08);
+      box-shadow: inset 0 -3px 0 rgba(220, 38, 38, 0.42);
+    }
+
+    [data-theme="dark"] .calendar-day-cell.has-event {
+      background: rgba(37, 99, 235, 0.18);
+    }
+
+    [data-theme="dark"] .calendar-day-cell.has-hub {
+      background: rgba(220, 38, 38, 0.18);
+    }
+
+    .event-dot {
+      width: 7px;
+      height: 7px;
+    }
+
+    .day-events-card {
+      border-top: 4px solid var(--village-accent);
+    }
+
+    .timeline-grid {
+      gap: 16px;
+    }
+
+    .timeline-item-card {
+      position: relative;
+      padding: 18px;
+      gap: 12px;
+      border-left: 4px solid var(--village-accent);
+    }
+
+    .timeline-item-card.timeline-hub {
+      border-left-color: var(--hub-accent);
+    }
+
+    .timeline-meta-row,
+    .timeline-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-location-title {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .timeline-activity-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-activity-title {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .timeline-description {
+      margin: 0;
+      color: var(--text-subtle);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    /* Mentor cards and professional profile layout */
+    .mentors-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .mentor-card {
+      align-items: stretch;
+      text-align: left;
+      padding: 22px;
+      gap: 16px;
+    }
+
+    .mentor-card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-width: 0;
+    }
+
+    .mentor-card-identity {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .avatar-wrapper,
+    .profile-header-avatar {
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--bg-card-subtle);
+      border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 1px var(--border-light), 0 8px 20px rgba(15, 23, 42, 0.12);
+    }
+
+    .avatar-wrapper {
+      width: 84px;
+      height: 84px;
+      flex: 0 0 84px;
+    }
+
+    .mentor-avatar-fallback,
+    .mentor-photo {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .mentor-avatar-fallback {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .mentor-photo {
+      position: relative;
+      z-index: 2;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .mentor-name {
+      margin: 0 0 7px;
+      font-size: 1.08rem;
+      line-height: 1.35;
+    }
+
+    .mentor-role {
+      padding: 4px 9px;
+      line-height: 1.35;
+    }
+
+    .mentor-desc {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      overflow: hidden;
+    }
+
+    .mentor-card .tags-row {
+      justify-content: flex-start;
+      gap: 6px;
+      margin-top: 0;
+    }
+
+    .tag-badge {
+      padding: 4px 8px;
+      line-height: 1.25;
+    }
+
+    .mentor-profile-window {
+      max-width: 820px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .mentor-profile-window .modal-header {
+      padding: 22px 24px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.10), rgba(14, 165, 233, 0.04));
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .profile-header-avatar {
+      width: 76px;
+      height: 76px;
+      flex: 0 0 76px;
+      position: relative;
+    }
+
+    .profile-modal-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 22px 24px 26px;
+    }
+
+    .cv-section-block {
+      padding: 16px;
+      gap: 9px;
+      border-radius: 14px;
+    }
+
+    .profile-summary,
+    .profile-achievements,
+    .profile-expertise {
+      grid-column: 1 / -1;
+    }
+
+    .cv-section-title {
+      font-size: 0.88rem;
+    }
+
+    .cv-section-text {
+      font-size: 0.84rem;
+      line-height: 1.75;
+    }
+
+    .profile-social-links {
+      gap: 9px;
+      margin-top: 9px;
+    }
+
+    .social-link-btn {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* Settings information architecture */
+    .settings-group-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 2px -4px;
+      color: var(--text-main);
+    }
+
+    .settings-group-heading::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: var(--border-light);
+    }
+
+    .settings-group-icon {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      background: rgba(37, 99, 235, 0.10);
+      color: #1d4ed8;
+      font-size: 1rem;
+    }
+
+    .settings-group-title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 850;
+    }
+
+    .settings-group-kicker {
+      margin: 2px 0 0;
+      color: var(--text-subtle);
+      font-size: 0.72rem;
+      line-height: 1.4;
+    }
+
+    .appearance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      background: var(--bg-card-subtle);
+    }
+
+    .appearance-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .appearance-preview-icon {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      font-size: 1.2rem;
+    }
+
+    .settings-card--privacy {
+      border-left: 4px solid #8b5cf6;
+    }
+
+    .settings-card--system {
+      border-left: 4px solid #0ea5e9;
+    }
+
+    #admin-active-card,
+    #admin-analytics-card {
+      border-left: 4px solid var(--admin-accent);
+    }
+
+    .ui-state-panel,
+    .empty-events-state {
+      min-height: 150px;
+      padding: 26px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-align: center;
+      color: var(--text-muted);
+      background: var(--bg-card-subtle);
+      border: 1px dashed var(--border-light);
+      border-radius: 14px;
+    }
+
+    .ui-state-panel strong {
+      color: var(--text-main);
+      font-size: 0.92rem;
+    }
+
+    .ui-state-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-light);
+      font-size: 0.75rem;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .status-badge[data-state="loading"],
+    .status-badge[data-state="offline"] {
+      color: #a16207;
+      background: rgba(234, 179, 8, 0.12);
+      border-color: rgba(202, 138, 4, 0.28);
+    }
+
+    .status-badge[data-state="success"] {
+      color: #047857;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(5, 150, 105, 0.28);
+    }
+
+    .status-badge[data-state="error"] {
+      color: #b91c1c;
+      background: rgba(239, 68, 68, 0.11);
+      border-color: rgba(220, 38, 38, 0.28);
+    }
+
+    [data-theme="dark"] .status-badge[data-state="loading"],
+    [data-theme="dark"] .status-badge[data-state="offline"] { color: #fde68a; }
+    [data-theme="dark"] .status-badge[data-state="success"] { color: #6ee7b7; }
+    [data-theme="dark"] .status-badge[data-state="error"] { color: #fca5a5; }
+
+    @media (pointer: coarse) {
+      :where(.nav-tab, .btn, button, .theme-toggle-btn, .btn-return-map, .loc-action-btn,
+        .social-link-btn, .month-btn, .filter-btn, .lever-switch) {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header.header {
+        padding: 8px 10px;
+        gap: 7px;
+      }
+
+      .header-title {
+        font-size: 0.98rem;
+      }
+
+      .header-logo {
+        font-size: 1.1rem;
+      }
+
+      .nav-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: 100%;
+        gap: 3px;
+        padding: 3px;
+        overflow: visible;
+        border-radius: 12px;
+      }
+
+      .nav-tab {
+        min-width: 0;
+        min-height: 44px;
+        padding: 5px 4px;
+        white-space: normal;
+        font-size: clamp(0.65rem, 2.45vw, 0.76rem);
+        line-height: 1.2;
+      }
+
+      .nav-tab.active::after,
+      .nav-tab[aria-current="page"]::after {
+        left: 20%;
+        right: 20%;
+        bottom: 2px;
+      }
+
+      .calendar-layout {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .day-events-card {
+        order: -1;
+      }
+
+      .calendar-day-cell {
+        min-height: 40px;
+        aspect-ratio: auto;
+        padding: 4px 1px;
+      }
+
+      .event-dots-wrap {
+        margin-top: 2px;
+      }
+
+      .event-dot {
+        width: 5px;
+        height: 5px;
+      }
+
+      .timeline-item-card {
+        padding: 15px;
+      }
+
+      .timeline-actions {
+        align-items: stretch;
+      }
+
+      .timeline-actions > * {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .mentors-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .mentor-card {
+        padding: 17px;
+      }
+
+      .avatar-wrapper {
+        width: 72px;
+        height: 72px;
+        flex-basis: 72px;
+      }
+
+      .mentor-profile-window .modal-header {
+        padding: 17px;
+      }
+
+      .profile-modal-body {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .profile-summary,
+      .profile-achievements,
+      .profile-expertise {
+        grid-column: auto;
+      }
+
+      .appearance-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .appearance-row .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .settings-group-heading {
+        margin-top: 12px;
+      }
+
+      .admin-controls-group::before {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .header-title > span:last-child {
+        max-width: 205px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .mentor-card-header {
+        align-items: flex-start;
+      }
+
+      .profile-header-avatar {
+        width: 64px;
+        height: 64px;
+        flex-basis: 64px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1566,7 +2224,7 @@
         <nav class="nav-tabs">
           <a href="index.html" class="nav-tab">მთავარი გვერდი</a>
           <a href="calendar.html" class="nav-tab">კალენდარი</a>
-          <a href="mentors.html" class="nav-tab active">მენტორები</a>
+          <a href="mentors.html" class="nav-tab active" aria-current="page">მენტორები</a>
           <a href="settings.html" class="nav-tab">პარამეტრები</a>
         </nav>
       </div>
@@ -1691,31 +2349,31 @@
       <div class="modal-body profile-modal-body">
         
         <!-- Summary / Focus -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-summary">
           <h4 class="cv-section-title"><span>📝</span> საქმიანობის მიმართულება და ბიოგრაფია</h4>
           <p class="cv-section-text" id="profile-mentor-desc"></p>
         </div>
 
         <!-- Education -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-education">
           <h4 class="cv-section-title"><span>🎓</span> განათლება და კვალიფიკაცია</h4>
           <p class="cv-section-text" id="profile-mentor-education"></p>
         </div>
 
         <!-- Work Experience -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-experience">
           <h4 class="cv-section-title"><span>💼</span> სამუშაო გამოცდილება</h4>
           <p class="cv-section-text" id="profile-mentor-experience"></p>
         </div>
 
         <!-- Achievements -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-achievements">
           <h4 class="cv-section-title"><span>🏆</span> მიღწევები და სათემო პროექტები</h4>
           <p class="cv-section-text" id="profile-mentor-achievements"></p>
         </div>
 
         <!-- Tags / Skills -->
-        <div class="cv-section-block">
+        <div class="cv-section-block profile-expertise">
           <h4 class="cv-section-title"><span>🏷️</span> კომპეტენციები და საკვანძო თემები</h4>
           <div class="tags-row" id="profile-mentor-tags" style="justify-content:flex-start;"></div>
         </div>
@@ -2354,6 +3012,108 @@
     });
 
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeHexColor(value, fallback) {
+      return /^#[0-9a-f]{6}$/i.test(String(value || '')) ? String(value) : (fallback || '#8b5cf6');
+    }
+
+    function safeHttpsUrl(value) {
+      if (!value) return '';
+      try {
+        const parsed = new URL(String(value));
+        return parsed.protocol === 'https:' ? parsed.href : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function safeEmail(value) {
+      const normalized = String(value || '').trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized) ? normalized : '';
+    }
+
+    function safeImageSource(value) {
+      const normalized = String(value || '').trim();
+      if (!normalized) return '';
+      if (safeHttpsUrl(normalized)) return safeHttpsUrl(normalized);
+      if (normalized.includes('..') || /[<>"'\\]/.test(normalized)) return '';
+      return /^(?:assets|images)\/[a-z0-9_./% -]+\.(?:avif|webp|png|jpe?g)$/i.test(normalized) ? normalized : '';
+    }
+
+    function validateLocationRecord(record) {
+      if (!record || typeof record !== 'object' || Array.isArray(record)) return false;
+      const id = Number(record.id);
+      const latitude = Number(record.latitude);
+      const longitude = Number(record.longitude);
+      return Number.isInteger(id) && id > 0 &&
+        typeof record.name === 'string' && record.name.trim().length > 0 && record.name.length <= 160 &&
+        typeof record.shortName === 'string' && record.shortName.trim().length > 0 && record.shortName.length <= 100 &&
+        (record.type === 'hub' || record.type === 'village') &&
+        /^\d{4}-\d{2}-\d{2}$/.test(String(record.date || '')) &&
+        Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+        Number.isFinite(longitude) && longitude >= -180 && longitude <= 180 &&
+        typeof record.activityTitle === 'string' && record.activityTitle.trim().length > 0 && record.activityTitle.length <= 240 &&
+        typeof record.activityDescription === 'string' && record.activityDescription.length <= 5000;
+    }
+
+    function normalizeLocationRecord(record) {
+      return {
+        id: Number(record.id),
+        name: String(record.name || '').trim(),
+        shortName: String(record.shortName || '').trim(),
+        type: record.type === 'hub' ? 'hub' : 'village',
+        date: String(record.date || ''),
+        latitude: Number(record.latitude),
+        longitude: Number(record.longitude),
+        activityTitle: String(record.activityTitle || '').trim(),
+        activityDescription: String(record.activityDescription || '').trim()
+      };
+    }
+
+    function validateLocationCollection(records) {
+      if (!Array.isArray(records) || records.length === 0) return false;
+      const ids = new Set();
+      return records.every(record => {
+        if (!validateLocationRecord(record) || ids.has(Number(record.id))) return false;
+        ids.add(Number(record.id));
+        return true;
+      });
+    }
+
+    function normalizeTags(value) {
+      const tags = Array.isArray(value) ? value : (typeof value === 'string' ? value.replace(/[{}"]/g, '').split(',') : []);
+      return tags.map(tag => String(tag).trim()).filter(Boolean).slice(0, 20);
+    }
+
+    function validateMentorRecord(record) {
+      if (!record || typeof record !== 'object' || Array.isArray(record)) return false;
+      const tags = normalizeTags(record.tags);
+      const socials = record.socials == null ? {} : record.socials;
+      return Number.isInteger(Number(record.id)) && Number(record.id) > 0 &&
+        typeof record.name === 'string' && record.name.trim().length > 0 && record.name.length <= 160 &&
+        typeof record.role === 'string' && record.role.trim().length > 0 && record.role.length <= 200 &&
+        typeof record.description === 'string' && record.description.trim().length > 0 && record.description.length <= 2000 &&
+        (record.education == null || (typeof record.education === 'string' && record.education.length <= 8000)) &&
+        (record.experience == null || (typeof record.experience === 'string' && record.experience.length <= 8000)) &&
+        (record.achievements == null || (typeof record.achievements === 'string' && record.achievements.length <= 8000)) &&
+        tags.length <= 20 && tags.every(tag => tag.length <= 80) &&
+        /^#[0-9a-f]{6}$/i.test(String(record.avatar_color || '')) &&
+        (!record.photo || !!safeImageSource(record.photo)) &&
+        typeof socials === 'object' && !Array.isArray(socials) &&
+        (!socials.linkedin || !!safeHttpsUrl(socials.linkedin)) &&
+        (!socials.facebook || !!safeHttpsUrl(socials.facebook)) &&
+        (!socials.email || !!safeEmail(socials.email));
+    }
+
+
     const INITIAL_MENTORS = [
   {
     "id": 1,
@@ -2479,6 +3239,7 @@
     }
 
     function getAvatarSvg(color) {
+      color = safeHexColor(color, '#8b5cf6');
       return `
         <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="60" cy="60" r="58" fill="${color}15" stroke="${color}40" stroke-width="2"/>
@@ -2486,6 +3247,13 @@
           <circle cx="60" cy="45" r="13" fill="${color}80"/>
         </svg>
       `;
+    }
+
+    function getMentorAvatarMarkup(mentor) {
+      const fallback = `<span class="mentor-avatar-fallback">${getAvatarSvg(mentor.avatar_color)}</span>`;
+      const photo = safeImageSource(mentor.photo);
+      if (!photo) return fallback;
+      return fallback + `<img class="mentor-photo" src="${escapeHtml(photo)}" alt="${escapeHtml(mentor.name)}" loading="lazy" decoding="async">`;
     }
 
     function renderMentorsSkeleton() {
@@ -2523,6 +3291,11 @@
       grid.innerHTML = '';
       const isAdmin = isAdminMode();
 
+      if (!mentorsData.length) {
+        grid.innerHTML = '<div class="ui-state-panel"><span class="ui-state-icon">👥</span><strong>მენტორების სია ცარიელია</strong><span>ინფორმაცია გამოჩნდება მონაცემების დამატების შემდეგ.</span></div>';
+        return;
+      }
+
       mentorsData.forEach(m => {
         const card = document.createElement('article');
         card.className = 'mentor-card';
@@ -2531,27 +3304,30 @@
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', m.name + ' — პროფილის ნახვა');
 
-        const tagsList = Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []);
-        const tagsHtml = tagsList.filter(t => t.trim()).map(t => `<span class="tag-badge">${t.trim()}</span>`).join('');
-        const color = m.avatar_color || '#8b5cf6';
-
+        const tagsList = normalizeTags(m.tags);
+        const tagsHtml = tagsList.map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('');
         card.innerHTML = `
-          <div class="avatar-wrapper">
-            ${getAvatarSvg(color)}
+          <div class="mentor-card-header">
+            <div class="avatar-wrapper">
+              ${getMentorAvatarMarkup(m)}
+            </div>
+            <div class="mentor-card-identity">
+              <h3 class="mentor-name">${escapeHtml(m.name)}</h3>
+              <span class="mentor-role">${escapeHtml(m.role || 'მენტორი')}</span>
+            </div>
           </div>
-          <div style="width:100%;">
-            <h3 class="mentor-name">${m.name}</h3>
-            <span class="mentor-role">${m.role || 'მენტორი'}</span>
-            <p class="mentor-desc">${m.description}</p>
-            <div class="tags-row">${tagsHtml}</div>
-          </div>
+          <p class="mentor-desc">${escapeHtml(m.description)}</p>
+          <div class="tags-row" aria-label="ექსპერტიზის მიმართულებები">${tagsHtml}</div>
           ${isAdmin ? `
             <div class="mentor-card-admin-actions" style="margin-top:auto; padding-top:10px; border-top:1px dashed var(--border-light); width:100%; display:flex; justify-content:center; gap:6px;">
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(${m.id})">✏️ ჩასწორება</button>
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="event.stopPropagation(); deleteMentor(${m.id})">🗑️ წაშლა</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="event.stopPropagation(); openEditMentor(${Number(m.id)})">✏️ ჩასწორება</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem; color:#ef4444;" onclick="event.stopPropagation(); deleteMentor(${Number(m.id)})">🗑️ წაშლა</button>
             </div>
           ` : ''}
         `;
+
+        const photo = card.querySelector('.mentor-photo');
+        if (photo) photo.addEventListener('error', () => photo.remove(), { once: true });
 
         card.addEventListener('click', (e) => {
           if (e.target.closest('.mentor-card-admin-actions')) return;
@@ -2588,33 +3364,40 @@
 
       if (nameEl) nameEl.textContent = mentor.name;
       if (roleEl) roleEl.textContent = mentor.role || 'მენტორი';
-      if (avatarWrap) avatarWrap.innerHTML = getAvatarSvg(mentor.avatar_color || '#8b5cf6');
+      if (avatarWrap) {
+        avatarWrap.innerHTML = getMentorAvatarMarkup(mentor);
+        const profilePhoto = avatarWrap.querySelector('.mentor-photo');
+        if (profilePhoto) profilePhoto.addEventListener('error', () => profilePhoto.remove(), { once: true });
+      }
       if (descEl) descEl.textContent = mentor.description || '';
       if (eduEl) eduEl.textContent = mentor.education || '';
       if (expEl) expEl.textContent = mentor.experience || '';
       if (achEl) achEl.textContent = mentor.achievements || '';
 
       if (tagsEl) {
-        const tagsList = Array.isArray(mentor.tags) ? mentor.tags : (typeof mentor.tags === 'string' ? mentor.tags.replace(/[{}"]/g, '').split(',') : []);
-        tagsEl.innerHTML = tagsList.filter(t => t.trim()).map(t => `<span class="tag-badge">${t.trim()}</span>`).join('');
+        const tagsList = normalizeTags(mentor.tags);
+        tagsEl.innerHTML = tagsList.map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('');
       }
 
       const socialsEl = document.getElementById('profile-social-links');
       if (socialsEl) {
         socialsEl.innerHTML = '';
         const s = mentor.socials || {};
-        if (s.linkedin) {
-          socialsEl.innerHTML += `<a href="${s.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
+        const linkedinUrl = safeHttpsUrl(s.linkedin);
+        const facebookUrl = safeHttpsUrl(s.facebook);
+        const emailAddress = safeEmail(s.email);
+        if (linkedinUrl) {
+          socialsEl.innerHTML += `<a href="${escapeHtml(linkedinUrl)}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn" aria-label="LinkedIn">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
           </a>`;
         }
-        if (s.facebook) {
-          socialsEl.innerHTML += `<a href="${s.facebook}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
+        if (facebookUrl) {
+          socialsEl.innerHTML += `<a href="${escapeHtml(facebookUrl)}" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Facebook" aria-label="Facebook">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
           </a>`;
         }
-        if (s.email) {
-          socialsEl.innerHTML += `<a href="mailto:${s.email}" class="social-link-btn" title="Email" aria-label="Email">
+        if (emailAddress) {
+          socialsEl.innerHTML += `<a href="mailto:${escapeHtml(emailAddress)}" class="social-link-btn" title="Email" aria-label="Email">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
           </a>`;
         }
@@ -2638,8 +3421,9 @@
           .select('*')
           .order('id', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          mentors = data.map(m => {
-            const fallbackSocials = (INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {}).socials || {};
+          const cloudMentors = data.map(m => {
+            const fallbackMentor = INITIAL_MENTORS.find(im => im.id === Number(m.id)) || {};
+            const fallbackSocials = fallbackMentor.socials || {};
             return {
               id: Number(m.id),
               name: m.name,
@@ -2650,13 +3434,20 @@
               achievements: m.achievements || '',
               tags: Array.isArray(m.tags) ? m.tags : (typeof m.tags === 'string' ? m.tags.replace(/[{}"]/g, '').split(',') : []),
               avatar_color: m.avatar_color || '#8b5cf6',
+              photo: safeImageSource(m.photo || fallbackMentor.photo),
               socials: m.socials || fallbackSocials
             };
           });
-          try {
-            localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
-          } catch(e) {}
-          renderMentorsList(mentors);
+          const ids = new Set();
+          if (cloudMentors.every(mentor => validateMentorRecord(mentor) && !ids.has(mentor.id) && ids.add(mentor.id))) {
+            mentors = cloudMentors;
+            try {
+              localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
+            } catch(e) {}
+            renderMentorsList(mentors);
+          } else {
+            console.warn('Supabase returned invalid mentor data; keeping the verified local copy.');
+          }
         }
       } catch (err) {
         console.warn('Mentors Supabase sync fallback:', err);
@@ -2719,16 +3510,29 @@
       const experience = document.getElementById('mentor-experience').value.trim();
       const achievements = document.getElementById('mentor-achievements').value.trim();
       const tagsStr = document.getElementById('mentor-tags').value.trim();
-      const tags = tagsStr ? tagsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const avatar_color = document.getElementById('mentor-color').value;
+      const tags = normalizeTags(tagsStr);
+      const avatar_color = safeHexColor(document.getElementById('mentor-color').value, '#8b5cf6');
+
+      if (!name || name.length > 160 || !description || description.length > 2000 ||
+          role.length > 200 || education.length > 8000 || experience.length > 8000 ||
+          achievements.length > 8000 || tags.some(tag => tag.length > 80)) {
+        alert('გთხოვთ შეამოწმოთ სავალდებულო ველები და ტექსტის სიგრძე.');
+        return;
+      }
 
       const record = { id, name, role, description, education, experience, achievements, tags, avatar_color };
+      const existingMentor = mentors.find(m => m.id === id);
+      const localRecord = {
+        ...record,
+        photo: existingMentor && existingMentor.photo ? existingMentor.photo : '',
+        socials: existingMentor && existingMentor.socials ? existingMentor.socials : {}
+      };
 
       if (isNew) {
-        mentors.push(record);
+        mentors.push(localRecord);
       } else {
         const idx = mentors.findIndex(m => m.id === id);
-        if (idx !== -1) mentors[idx] = record;
+        if (idx !== -1) mentors[idx] = localRecord;
       }
 
       try {
@@ -2737,8 +3541,6 @@
 
       renderMentorsList(mentors);
       closeMentorModal();
-      showToast('მენტორის მონაცემები წარმატებით შეინახა ✅');
-
       if (currentProfileMentorId === id) {
         const modal = document.getElementById('mentor-profile-modal');
         if (modal && modal.classList.contains('open')) {
@@ -2749,10 +3551,19 @@
       const client = initSupabase();
       if (client) {
         try {
-          await client.from('mentors').upsert(record);
+          const { error } = await client.from('mentors').upsert(record);
+          if (error) {
+            console.warn('Mentors Supabase save error:', error);
+            showToast('⚠️ ცვლილება მხოლოდ ამ ბრაუზერში შეინახა; ღრუბლოვანი შენახვა ვერ შესრულდა.');
+          } else {
+            showToast('მენტორის მონაცემები წარმატებით შეინახა ✅');
+          }
         } catch (err) {
           console.warn('Mentors Supabase save error:', err);
+          showToast('⚠️ ცვლილება მხოლოდ ამ ბრაუზერში შეინახა; კავშირის შეცდომაა.');
         }
+      } else {
+        showToast('მენტორის მონაცემები ლოკალურად შეინახა ✅');
       }
     }
 
@@ -2763,15 +3574,23 @@
         localStorage.setItem('gardabani_mentors_custom', JSON.stringify(mentors));
       } catch(err) {}
       renderMentorsList(mentors);
-      showToast('მენტორი წაიშალა 🗑️');
 
       const client = initSupabase();
       if (client) {
         try {
-          await client.from('mentors').delete().eq('id', id);
+          const { error } = await client.from('mentors').delete().eq('id', id);
+          if (error) {
+            console.warn('Mentors Supabase delete error:', error);
+            showToast('⚠️ მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა; ღრუბლოვანი წაშლა ვერ შესრულდა.');
+          } else {
+            showToast('მენტორი წარმატებით წაიშალა 🗑️');
+          }
         } catch (err) {
           console.warn('Mentors Supabase delete error:', err);
+          showToast('⚠️ მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა; კავშირის შეცდომაა.');
         }
+      } else {
+        showToast('მენტორი მხოლოდ ამ ბრაუზერიდან წაიშალა 🗑️');
       }
     }
 
@@ -2781,8 +3600,10 @@
         const localCustom = localStorage.getItem('gardabani_mentors_custom');
         if (localCustom) {
           const parsed = JSON.parse(localCustom);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            mentors = parsed;
+          const ids = new Set();
+          if (Array.isArray(parsed) && parsed.length > 0 &&
+              parsed.every(mentor => validateMentorRecord(mentor) && !ids.has(Number(mentor.id)) && ids.add(Number(mentor.id)))) {
+            mentors = parsed.map(mentor => ({ ...mentor, id: Number(mentor.id), tags: normalizeTags(mentor.tags), avatar_color: safeHexColor(mentor.avatar_color, '#8b5cf6') }));
           }
         }
       } catch(e) {}
@@ -3584,9 +4405,11 @@
 
         if (!error && data && data.id) {
           cloudRecordId = data.id;
+        } else if (error) {
+          console.warn('Analytics insert was rejected:', error.code || 'unknown_error');
         }
       } catch (err) {
-        // Total silence for analytics errors
+        console.warn('Analytics insert could not be completed.');
       }
     }
 
@@ -3618,7 +4441,7 @@
         const client = initSupabase();
         if (client) {
           try {
-            await client.from('site_analytics').update({
+            const { error } = await client.from('site_analytics').update({
               duration_seconds: duration,
               active_seconds: activeSeconds,
               scroll_depth: maxScrollDepth,
@@ -3630,7 +4453,12 @@
               load_time_seconds: loadTimeSec,
               updated_at: new Date().toISOString()
             }).eq('id', cloudRecordId);
-          } catch (e) {}
+            if (error) {
+              console.warn('Analytics update was rejected:', error.code || 'unknown_error');
+            }
+          } catch (e) {
+            console.warn('Analytics update could not be completed.');
+          }
         }
       }
     }
@@ -3664,7 +4492,11 @@
               event_type: eventType,
               target_name: targetName,
               page_path: pagePath
-            }]).then(() => {}).catch(() => {});
+            }]).then(({ error }) => {
+              if (error) console.warn('Analytics event was rejected:', error.code || 'unknown_error');
+            }).catch(() => {
+              console.warn('Analytics event could not be completed.');
+            });
           }
         }
       } catch (e) {}

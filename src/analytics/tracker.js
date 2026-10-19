@@ -361,9 +361,11 @@
 
         if (!error && data && data.id) {
           cloudRecordId = data.id;
+        } else if (error) {
+          console.warn('Analytics insert was rejected:', error.code || 'unknown_error');
         }
       } catch (err) {
-        // Total silence for analytics errors
+        console.warn('Analytics insert could not be completed.');
       }
     }
 
@@ -395,7 +397,7 @@
         const client = initSupabase();
         if (client) {
           try {
-            await client.from('site_analytics').update({
+            const { error } = await client.from('site_analytics').update({
               duration_seconds: duration,
               active_seconds: activeSeconds,
               scroll_depth: maxScrollDepth,
@@ -407,7 +409,12 @@
               load_time_seconds: loadTimeSec,
               updated_at: new Date().toISOString()
             }).eq('id', cloudRecordId);
-          } catch (e) {}
+            if (error) {
+              console.warn('Analytics update was rejected:', error.code || 'unknown_error');
+            }
+          } catch (e) {
+            console.warn('Analytics update could not be completed.');
+          }
         }
       }
     }
@@ -441,7 +448,11 @@
               event_type: eventType,
               target_name: targetName,
               page_path: pagePath
-            }]).then(() => {}).catch(() => {});
+            }]).then(({ error }) => {
+              if (error) console.warn('Analytics event was rejected:', error.code || 'unknown_error');
+            }).catch(() => {
+              console.warn('Analytics event could not be completed.');
+            });
           }
         }
       } catch (e) {}
