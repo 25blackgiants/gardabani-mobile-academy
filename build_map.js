@@ -56,6 +56,13 @@ const GEORGIAN_FONT_HEAD_TAG = `
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 `;
 
+const FAVICON_HEAD_TAG = `
+  <!-- Gardabani Mobile Academy brand favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.svg">
+  <meta name="theme-color" content="#2563eb">
+`;
+
 // Mobile Bottom Navigation Bar removed - single top navigation preserved for all viewports
 const MOBILE_BOTTOM_NAV_CSS = ``;
 
@@ -864,6 +871,7 @@ const mapHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია</title>
 ${GEORGIAN_FONT_HEAD_TAG}
+${FAVICON_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -3635,6 +3643,7 @@ const calendarHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — კალენდარი</title>
 ${GEORGIAN_FONT_HEAD_TAG}
+${FAVICON_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -5575,6 +5584,7 @@ const mentorsHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — მენტორები</title>
 ${GEORGIAN_FONT_HEAD_TAG}
+${FAVICON_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>
@@ -7242,6 +7252,7 @@ const settingsHtmlContent = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>გარდაბნის მობილური აკადემია — პარამეტრები</title>
 ${GEORGIAN_FONT_HEAD_TAG}
+${FAVICON_HEAD_TAG}
   
   <!-- Immediate Theme Initializer to prevent white flash (Default White / Clean Light Mode) -->
   <script>

@@ -332,6 +332,14 @@ const tests = [
            localizationSource.includes('min-width: 290px') &&
            localizationSource.includes('min-width: 98px') &&
            localizationSource.includes('[data-language="az"] .header-title')
+  },
+  {
+    name: '38. Branded SVG favicon is linked on every public page',
+    check: fs.existsSync('favicon.svg') &&
+           fs.readFileSync('favicon.svg', 'utf8').includes('<svg') &&
+           [index, calendar, mentors, settings].every(page =>
+             page.includes('<link rel="icon" type="image/svg+xml" href="favicon.svg">') &&
+             page.includes('<meta name="theme-color" content="#2563eb">'))
   }
 ];
 
